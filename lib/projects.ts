@@ -187,6 +187,49 @@ export const projects: Project[] = [
     ],
     screenshots: ["/projects/movie_database.png"],
   },
+  {
+    slug: "auto-ecole",
+    name: "Auto-école en ligne",
+    pitch: "Plateforme de réservation de cours de conduite avec gestion complète des élèves et instructeurs.",
+    description: "Plateforme web complète pour la gestion d'une auto-école en ligne. Permet la réservation de cours de conduite, la gestion des disponibilités des instructeurs, le suivi des progrès des élèves et l'administration des offres via un back-office modulable.",
+    image: "/projects/auto-ecole.jpg",
+    tags: ["Symfony", "PHP", "Stripe", "Dashboard", "Email"],
+    stack: {
+      frontend: ["Twig", "Bootstrap", "JavaScript", "CSS"],
+      backend: ["Symfony", "PHP 8", "Doctrine ORM"],
+      database: ["MySQL", "Doctrine"],
+      tools: ["Stripe", "Email notifications", "Git", "Composer"],
+    },
+    links: {
+      github: "https://github.com/Yohannkp/AUTO_ECOLE",
+    },
+    problem: "Les auto-écoles traditionnelles gèrent souvent leurs plannings et réservations de manière manuelle ou avec des outils dispersés. La coordination entre instructeurs et élèves, le suivi des heures de conduite et les paiements sont des processus chronophages et sources d'erreurs.",
+    solution: "Une plateforme centralisée développée avec Symfony qui digitalise l'ensemble du processus. Le système de planning intelligent synchronise les disponibilités des instructeurs avec les demandes des élèves. Les notifications email automatiques assurent une communication fluide. Le back-office modulable permet une gestion efficace des offres et services.",
+    features: [
+      "Planning intelligent instructeurs vs élèves avec synchronisation",
+      "Système de réservation de cours en ligne",
+      "Notifications email automatiques pour les rendez-vous",
+      "Espace élève personnel : bilans, heures restantes, progression",
+      "Back-office d'administration modulable pour gérer les offres",
+      "Intégration Stripe pour les paiements en ligne",
+      "Gestion des disponibilités des instructeurs",
+      "Suivi détaillé des progrès et performances des élèves",
+    ],
+    challenges: [
+      "Développer un système de planning robuste gérant les conflits de disponibilités",
+      "Intégrer Stripe pour des paiements sécurisés et conformes",
+      "Concevoir un back-office modulable et évolutif pour différents types d'offres",
+      "Mettre en place un système de notifications email fiable et automatisé",
+    ],
+    learnings: [
+      "Maîtrise du framework Symfony et de son architecture MVC",
+      "Intégration de solutions de paiement avec Stripe API",
+      "Conception de systèmes de planning et gestion de calendriers",
+      "Développement de dashboards administratifs complexes",
+      "Gestion des notifications email et templating",
+    ],
+    screenshots: ["/projects/auto-ecole.jpg"],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
