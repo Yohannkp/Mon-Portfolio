@@ -144,6 +144,49 @@ export const projects: Project[] = [
     ],
     screenshots: ["/projects/taskboard-1.jpg", "/projects/taskboard-2.jpg"],
   },
+  {
+    slug: "movies-database",
+    name: "Movies Database",
+    pitch: "Application web moderne pour explorer et gérer une base de données de films.",
+    description: "Movies Database est une application web moderne pour explorer et gérer une base de données de films via une architecture micro-services et une base graphique Neo4j. Interface responsive avec navigation par filtres, favoris dynamiques et moteur de recherche intelligent.",
+    image: "/projects/movie database.png",
+    tags: ["Graph DB", "Neo4j", "FastAPI", "CI/CD", "Design System"],
+    stack: {
+      frontend: ["React", "TypeScript", "Design System", "Responsive Design"],
+      backend: ["FastAPI", "Python", "Micro-services"],
+      database: ["Neo4j", "Graph Database"],
+      tools: ["CI/CD", "Git", "Monitoring", "Docker"],
+    },
+    links: {
+      github: "https://github.com/fayesarah555/movies-webapp.git",
+    },
+    problem: "La recherche et la gestion de films dans une base de données relationnelle classique peut être limitée pour représenter les relations complexes entre films, acteurs, réalisateurs et genres. Les utilisateurs ont besoin d'une interface intuitive pour explorer ces connexions.",
+    solution: "Movies Database utilise Neo4j comme base de données graphique pour représenter naturellement les relations entre les entités. L'architecture micro-services avec FastAPI assure performance et scalabilité. Le design system garantit une expérience utilisateur cohérente et moderne.",
+    features: [
+      "Interface responsive avec navigation par filtres",
+      "Système de favoris dynamiques",
+      "Moteur de recherche tolérant aux fautes",
+      "Suggestions contextuelles intelligentes",
+      "Architecture micro-services avec FastAPI",
+      "Monitoring de la qualité de service",
+      "Design system cohérent et moderne",
+      "Base de données graphique Neo4j",
+    ],
+    challenges: [
+      "Modéliser efficacement les relations complexes dans Neo4j",
+      "Implémenter un moteur de recherche tolérant aux fautes avec suggestions",
+      "Assurer la performance avec une architecture micro-services",
+      "Mettre en place un monitoring robuste de la qualité de service",
+    ],
+    learnings: [
+      "Maîtrise des bases de données graphiques et du langage Cypher",
+      "Architecture micro-services avec FastAPI et Python",
+      "Mise en place de pipelines CI/CD complets",
+      "Création et maintenance d'un design system scalable",
+      "Monitoring et observabilité des applications distribuées",
+    ],
+    screenshots: ["/projects/movie database.png"],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
