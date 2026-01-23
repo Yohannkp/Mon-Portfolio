@@ -512,8 +512,8 @@ export const projects: Project[] = [
     stack: {
       frontend: ["Flutter 3.0.5+", "Dart", "Provider", "GetX", "Lottie"],
       backend: ["Firebase Core", "Firebase Auth", "Cloud Firestore", "Firebase Storage", "Firebase Messaging"],
-      services: ["Google Sign-In", "CinetPay", "Google Maps Flutter", "Geolocator"],
-      tools: ["Android Studio", "Xcode", "Firebase Console"],
+      database: ["Cloud Firestore"],
+      tools: ["Google Sign-In", "CinetPay", "Google Maps Flutter", "Geolocator", "Android Studio", "Xcode", "Firebase Console"],
     },
     links: {
       github: "https://github.com/Yohannkp/NORAF",
