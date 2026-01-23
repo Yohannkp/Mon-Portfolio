@@ -62,7 +62,7 @@ export const projects: Project[] = [
       "Importance des tests d'intégration pour les fonctionnalités critiques",
       "Gestion des états de chargement et d'erreur pour une meilleure UX",
     ],
-    screenshots: ["/projects/applyflow-1.jpg", "/projects/applyflow-2.jpg"],
+    screenshots: ["/projects/applyflow.jpg"],
   },
   {
     slug: "minisearch",
@@ -102,7 +102,7 @@ export const projects: Project[] = [
       "Patterns de debouncing et throttling pour les recherches en temps réel",
       "Importance du monitoring et des métriques de performance",
     ],
-    screenshots: ["/projects/minisearch-1.jpg", "/projects/minisearch-2.jpg"],
+    screenshots: ["/projects/minisearch.jpg"],
   },
   {
     slug: "taskboard",
@@ -142,7 +142,7 @@ export const projects: Project[] = [
       "Tests d'intégration pour les fonctionnalités collaboratives",
       "DevOps basique avec Docker pour le développement local",
     ],
-    screenshots: ["/projects/taskboard-1.jpg", "/projects/taskboard-2.jpg"],
+    screenshots: ["/projects/taskboard.jpg"],
   },
   {
     slug: "movies-database",
