@@ -274,6 +274,50 @@ export const projects: Project[] = [
     ],
     screenshots: ["/projects/text_to_speech_ai.png"],
   },
+  {
+    slug: "gestion-tickets-it",
+    name: "Système de Gestion de Tickets IT",
+    pitch: "Application web complète de gestion de tickets IT avec authentification sécurisée et communication en temps réel.",
+    description: "Une application Flask pour gérer les tickets IT avec système d'authentification sécurisé, distinction de rôles (Admin/User), messagerie en temps réel via WebSocket et tableau de bord pour le suivi des tickets.",
+    image: "/projects/Gestion_tickets.png",
+    tags: ["Flask", "MySQL", "WebSocket", "Authentication", "Python"],
+    stack: {
+      frontend: ["Jinja2", "Bootstrap", "CSS", "JavaScript"],
+      backend: ["Flask", "Flask-SQLAlchemy", "Flask-SocketIO", "Flask-Login"],
+      database: ["MySQL", "Alembic (Migrations)"],
+      tools: ["Flask-WTF", "Bcrypt", "Git", "Render"],
+    },
+    links: {
+      demo: "https://sqlite-tp-flask-8.onrender.com/login",
+      github: "https://github.com/Yohannkp/Site_Flask",
+    },
+    problem: "Les équipes IT ont besoin d'une solution pour gérer efficacement les tickets de support. Un système centralisé et sécurisé est essentiel pour tracer les problèmes, communiquer avec les utilisateurs et maintenir une archive des interventions.",
+    solution: "Une application Flask complète offrant un système de gestion de tickets avec authentification robuste, rôles administrateur/utilisateur, messagerie en temps réel et statistiques d'administration. La base MySQL assure la persistance des données et les migrations Alembic facilitent l'évolution du schéma.",
+    features: [
+      "Inscription et connexion sécurisées avec hashage bcrypt",
+      "Distinction de rôles : Admin et User",
+      "Création, modification et suppression de tickets",
+      "Messagerie en temps réel avec WebSocket (SocketIO)",
+      "Tableau de bord avec gestion de tâches personnelles",
+      "Vue d'ensemble des statistiques pour les administrateurs",
+      "Consultation de tous les tickets (Admin)",
+      "États multiples des tickets : ouvert, en cours, fermé, en attente",
+    ],
+    challenges: [
+      "Implémenter la communication WebSocket avec Flask-SocketIO pour les messages temps réel",
+      "Gérer les permissions et les rôles de manière robuste",
+      "Concevoir une interface responsive avec Bootstrap",
+      "Maintenir la cohérence des données avec les migrations Alembic",
+    ],
+    learnings: [
+      "Maîtrise du framework Flask et de son écosystème (SQLAlchemy, Login, WTF)",
+      "Implémentation de WebSocket en temps réel avec Flask-SocketIO",
+      "Sécurité des applications web : hashage, validation, protection CSRF",
+      "Gestion des migrations de base de données avec Alembic",
+      "Architecture MVC et design patterns pour les applications web",
+    ],
+    screenshots: ["/projects/Gestion_tickets.png"],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
