@@ -546,6 +546,7 @@ export const projects: Project[] = [
     },
     links: {
       github: "https://github.com/Yohannkp/minisearch-engine",
+      demo: "https://find-all-finder.lovable.app/",
     },
     problem: "Les organisations ont besoin d'un moteur de recherche interne performant capable de rechercher parmi des milliers de documents tout en fournissant des résultats pertinents, filtrables et rapides.",
     solution: "Plateforme de recherche full-stack utilisant PostgreSQL full-text search natif pour l'indexation optimisée, React pour l'UI moderne, et Supabase pour le backend. Système de scoring intelligent avec décomposition des scores (pertinence textuelle, boost titre, récence, popularité, qualité).",
