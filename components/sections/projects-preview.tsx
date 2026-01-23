@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { projects } from "@/lib/projects"
 
-const featuredProjects = projects.slice(0, 3)
+const featuredProjects = projects.filter(p => 
+  ["applyflow", "visualisation-donnees-python", "minisearch"].includes(p.slug)
+)
 
 export function ProjectsPreview() {
   return (
