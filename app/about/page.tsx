@@ -55,7 +55,7 @@ export default function AboutPage() {
           <h1 className="text-4xl font-semibold tracking-tight">À propos</h1>
           <div className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground">
             <p>
-              Bonjour, je m&apos;appelle Alex Martin. Je suis développeur web junior 
+              Bonjour, je m&apos;appelle Yendi Yohann. Je suis développeur web junior 
               passionné par la création d&apos;applications web modernes et performantes.
             </p>
             <p>
@@ -86,7 +86,7 @@ export default function AboutPage() {
         <div className="relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-2xl bg-secondary">
           <Image
             src="/avatar.jpg"
-            alt="Alex Martin"
+            alt="Yendi Yohann"
             fill
             className="object-cover"
             sizes="280px"

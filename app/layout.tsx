@@ -12,24 +12,24 @@ const _geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono
 
 export const metadata: Metadata = {
   title: {
-    default: 'Alex Martin | Développeur Web Junior',
-    template: '%s | Alex Martin',
+    default: 'Yendi Yohann | Développeur Web Junior',
+    template: '%s | Yendi Yohann',
   },
   description: 'Développeur Web Junior spécialisé en front-end et full-stack. Je transforme des idées en applications propres et utiles.',
   keywords: ['développeur web', 'junior', 'front-end', 'full-stack', 'React', 'Next.js', 'TypeScript'],
-  authors: [{ name: 'Alex Martin' }],
-  creator: 'Alex Martin',
+  authors: [{ name: 'Yendi Yohann' }],
+  creator: 'Yendi Yohann',
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
     url: 'https://alexmartin.dev',
-    title: 'Alex Martin | Développeur Web Junior',
+    title: 'Yendi Yohann | Développeur Web Junior',
     description: 'Développeur Web Junior spécialisé en front-end et full-stack. Je transforme des idées en applications propres et utiles.',
-    siteName: 'Alex Martin Portfolio',
+    siteName: 'Yendi Yohann Portfolio',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Alex Martin | Développeur Web Junior',
+    title: 'Yendi Yohann | Développeur Web Junior',
     description: 'Développeur Web Junior spécialisé en front-end et full-stack.',
   },
   robots: {

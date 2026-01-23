@@ -21,7 +21,7 @@ export function AboutPreview() {
           <div className="relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-2xl bg-secondary">
             <Image
               src="/avatar.jpg"
-              alt="Alex Martin"
+              alt="Yendi Yohann"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 400px"
@@ -35,7 +35,7 @@ export function AboutPreview() {
                 À propos
               </span>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight">
-                Alex Martin
+                Yendi Yohann
               </h2>
             </div>
 

@@ -35,7 +35,7 @@ export function Header() {
             animate={{ opacity: 1, x: 0 }}
             className="text-lg font-semibold tracking-tight"
           >
-            Alex Martin
+            Yendi Yohann
           </motion.div>
         </Link>
 

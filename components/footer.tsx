@@ -13,7 +13,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
           <div className="flex flex-col items-center gap-2 md:items-start">
-            <span className="text-sm font-medium">Alex Martin</span>
+            <span className="text-sm font-medium">Yendi Yohann</span>
             <span className="text-sm text-muted-foreground">
               Développeur Web Junior
             </span>
@@ -36,7 +36,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-border/40 pt-8 text-sm text-muted-foreground md:flex-row">
-          <p>&copy; {new Date().getFullYear()} Alex Martin. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} Yendi Yohann. Tous droits réservés.</p>
           <div className="flex items-center gap-1">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
