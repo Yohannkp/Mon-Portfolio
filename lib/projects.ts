@@ -192,7 +192,7 @@ export const projects: Project[] = [
     name: "Auto-école en ligne",
     pitch: "Plateforme de réservation de cours de conduite avec gestion complète des élèves et instructeurs.",
     description: "Plateforme web complète pour la gestion d'une auto-école en ligne. Permet la réservation de cours de conduite, la gestion des disponibilités des instructeurs, le suivi des progrès des élèves et l'administration des offres via un back-office modulable.",
-    image: "/projects/auto-ecole.jpg",
+    image: "/projects/auto_ecole.png",
     tags: ["Symfony", "PHP", "Stripe", "Dashboard", "Email"],
     stack: {
       frontend: ["Twig", "Bootstrap", "JavaScript", "CSS"],
@@ -228,7 +228,7 @@ export const projects: Project[] = [
       "Développement de dashboards administratifs complexes",
       "Gestion des notifications email et templating",
     ],
-    screenshots: ["/projects/auto-ecole.jpg"],
+    screenshots: ["/projects/auto_ecole.png"],
   },
   {
     slug: "text-to-speech-ai",
