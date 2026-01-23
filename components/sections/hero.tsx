@@ -33,9 +33,9 @@ export function Hero() {
             className="max-w-3xl"
           >
             <h1 className="text-4xl font-semibold leading-tight tracking-tight text-balance md:text-5xl lg:text-6xl">
-              Développeur Web Junior
+              Développeur Fullstack & Mobile
               <span className="block text-muted-foreground">
-                Je transforme des idées en applications propres et utiles.
+                Je conçois des solutions complètes et intelligentes.
               </span>
             </h1>
           </motion.div>
@@ -47,9 +47,8 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl"
           >
-            Spécialisé en front-end et full-stack, je construis des interfaces 
-            modernes et des applications solides. Passionné par le code propre 
-            et les bonnes pratiques.
+            Développeur fullstack & mobile avec une solide formation en développement et une passion pour l&apos;innovation technologique. 
+            Actuellement en cycle ingénieur Big Data & IA à l&apos;ECE Paris, je combine développement et data science pour créer des applications intelligentes.
           </motion.p>
 
           {/* CTA buttons */}

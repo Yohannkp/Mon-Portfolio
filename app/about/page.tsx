@@ -30,19 +30,29 @@ const values = [
 
 const timeline = [
   {
-    year: "2024",
-    title: "Formation intensive",
-    description: "Bootcamp de développement web full-stack. JavaScript, React, Node.js, bases de données.",
+    year: "2025 - Present",
+    title: "Cycle ingénieur Big Data & IA - ECE Paris",
+    description: "Formation avancée en intelligence artificielle et analyse de données massives. Spécialisation dans les algorithmes de machine learning, architectures distribuées et développement de solutions IA innovantes.",
   },
   {
-    year: "2023",
-    title: "Apprentissage autodidacte",
-    description: "Premiers pas en programmation. HTML, CSS, JavaScript. Projets personnels et tutoriels.",
+    year: "2025",
+    title: "Certifications Google & IBM Data Analytics",
+    description: "Obtention des certifications Google Advanced Data Analytics Professional et IBM Data Analyst Professional. Maîtrise complète de l'analyse de données, visualisation avec Tableau, et statistiques avancées.",
   },
   {
-    year: "2022",
-    title: "Découverte du code",
-    description: "Première ligne de code. Fascination pour la création et la résolution de problèmes.",
+    year: "2024 - 2025",
+    title: "Bachelor Développement Fullstack & DevOps - Paris",
+    description: "Formation complète en développement web et mobile avec une spécialisation DevOps. Maîtrise des technologies frontend (React, Flutter), backend (Node.js, Symfony) et des pratiques d'intégration continue.",
+  },
+  {
+    year: "2023 - 2024",
+    title: "Projets Personnels & Freelance",
+    description: "Développement d'applications mobiles et web pour divers clients. Création d'une expertise en Flutter, Firebase et développement de solutions innovantes.",
+  },
+  {
+    year: "2020 - 2023",
+    title: "Diplôme en Génie Logiciel - Togo",
+    description: "Formation complète axée sur le développement web et mobile, les mathématiques appliquées, les statistiques et la conception de systèmes logiciels. Acquisition de bases solides en algorithmique et architecture.",
   },
 ]
 
@@ -55,14 +65,14 @@ export default function AboutPage() {
           <h1 className="text-4xl font-semibold tracking-tight">À propos</h1>
           <div className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground">
             <p>
-              Bonjour, je m&apos;appelle Yendi Yohann. Je suis développeur web junior 
-              passionné par la création d&apos;applications web modernes et performantes.
+              Bonjour, je m&apos;appelle Yendi Yohann. Je suis développeur fullstack & mobile 
+              avec une solide formation en développement et une passion pour l&apos;innovation technologique.
             </p>
             <p>
-              Mon parcours a commencé il y a quelques années par curiosité, et s&apos;est 
-              rapidement transformé en passion. Après une formation intensive et de 
-              nombreux projets personnels, je suis prêt à rejoindre une équipe où je 
-              pourrai contribuer tout en continuant à apprendre.
+              Basé à Paris, j&apos;ai développé une expertise technique diversifiée qui me permet de concevoir 
+              des solutions complètes, du backend au frontend, en passant par les applications mobiles. 
+              Actuellement en cycle ingénieur Big Data & IA à l&apos;ECE Paris, je combine mes compétences 
+              en développement avec une approche data-driven pour créer des applications intelligentes et performantes.
             </p>
           </div>
 
@@ -159,21 +169,19 @@ export default function AboutPage() {
         <h2 className="text-2xl font-semibold tracking-tight">Pourquoi le développement ?</h2>
         <div className="mt-6 space-y-4 leading-relaxed text-muted-foreground">
           <p>
-            Ce qui m&apos;a attiré vers le développement, c&apos;est la combinaison unique de 
-            créativité et de logique. Créer quelque chose à partir de rien, voir une 
-            idée prendre forme sur l&apos;écran, résoudre des problèmes complexes — tout 
-            ça me passionne.
+            Ce qui m&apos;a attiré vers le développement, c&apos;est la capacité de créer des solutions 
+            qui résolvent de vrais problèmes. Combiner développement fullstack, mobile et intelligence 
+            artificielle me permet d&apos;apporter une vision globale et innovante à chaque projet.
           </p>
           <p>
-            J&apos;aime particulièrement le front-end car il permet de créer des expériences 
-            qui ont un impact direct sur les utilisateurs. Mais j&apos;apprécie aussi le 
-            backend pour sa logique et sa structure. C&apos;est pourquoi je me forme en 
-            full-stack.
+            Ma formation en Big Data & IA complète parfaitement mes compétences en développement. 
+            Je peux concevoir des applications qui ne sont pas seulement fonctionnelles, mais aussi 
+            intelligentes et data-driven. C&apos;est cette double expertise qui me passionne et me différencie.
           </p>
           <p>
-            Le développement, c&apos;est aussi un domaine où l&apos;apprentissage ne s&apos;arrête 
-            jamais. Il y a toujours une nouvelle technologie à explorer, une meilleure 
-            façon de faire les choses. Cette évolution permanente me motive.
+            Du mobile avec Flutter au backend avec Symfony et Node.js, en passant par l&apos;analyse de données 
+            et le machine learning, j&apos;aime maîtriser toute la chaîne de développement. Cette polyvalence 
+            me permet de m&apos;adapter à différents projets et de toujours apporter une valeur ajoutée.
           </p>
         </div>
       </section>

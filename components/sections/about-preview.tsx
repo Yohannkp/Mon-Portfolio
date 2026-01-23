@@ -41,17 +41,14 @@ export function AboutPreview() {
 
             <div className="space-y-4 text-muted-foreground">
               <p className="leading-relaxed">
-                Passionné par le développement web depuis plusieurs années, 
-                je me suis formé de manière autodidacte avant de suivre une 
-                formation intensive. Aujourd&apos;hui, je cherche à rejoindre 
-                une équipe où je pourrai continuer à apprendre et contribuer 
-                à des projets concrets.
+                Développeur fullstack & mobile avec une solide formation en développement et une passion pour l&apos;innovation technologique. 
+                Basé à Paris, j&apos;ai développé une expertise technique diversifiée qui me permet de concevoir des solutions complètes, 
+                du backend au frontend, en passant par les applications mobiles.
               </p>
               <p className="leading-relaxed">
-                Ce qui me motive : résoudre des problèmes, créer des interfaces 
-                qui ont du sens, et écrire du code dont je peux être fier. 
-                J&apos;aime les projets bien structurés et les équipes qui 
-                valorisent la qualité.
+                Actuellement en cycle ingénieur Big Data & IA à l&apos;ECE Paris, je combine mes compétences en développement avec une 
+                approche data-driven pour créer des applications intelligentes et performantes. Ma double expertise en développement et 
+                en data science me permet d&apos;apporter une vision globale aux projets sur lesquels je travaille.
               </p>
             </div>
 
