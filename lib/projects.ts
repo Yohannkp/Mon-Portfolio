@@ -488,6 +488,49 @@ export const projects: Project[] = [
     ],
     screenshots: ["/projects/leboncoin.png"],
   },
+  {
+    slug: "marketplace-mern",
+    name: "Marketplace MERN - Plateforme de Gestion de Produits",
+    pitch: "Application full-stack MERN pour créer, gérer et parcourir des produits avec upload d'images.",
+    description: "Plateforme moderne de gestion de produits avec stack MERN complète. Système d'authentification JWT, CRUD produits, upload d'images avec Multer, filtrage avancé par nom/catégorie/prix. Seul le propriétaire peut modifier ses produits.",
+    image: "/projects/porduct_mearn.png",
+    tags: ["React", "Node.js", "Express", "MongoDB", "Multer"],
+    stack: {
+      frontend: ["React 19.1.0", "React Router", "React Bootstrap", "Material-UI", "TailwindCSS"],
+      backend: ["Node.js", "Express", "JWT", "bcryptjs", "Multer"],
+      database: ["MongoDB", "Mongoose"],
+      tools: ["Axios", "CORS", "dotenv", "Git"],
+    },
+    links: {
+      github: "https://github.com/fayesarah555/tp-groupe-mern-",
+    },
+    problem: "Les utilisateurs ont besoin d'une plateforme de marketplace pour gérer leurs produits avec contrôle d'accès strict, upload d'images et recherche avancée. La gestion de propriété doit être sécurisée.",
+    solution: "Application MERN avec authentification JWT robuste, middleware de vérification de propriété, upload d'images avec Multer (5MB, formats JPG/PNG/GIF/WebP), et filtrage dynamique. Context API pour la gestion d'état globale.",
+    features: [
+      "Authentification complète (inscription, connexion, JWT)",
+      "CRUD complet des produits avec protection propriétaire",
+      "Upload d'images avec Multer (5MB max)",
+      "Filtrage avancé : nom, catégorie, fourchette de prix",
+      "Dashboard utilisateur pour gérer ses propres produits",
+      "Interface moderne avec React Bootstrap et Material-UI",
+      "Routes privées protégées avec middleware",
+      "Grille de produits avec cartes interactives",
+    ],
+    challenges: [
+      "Implémenter un système d'upload d'images sécurisé avec Multer",
+      "Gérer les autorisations par propriétaire avec middleware personnalisé",
+      "Optimiser le filtrage et la recherche de produits",
+      "Structurer une architecture MERN complète et scalable",
+    ],
+    learnings: [
+      "Architecture MERN full-stack avec séparation frontend/backend",
+      "Upload de fichiers avec Multer et gestion du stockage",
+      "Middleware d'authentification et de vérification de propriété",
+      "Context API pour la gestion d'état React",
+      "Filtrage avancé et requêtes MongoDB avec Mongoose",
+    ],
+    screenshots: ["/projects/porduct_mearn.png"],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
@@ -501,3 +544,4 @@ export function getAllTags(): string[] {
   })
   return Array.from(tags).sort()
 }
+
