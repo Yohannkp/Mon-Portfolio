@@ -561,7 +561,7 @@ export const projects: Project[] = [
     name: "Visualisation de Données avec Python – Projet Final",
     pitch: "Dashboard Plotly Dash et visualisations Matplotlib/Seaborn/Folium pour analyser les ventes automobiles.",
     description: "Projet final du cours IBM 'Visualisation de données avec Python' (Coursera) : visualisations statiques (Matplotlib, Seaborn, Folium) et dashboard interactif Plotly Dash pour explorer les statistiques de vente d'automobiles.",
-    image: "/projects/visualisation_python.png",
+    image: "/projects/visualisation_donnee.png",
     tags: ["Python", "Plotly Dash", "Matplotlib", "Seaborn", "Folium"],
     stack: {
       frontend: ["Plotly Dash"],
@@ -594,7 +594,7 @@ export const projects: Project[] = [
       "Visualisations avec Matplotlib, Seaborn et Folium",
       "Déploiement d'applications Python sur Render",
     ],
-    screenshots: ["/projects/visualisation_python.png"],
+    screenshots: ["/projects/visualisation_donnee.png"],
   },
 ]
 
