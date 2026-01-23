@@ -556,6 +556,46 @@ export const projects: Project[] = [
     ],
     screenshots: ["/projects/Noraf.png"],
   },
+  {
+    slug: "visualisation-donnees-python",
+    name: "Visualisation de Données avec Python – Projet Final",
+    pitch: "Dashboard Plotly Dash et visualisations Matplotlib/Seaborn/Folium pour analyser les ventes automobiles.",
+    description: "Projet final du cours IBM 'Visualisation de données avec Python' (Coursera) : visualisations statiques (Matplotlib, Seaborn, Folium) et dashboard interactif Plotly Dash pour explorer les statistiques de vente d'automobiles.",
+    image: "/projects/visualisation_python.png",
+    tags: ["Python", "Plotly Dash", "Matplotlib", "Seaborn", "Folium"],
+    stack: {
+      frontend: ["Plotly Dash"],
+      backend: ["Python"],
+      database: ["CSV"],
+      tools: ["Pandas", "Matplotlib", "Seaborn", "Folium", "Render"],
+    },
+    links: {
+      demo: "https://visualisation-des-donn-es-avec-python-ibm-49d0.onrender.com/",
+      github: "https://github.com/Yohannkp/Visualisation-des-donn-es-avec-python-IBM-/tree/main/Projet%20Finale",
+    },
+    problem: "Besoin d'explorer et visualiser les ventes automobiles avec filtres interactifs et indicateurs clés.",
+    solution: "Dashboard Plotly Dash interactif pour filtrer les ventes, couplé à des visualisations Matplotlib/Seaborn/Folium pour analyser tendances, répartitions et cartes.",
+    features: [
+      "Dashboard interactif Plotly Dash avec filtres",
+      "Graphiques Matplotlib et Seaborn pour statistiques descriptives",
+      "Carte Folium des données géographiques",
+      "KPIs et tendances des ventes automobiles",
+      "Déploiement en ligne (Render)",
+    ],
+    challenges: [
+      "Combiner visualisations statiques et interactives dans un même projet",
+      "Optimiser les callbacks Plotly Dash pour garder des temps de réponse courts",
+      "Nettoyer et préparer les données avec Pandas",
+      "Déployer un dashboard Plotly Dash sur Render",
+    ],
+    learnings: [
+      "Manipulation et agrégation de données avec Pandas",
+      "Création de dashboards interactifs avec Plotly Dash",
+      "Visualisations avec Matplotlib, Seaborn et Folium",
+      "Déploiement d'applications Python sur Render",
+    ],
+    screenshots: ["/projects/visualisation_python.png"],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
