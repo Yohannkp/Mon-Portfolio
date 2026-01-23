@@ -448,6 +448,46 @@ export const projects: Project[] = [
     ],
     screenshots: ["/projects/Chili_Loco.png"],
   },
+  {
+    slug: "leboncoin-clone",
+    name: "Le Bon Coin - Clone MERN",
+    pitch: "Clone MERN de petites annonces avec authentification sécurisée et gestion complète des listings.",
+    description: "Application MERN inspirée de Le Bon Coin permettant de publier, consulter, modifier et supprimer des annonces. Authentification JWT/bcrypt, autorisations par auteur, interface React stylisée et responsive.",
+    image: "/projects/leboncoin.png",
+    tags: ["React", "Node.js", "Express", "MongoDB", "JWT"],
+    stack: {
+      frontend: ["React", "React Router", "CSS"],
+      backend: ["Node.js", "Express", "JWT", "bcryptjs"],
+      database: ["MongoDB"],
+      tools: ["Git", "dotenv", "VS Code"],
+    },
+    links: {
+      github: "https://github.com/Yohannkp/React-MERN-Project",
+    },
+    problem: "Les utilisateurs veulent une plateforme simple pour publier et gérer des annonces avec contrôle d'accès sur les modifications et suppressions.",
+    solution: "Un stack MERN avec authentification JWT et rôles basés sur l'auteur. UI React conditionnelle pour n'autoriser l'édition/suppression qu'aux propriétaires des annonces.",
+    features: [
+      "Inscription et connexion sécurisées (JWT + bcrypt)",
+      "Création, consultation, modification et suppression d'annonces",
+      "Restrictions : seuls les auteurs peuvent modifier/supprimer leurs annonces",
+      "Routing conditionnel et pages protégées",
+      "Interface moderne, responsive et fluide",
+      "Liste et détails d'annonce avec actions contextuelles",
+    ],
+    challenges: [
+      "Mettre en place l'authentification JWT et la protection des routes",
+      "Assurer le contrôle d'accès par auteur sur les opérations CRUD",
+      "Structurer le code backend (controllers, routes, middleware)",
+      "Gérer l'état et la navigation conditionnelle côté front",
+    ],
+    learnings: [
+      "Architecture MERN complète (MongoDB, Express, React, Node)",
+      "Implémentation JWT + bcrypt pour la sécurité",
+      "Design d'UI responsive avec React",
+      "Structuration d'un backend REST avec controllers et middleware",
+    ],
+    screenshots: ["/projects/leboncoin.png"],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
