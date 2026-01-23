@@ -230,6 +230,50 @@ export const projects: Project[] = [
     ],
     screenshots: ["/projects/auto-ecole.jpg"],
   },
+  {
+    slug: "text-to-speech-ai",
+    name: "Text-to-Speech avec IA",
+    pitch: "Assistant vocal multilingue avec interface animée et réponses IA en temps réel.",
+    description: "Application mobile Flutter permettant d'interagir avec une IA via la voix. L'utilisateur envoie des requêtes textuelles qui sont converties en parole naturelle. Intègre la correction orthographique, la traduction multilingue et la synchronisation Firebase.",
+    image: "/projects/text-to-speech.jpg",
+    tags: ["Flutter", "Firebase", "IA vocale", "Android", "TTS"],
+    stack: {
+      frontend: ["Flutter", "Dart", "Animated UI"],
+      backend: ["Firebase Realtime Database", "AI API"],
+      database: ["Firebase Realtime DB"],
+      tools: ["Text-to-Speech API", "Git", "Android Studio"],
+    },
+    links: {
+      demo: "https://drive.google.com/file/d/1a76glMwJPePfoZuSV2Zj6k68_7VsRG-P/view?usp=sharing",
+      github: "https://github.com/Yohannkp/application_translate_flutter",
+    },
+    problem: "Les applications d'assistant vocal existantes manquent souvent de personnalisation et ne combinent pas efficacement la synthèse vocale avec les capacités d'IA moderne. Les utilisateurs ont besoin d'une interface accessible, multilingue et qui conserve l'historique des conversations.",
+    solution: "Une application Flutter native qui intègre Text-to-Speech avec des réponses IA intelligentes. Firebase assure la synchronisation de l'historique entre appareils. L'interface animée et le mode accessibilité rendent l'expérience fluide et inclusive. La correction orthographique et la traduction multilingue élargissent les possibilités d'utilisation.",
+    features: [
+      "Synthèse vocale naturelle avec personnalisation des voix",
+      "Requêtes à l'IA avec réponses intelligentes en temps réel",
+      "Historique des conversations synchronisé via Firebase",
+      "Correction automatique des fautes d'orthographe",
+      "Traduction de texte en plusieurs langues",
+      "Mode accessibilité avec commandes gestuelles",
+      "Interface animée et réactive",
+      "Contrôle de la lecture vocale (pause, arrêt, reprise)",
+    ],
+    challenges: [
+      "Intégrer l'API Text-to-Speech avec des voix naturelles et personnalisables",
+      "Synchroniser en temps réel l'historique des conversations avec Firebase",
+      "Optimiser les performances de l'interface animée sur mobile",
+      "Gérer la correction orthographique et la traduction multilingue efficacement",
+    ],
+    learnings: [
+      "Développement d'applications mobiles natives avec Flutter et Dart",
+      "Intégration de Firebase Realtime Database pour la synchronisation",
+      "Implémentation d'APIs Text-to-Speech et d'IA conversationnelle",
+      "Conception d'interfaces animées et accessibles sur mobile",
+      "Gestion des permissions Android et optimisation des performances",
+    ],
+    screenshots: ["/projects/text-to-speech.jpg"],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
