@@ -31,4 +31,4 @@ Continue building your app on:
 3. Changes are automatically pushed to this repository
 4. Vercel deploys the latest version from this repository
 
-Application
+Application : https://v0-junior-developer-portfolio-bay.vercel.app/
