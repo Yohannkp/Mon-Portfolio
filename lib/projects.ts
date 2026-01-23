@@ -149,7 +149,7 @@ export const projects: Project[] = [
     name: "Movies Database",
     pitch: "Application web moderne pour explorer et gérer une base de données de films.",
     description: "Movies Database est une application web moderne pour explorer et gérer une base de données de films via une architecture micro-services et une base graphique Neo4j. Interface responsive avec navigation par filtres, favoris dynamiques et moteur de recherche intelligent.",
-    image: "/projects/movie database.png",
+    image: "/projects/movie_database.png",
     tags: ["Graph DB", "Neo4j", "FastAPI", "CI/CD", "Design System"],
     stack: {
       frontend: ["React", "TypeScript", "Design System", "Responsive Design"],
@@ -185,7 +185,7 @@ export const projects: Project[] = [
       "Création et maintenance d'un design system scalable",
       "Monitoring et observabilité des applications distribuées",
     ],
-    screenshots: ["/projects/movie database.png"],
+    screenshots: ["/projects/movie_database.png"],
   },
 ]
 
