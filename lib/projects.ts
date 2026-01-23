@@ -38,7 +38,7 @@ export const projects: Project[] = [
       tools: ["Git", "Vercel", "Postman"],
     },
     links: {
-      demo: "https://applyflow.demo",
+      demo: "https://role-route-finder.lovable.app/",
       github: "https://github.com/alexmartin/applyflow",
     },
     problem: "Quand on cherche un emploi, on postule à des dizaines d'offres. Sans un système organisé, on perd le fil : quel poste, quelle entreprise, où en est-on dans le processus ? Les spreadsheets deviennent vite un cauchemar à maintenir.",

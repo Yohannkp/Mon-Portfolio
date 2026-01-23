@@ -11,20 +11,20 @@ const contactInfo = [
   {
     icon: Mail,
     label: "Email",
-    value: "contact@alexmartin.dev",
-    href: "mailto:contact@alexmartin.dev",
+    value: "yendiyohann@gmail.com",
+    href: "mailto:yendiyohann@gmail.com",
   },
   {
     icon: Linkedin,
     label: "LinkedIn",
-    value: "linkedin.com/in/alexmartin",
-    href: "https://linkedin.com/in/alexmartin",
+    value: "linkedin.com/in/yohannkp",
+    href: "https://www.linkedin.com/in/yohannkp/",
   },
   {
     icon: Github,
     label: "GitHub",
-    value: "github.com/alexmartin",
-    href: "https://github.com/alexmartin",
+    value: "github.com/Yohannkp",
+    href: "https://github.com/Yohannkp",
   },
   {
     icon: MapPin,

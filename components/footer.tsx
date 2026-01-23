@@ -2,9 +2,9 @@ import Link from "next/link"
 import { Github, Linkedin, Mail } from "lucide-react"
 
 const socialLinks = [
-  { name: "GitHub", href: "https://github.com", icon: Github },
-  { name: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
-  { name: "Email", href: "mailto:contact@alexmartin.dev", icon: Mail },
+  { name: "GitHub", href: "https://github.com/Yohannkp", icon: Github },
+  { name: "LinkedIn", href: "https://www.linkedin.com/in/yohannkp/", icon: Linkedin },
+  { name: "Email", href: "mailto:yendiyohann@gmail.com", icon: Mail },
 ]
 
 export function Footer() {

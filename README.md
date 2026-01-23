@@ -14,7 +14,9 @@ Any changes you make to your deployed app will be automatically pushed to this r
 
 Your project is live at:
 
-**[https://vercel.com/yohannkps-projects/v0-junior-developer-portfolio](https://vercel.com/yohannkps-projects/v0-junior-developer-portfolio)**
+🌐 **[https://v0-junior-developer-portfolio-bay.vercel.app/](https://v0-junior-developer-portfolio-bay.vercel.app/)**
+
+Dashboard: **[https://vercel.com/yohannkps-projects/v0-junior-developer-portfolio](https://vercel.com/yohannkps-projects/v0-junior-developer-portfolio)**
 
 ## Build your app
 
