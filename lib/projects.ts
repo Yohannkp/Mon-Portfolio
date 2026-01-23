@@ -361,6 +361,50 @@ export const projects: Project[] = [
     ],
     screenshots: ["/projects/emmergency.png"],
   },
+  {
+    slug: "cloudus-api",
+    name: "CloudUs - API de Gestion de Fichiers",
+    pitch: "API REST sécurisée pour la gestion de fichiers et d'espace de stockage cloud.",
+    description: "API REST complète développée avec Symfony pour gérer les fichiers et l'espace de stockage. Authentification JWT sécurisée, gestion des rôles (Admin/User), système d'achat d'espace et génération automatique de factures PDF.",
+    image: "/projects/api_gestion_fichier.png",
+    tags: ["Symfony", "PHP", "JWT", "API REST", "MySQL"],
+    stack: {
+      frontend: [],
+      backend: ["Symfony 6.0+", "PHP 8.2+", "JWT Auth", "Doctrine ORM"],
+      database: ["MySQL", "Migrations Doctrine"],
+      tools: ["Composer", "PDF Generation", "Email", "Git"],
+    },
+    links: {
+      github: "https://github.com/Batyeste/CloudUs",
+    },
+    problem: "Les utilisateurs ont besoin d'une solution cloud fiable pour stocker et gérer leurs fichiers. Les administrateurs doivent avoir une visibilité complète sur l'utilisation des ressources. Un système d'achat et de facturation automatisée est essentiel pour monétiser le service.",
+    solution: "CloudUs propose une API REST robuste basée sur Symfony avec authentification JWT. Le système gère automatiquement les quotas d'espace, les achats d'extension et la génération de factures PDF. Les rôles d'administrateur offrent une surveillance complète avec dashboards et statistiques détaillées.",
+    features: [
+      "Inscription et authentification sécurisée avec JWT",
+      "Gestion des fichiers : upload, téléchargement, suppression",
+      "Système d'achat d'espace de stockage (20 Go par achat)",
+      "Suivi en temps réel de l'espace utilisé vs disponible",
+      "Génération automatique de factures PDF",
+      "Envoi des factures par email",
+      "Tableau de bord administrateur avec statistiques",
+      "Liste des clients avec détails de stockage",
+      "Vue complète de tous les fichiers du système",
+    ],
+    challenges: [
+      "Implémenter l'authentification JWT sécurisée avec Symfony",
+      "Gérer les quotas d'espace et les limitations d'upload",
+      "Générer des factures PDF dynamiques et sécurisées",
+      "Assurer l'intégrité et la sécurité du stockage de fichiers",
+    ],
+    learnings: [
+      "Développement d'API REST sécurisée avec Symfony 6",
+      "Authentification et autorisation avec JWT",
+      "Gestion complexe des fichiers et des quotas",
+      "Génération de documents PDF et envoi d'emails",
+      "Conception de dashboards administratifs",
+    ],
+    screenshots: ["/projects/api_gestion_fichier.png"],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
