@@ -235,7 +235,7 @@ export const projects: Project[] = [
     name: "Text-to-Speech avec IA",
     pitch: "Assistant vocal multilingue avec interface animée et réponses IA en temps réel.",
     description: "Application mobile Flutter permettant d'interagir avec une IA via la voix. L'utilisateur envoie des requêtes textuelles qui sont converties en parole naturelle. Intègre la correction orthographique, la traduction multilingue et la synchronisation Firebase.",
-    image: "/projects/text-to-speech.jpg",
+    image: "/projects/text_to_speech_ai.png",
     tags: ["Flutter", "Firebase", "IA vocale", "Android", "TTS"],
     stack: {
       frontend: ["Flutter", "Dart", "Animated UI"],
@@ -272,7 +272,7 @@ export const projects: Project[] = [
       "Conception d'interfaces animées et accessibles sur mobile",
       "Gestion des permissions Android et optimisation des performances",
     ],
-    screenshots: ["/projects/text-to-speech.jpg"],
+    screenshots: ["/projects/text_to_speech_ai.png"],
   },
 ]
 
