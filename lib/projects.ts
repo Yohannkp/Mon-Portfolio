@@ -65,47 +65,6 @@ export const projects: Project[] = [
     screenshots: ["/projects/applyflow.jpg"],
   },
   {
-  {
-    slug: "taskboard",
-    name: "TaskBoard",
-    pitch: "Un clone Trello minimaliste pour la gestion de projets en équipe.",
-    description: "TaskBoard est une application de gestion de tâches inspirée de Trello. Elle permet de créer des tableaux, des listes et des cartes pour organiser le travail en équipe. L'application met l'accent sur la simplicité et la performance.",
-    image: "/projects/taskboard.jpg",
-    tags: ["React", "Node.js", "WebSocket", "Collaboration"],
-    stack: {
-      frontend: ["React", "TypeScript", "Tailwind CSS", "Zustand"],
-      backend: ["Node.js", "Express", "Socket.io"],
-      database: ["MongoDB", "Mongoose"],
-      tools: ["Git", "Docker", "Jest"],
-    },
-    links: {
-      demo: "https://taskboard.demo",
-      github: "https://github.com/alexmartin/taskboard",
-    },
-    problem: "Les outils de gestion de projet comme Trello ou Asana sont puissants mais parfois trop complexes pour des petites équipes. On veut juste un tableau avec des colonnes et des cartes, sans toutes les fonctionnalités premium.",
-    solution: "TaskBoard va à l'essentiel : tableaux, listes, cartes. Le temps réel permet la collaboration instantanée. L'interface minimaliste réduit la charge cognitive et permet de se concentrer sur les tâches.",
-    features: [
-      "Tableaux et listes personnalisables",
-      "Cartes avec descriptions et assignations",
-      "Collaboration en temps réel via WebSocket",
-      "Drag & drop intuitif",
-      "Labels et filtres par couleur",
-      "Historique des modifications",
-    ],
-    challenges: [
-      "Synchroniser l'état en temps réel entre plusieurs utilisateurs avec Socket.io",
-      "Gérer les conflits d'édition concurrent (optimistic locking)",
-      "Optimiser le rendu React pour des tableaux avec beaucoup de cartes",
-    ],
-    learnings: [
-      "Architecture temps réel avec WebSocket et gestion des événements",
-      "State management avec Zustand et patterns de normalisation",
-      "Tests d'intégration pour les fonctionnalités collaboratives",
-      "DevOps basique avec Docker pour le développement local",
-    ],
-    screenshots: ["/projects/taskboard.jpg"],
-  },
-  {
     slug: "movies-database",
     name: "Movies Database",
     pitch: "Application web moderne pour explorer et gérer une base de données de films.",
@@ -610,4 +569,5 @@ export function getAllTags(): string[] {
   })
   return Array.from(tags).sort()
 }
+
 
