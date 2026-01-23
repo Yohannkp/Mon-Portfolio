@@ -318,6 +318,49 @@ export const projects: Project[] = [
     ],
     screenshots: ["/projects/Gestion_tickets.png"],
   },
+  {
+    slug: "emmergency",
+    name: "Emmergency - Plateforme d'Urgence Intégrée",
+    pitch: "Solution multi-plateforme pour la gestion des situations critiques et services d'urgence.",
+    description: "Plateforme complète de gestion des urgences combinant une API Django robuste avec des interfaces Flutter pour mobile et desktop. Permet aux personnes en danger de signaler rapidement leur situation aux services d'urgence avec géolocalisation intégrée.",
+    image: "/projects/emmergency.png",
+    tags: ["Django", "Flutter", "MySQL", "API REST", "Mobile", "Desktop"],
+    stack: {
+      frontend: ["Flutter", "Dart", "Awesome Notifications", "Window Manager"],
+      backend: ["Django", "Django REST Framework", "Python", "PyMySQL"],
+      database: ["MySQL", "ORM Django"],
+      tools: ["Git", "CORS Headers", "JWT Tokens"],
+    },
+    links: {
+      github: "https://github.com/Yohannkp/emmergency",
+    },
+    problem: "Les situations d'urgence exigent une réponse rapide et coordonnée. Les personnes en danger ont besoin d'un moyen simple et intuitif de signaler leur localisation aux services d'urgence les plus proches. Les hôpitaux et services d'urgence doivent avoir une vue centralisée des demandes.",
+    solution: "Emmergency offre une plateforme intégrée qui réunit personnes en danger et services d'urgence. L'application mobile permet des signalements instantanés avec géolocalisation. Le dashboard desktop centralize la gestion des demandes. L'API Django orchestre la communication en temps réel.",
+    features: [
+      "Signalement d'urgence instantané avec localisation automatique",
+      "Interface mobile optimisée pour les situations critiques",
+      "Tableau de bord desktop pour les hôpitaux et services d'urgence",
+      "Système de confirmation/refus des demandes d'urgence",
+      "Notifications en temps réel sur l'état de la requête",
+      "Authentification sécurisée avec tokens JWT",
+      "Répertoire d'urgence avec numéros de secours locaux",
+      "Historique complet des interventions",
+    ],
+    challenges: [
+      "Implémenter la géolocalisation fiable et sécurisée",
+      "Assurer la communication temps réel entre mobile et desktop",
+      "Gérer les notifications push multi-plateforme",
+      "Concevoir une UX optimale pour les situations de stress",
+    ],
+    learnings: [
+      "Développement backend avec Django REST Framework et MySQL",
+      "Création d'applications multi-plateforme avec Flutter (mobile + desktop)",
+      "Architecture API robuste et sécurisée avec tokens JWT",
+      "Gestion de la géolocalisation et notifications en temps réel",
+      "Design UX pour applications critiques et sensibles au temps",
+    ],
+    screenshots: ["/projects/emmergency.png"],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
