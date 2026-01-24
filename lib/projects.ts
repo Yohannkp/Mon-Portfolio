@@ -38,8 +38,8 @@ export const projects: Project[] = [
       tools: ["Git", "Vercel", "Postman"],
     },
     links: {
-      demo: "https://role-route-finder.lovable.app/",
-      github: "https://github.com/Yohannkp/apply-flow",
+      demo: "https://v0-apply-flow-saa-s-app.vercel.app/",
+      github: "https://github.com/Yohannkp/ApplyFlowFinal",
     },
     problem: "Quand on cherche un emploi, on postule à des dizaines d'offres. Sans un système organisé, on perd le fil : quel poste, quelle entreprise, où en est-on dans le processus ? Les spreadsheets deviennent vite un cauchemar à maintenir.",
     solution: "ApplyFlow centralise toutes les candidatures dans une interface claire avec un système de kanban. Chaque candidature a sa fiche détaillée avec notes, contacts et rappels. Le dashboard offre une vue d'ensemble de la progression.",
