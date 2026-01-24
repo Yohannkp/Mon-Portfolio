@@ -36,7 +36,15 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-    generator: 'v0.app'
+  icons: {
+    icon: [
+      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
+      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
+    ],
+    apple: '/apple-icon.png',
+    shortcut: '/icon-light-32x32.png',
+  },
+  generator: 'v0.app'
 }
 
 export const viewport: Viewport = {
