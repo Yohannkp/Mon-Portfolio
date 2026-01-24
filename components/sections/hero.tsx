@@ -69,12 +69,7 @@ export function Hero() {
                 Me contacter
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="lg" className="gap-2">
-              <a href="/cv.pdf" download>
-                <Download className="h-4 w-4" />
-                Télécharger CV
-              </a>
-            </Button>
+            {/* CV download removed */}
           </motion.div>
         </div>
       </div>

@@ -83,12 +83,23 @@ export default function AboutPage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="outline" className="gap-2 bg-transparent">
-              <a href="/cv.pdf" download>
-                <Download className="h-4 w-4" />
-                Télécharger mon CV
-              </a>
-            </Button>
+            {/* CV download removed */}
+          </div>
+
+          <div className="mt-6 rounded-xl border border-border/40 bg-card p-4">
+            <h3 className="font-semibold">Portfolio Data</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Je dispose d'un portfolio dédié à la data science présentant mes études de cas, notebooks, visualisations
+              et projets analytiques réalisés pendant ma formation d'ingénierie Data. Vous y trouverez des démonstrations
+              pratiques de mes compétences en nettoyage de données, modélisation et visualisation.
+            </p>
+            <div className="mt-3">
+              <Button asChild variant="secondary" className="gap-2">
+                <a href="https://www.datascienceportfol.io/yendiyohann" target="_blank" rel="noopener noreferrer">
+                  Voir mon portfolio Data
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
 
