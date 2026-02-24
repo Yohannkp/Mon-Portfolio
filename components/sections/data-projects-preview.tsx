@@ -13,6 +13,7 @@ import {
   Github,
   Globe,
   LayoutDashboard,
+  FileText,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -163,6 +164,17 @@ export function DataProjectsPreview() {
                         aria-label={`Voir le dashboard de ${project.title}`}
                       >
                         <LayoutDashboard className="h-4 w-4" />
+                      </a>
+                    )}
+                    {project.links.article && (
+                      <a
+                        href={project.links.article}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-foreground"
+                        aria-label={`Lire l'article sur ${project.title}`}
+                      >
+                        <FileText className="h-4 w-4" />
                       </a>
                     )}
                   </div>

@@ -9,6 +9,7 @@ export interface DataProject {
     portfolio?: string
     github?: string
     dashboard?: string
+    article?: string
   }
 }
 
@@ -53,6 +54,7 @@ export const dataProjects: DataProject[] = [
       portfolio: "https://finance-analytics---credit-scoring.streamlit.app/",
       dashboard:
         "https://app.powerbi.com/groups/me/reports/1247c610-71ea-4df2-b8cc-b71f992e27aa/1bdb29f134b7576fc281?experience=power-bi",
+      article: "https://github.com/Yohannkp/Finance-Analytics---Credit-Scoring#readme",
     },
   },
   {

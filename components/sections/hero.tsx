@@ -1,14 +1,95 @@
 "use client"
 
+import * as React from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Hero() {
+  const squarePositions = [
+    "-140",
+    "-90",
+    "-40",
+    "10",
+    "60",
+    "110",
+    "160",
+    "210",
+    "260",
+    "310",
+    "360",
+    "410",
+  ]
+
+  React.useEffect(() => {
+    console.log("Hero mounted, checking for squares...")
+    const squares = document.querySelectorAll('.hero-square')
+    console.log(`Found ${squares.length} squares`)
+    
+    // Charger anime.js
+    const script = document.createElement('script')
+    script.src = 'https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js'
+    script.onload = () => {
+      const anime = (window as any).anime
+      console.log("Anime.js loaded:", !!anime)
+      if (!anime) return
+
+      // Test simple d'abord
+      anime({
+        targets: '.hero-square',
+        translateX: function(el: HTMLElement) {
+          const x = el.getAttribute('data-x')
+          console.log("Animating square with x:", x)
+          return x
+        },
+        translateY: function(_: any, i: number) {
+          return 50 + (-50 * i)
+        },
+        scale: function(_: any, i: number, l: number) {
+          return (l - i) * 0.75
+        },
+        rotate: function() {
+          return anime.random(-360, 360)
+        },
+        duration: function() {
+          return anime.random(1200, 1800)
+        },
+        delay: function() {
+          return anime.random(0, 400)
+        },
+        easing: 'easeOutElastic(1, .5)',
+        loop: true,
+      })
+    }
+    document.head.appendChild(script)
+  }, [])
+
   return (
     <section className="relative overflow-hidden">
-      <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
+      {/* Background decoration avec carrés animés */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: -1 }}>
+        <div className="absolute -right-1/4 -top-1/4 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
+        <div className="absolute -bottom-1/4 -left-1/4 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="hero-squares">
+            {squarePositions.map((x, index) => (
+              <span
+                key={`${x}-${index}`}
+                className="hero-square"
+                data-x={x}
+                style={{ 
+                  visibility: 'visible',
+                  opacity: 1,
+                  willChange: 'transform'
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-6 py-24 md:py-32" style={{ position: 'relative', zIndex: 1 }}>
         <div className="flex flex-col items-start gap-8">
           {/* Availability badge */}
           <motion.div
@@ -72,12 +153,6 @@ export function Hero() {
             {/* CV download removed */}
           </motion.div>
         </div>
-      </div>
-
-      {/* Background decoration */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -right-1/4 -top-1/4 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
-        <div className="absolute -bottom-1/4 -left-1/4 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
       </div>
     </section>
   )
