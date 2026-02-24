@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ArrowRight, Download } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Hero() {
@@ -33,9 +33,9 @@ export function Hero() {
             className="max-w-3xl"
           >
             <h1 className="text-4xl font-semibold leading-tight tracking-tight text-balance md:text-5xl lg:text-6xl">
-              Développeur Fullstack & Mobile
+              Développeur Fullstack & Data
               <span className="block text-muted-foreground">
-                Je conçois des solutions complètes et intelligentes.
+                Des applications robustes aux analyses data actionnables.
               </span>
             </h1>
           </motion.div>
@@ -47,8 +47,8 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl"
           >
-            Développeur fullstack & mobile avec une solide formation en développement et une passion pour l&apos;innovation technologique. 
-            Actuellement en cycle ingénieur Big Data & IA à l&apos;ECE Paris, je combine développement et data science pour créer des applications intelligentes.
+            Je conçois des applications web et mobiles, et je construis des projets data pour transformer les donnees en decisions.
+            En cycle ingenieur Big Data & IA a l&apos;ECE Paris, je relie produit, data et IA pour livrer des solutions utiles et mesurables.
           </motion.p>
 
           {/* CTA buttons */}

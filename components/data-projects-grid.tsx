@@ -1,8 +1,19 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { Database, BarChart3, Brain, Eye, MessageSquare, ExternalLink } from "lucide-react"
+import {
+  Database,
+  BarChart3,
+  Brain,
+  Eye,
+  MessageSquare,
+  ExternalLink,
+  Github,
+  Globe,
+  LayoutDashboard,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { DataProject } from "@/lib/data-projects"
@@ -77,6 +88,17 @@ export function DataProjectsGrid({ projects }: DataProjectsGridProps) {
               transition={{ duration: 0.25 }}
               className="group flex flex-col rounded-xl border border-border/40 bg-card p-5 transition-all hover:border-border hover:shadow-lg"
             >
+              {project.image && (
+                <div className="relative mb-4 h-40 w-full overflow-hidden rounded-lg">
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
+                    className="object-cover"
+                  />
+                </div>
+              )}
               {/* Category badge */}
               <div className="flex items-center justify-between">
                 <span
@@ -85,16 +107,42 @@ export function DataProjectsGrid({ projects }: DataProjectsGridProps) {
                   {categoryIcons[project.category]}
                   {dataCategories.find((c) => c.id === project.category)?.label}
                 </span>
-                {project.links?.github && (
-                  <a
-                    href={project.links.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
-                    aria-label={`Voir ${project.title} sur GitHub`}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
+                {project.links && (
+                  <div className="flex items-center gap-2 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+                    {project.links.github && (
+                      <a
+                        href={project.links.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-foreground"
+                        aria-label={`Voir ${project.title} sur GitHub`}
+                      >
+                        <Github className="h-4 w-4" />
+                      </a>
+                    )}
+                    {project.links.portfolio && (
+                      <a
+                        href={project.links.portfolio}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-foreground"
+                        aria-label={`Voir la demo de ${project.title}`}
+                      >
+                        <Globe className="h-4 w-4" />
+                      </a>
+                    )}
+                    {project.links.dashboard && (
+                      <a
+                        href={project.links.dashboard}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-foreground"
+                        aria-label={`Voir le dashboard de ${project.title}`}
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                      </a>
+                    )}
+                  </div>
                 )}
               </div>
 

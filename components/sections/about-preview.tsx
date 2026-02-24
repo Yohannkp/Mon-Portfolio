@@ -41,14 +41,13 @@ export function AboutPreview() {
 
             <div className="space-y-4 text-muted-foreground">
               <p className="leading-relaxed">
-                Développeur fullstack & mobile avec une solide formation en développement et une passion pour l&apos;innovation technologique. 
-                Basé à Paris, j&apos;ai développé une expertise technique diversifiée qui me permet de concevoir des solutions complètes, 
-                du backend au frontend, en passant par les applications mobiles.
+                Developpeur fullstack et data, je construis des applications web et mobiles et je developpe des analyses et modeles
+                pour produire des insights utiles. Base a Paris, je propose une approche complete, du backend au frontend,
+                avec une attention particuliere a la qualite des donnees et a l&apos;impact produit.
               </p>
               <p className="leading-relaxed">
-                Actuellement en cycle ingénieur Big Data & IA à l&apos;ECE Paris, je combine mes compétences en développement avec une 
-                approche data-driven pour créer des applications intelligentes et performantes. Ma double expertise en développement et 
-                en data science me permet d&apos;apporter une vision globale aux projets sur lesquels je travaille.
+                En cycle ingenieur Big Data & IA a l&apos;ECE Paris, j&apos;allie developpement, data science et IA pour concevoir
+                des solutions mesurables : tableaux de bord clairs, modeles predicitfs et integrations fluides dans les apps.
               </p>
             </div>
 
