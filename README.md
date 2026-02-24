@@ -1,34 +1,60 @@
-# Junior developer portfolio
+# Junior Developer Portfolio
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+This repository contains the source code for my personal portfolio as a junior developer. It showcases my projects, skills, and contact information.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/yohannkps-projects/v0-junior-developer-portfolio)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/m3ChqG6MCXd)
+## Live Demo
 
-## Overview
-
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
-
-## Deployment
-
-Your project is live at:
+The portfolio is deployed and accessible at:
 
 🌐 **[https://v0-junior-developer-portfolio-bay.vercel.app/](https://v0-junior-developer-portfolio-bay.vercel.app/)**
 
-Dashboard: **[https://vercel.com/yohannkps-projects/v0-junior-developer-portfolio](https://vercel.com/yohannkps-projects/v0-junior-developer-portfolio)**
+## Features
 
-## Build your app
+- **About Me**: Learn more about my background and experience.
+- **Projects**: Explore the projects I have worked on, including detailed descriptions and links.
+- **Contact**: Get in touch with me through the contact form.
 
-Continue building your app on:
+## Technologies Used
 
-**[https://v0.app/chat/m3ChqG6MCXd](https://v0.app/chat/m3ChqG6MCXd)**
+- **Next.js**: React framework for building the portfolio.
+- **TypeScript**: Strongly typed programming language for better code quality.
+- **Tailwind CSS**: Utility-first CSS framework for styling.
+- **Vercel**: Deployment platform for hosting the portfolio.
 
-## How It Works
+## Getting Started
 
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+To run this project locally, follow these steps:
 
-Application : https://v0-junior-developer-portfolio-bay.vercel.app/
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/Yohannkp/Mon-Portfolio.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd Mon-Portfolio
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+4. Run the development server:
+
+   ```bash
+   pnpm dev
+   ```
+
+5. Open your browser and visit `http://localhost:3000`.
+
+## Contributing
+
+Contributions are welcome! If you have suggestions or improvements, feel free to open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
