@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 
 export const metadata: Metadata = {
   title: "À propos",
-  description: "Découvrez mon parcours, ma motivation et ce que je recherche en tant que développeur web junior.",
+  description: "Découvrez mon parcours et mon positionnement en tant qu'ingénieur Big Data & IA.",
 }
 
 const values = [
@@ -65,13 +65,13 @@ export default function AboutPage() {
           <h1 className="text-4xl font-semibold tracking-tight">À propos</h1>
           <div className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground">
             <p>
-              Bonjour, je m&apos;appelle Yendi Yohann. Je suis Data Analyst / Data Scientist
-              base en France, avec une solide formation en data et une passion pour l&apos;innovation.
+              Bonjour, je m&apos;appelle Yendi Yohann. Je suis Software Engineer spécialisé en IA,
+              basé en France, avec une solide formation en data et une passion pour l&apos;innovation.
             </p>
             <p>
-              Je conçois des analyses actionnables, des dashboards clairs et des modeles predictifs.
-              Actuellement en cycle ingenieur Big Data & IA a l&apos;ECE Paris, j&apos;allie data, IA et sens produit
-              pour livrer des solutions mesurables.
+              Je ne fais pas que des graphiques, je construis des systèmes intelligents de bout en bout.
+              Actuellement en cycle ingénieur Big Data & IA à l&apos;ECE Paris, j&apos;allie IA, software engineering
+              et sens produit pour livrer des solutions mesurables.
             </p>
           </div>
 
@@ -129,6 +129,9 @@ export default function AboutPage() {
             je pourrai m&apos;intégrer à une équipe technique bienveillante. L&apos;idéal serait 
             de travailler sur des projets concrets avec des technologies modernes (React, 
             Next.js, TypeScript) tout en bénéficiant d&apos;un accompagnement pour progresser.
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Rythme d&apos;alternance : 3 jours en entreprise / 2 jours à l&apos;école.
           </p>
         </div>
       </section>

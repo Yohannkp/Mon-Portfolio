@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { DataProjectsGrid } from "@/components/data-projects-grid"
-import { dataProjects } from "@/lib/data-projects"
+import { visibleDataProjects } from "@/lib/data-projects"
 
 export const metadata: Metadata = {
   title: "Projets Data",
@@ -20,7 +20,7 @@ export default function DataProjectsPage() {
         </p>
       </div>
 
-      <DataProjectsGrid projects={dataProjects} />
+      <DataProjectsGrid projects={visibleDataProjects} />
     </div>
   )
 }

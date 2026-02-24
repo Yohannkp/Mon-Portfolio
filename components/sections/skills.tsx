@@ -5,34 +5,20 @@ import { Badge } from "@/components/ui/badge"
 
 const skillCategories = [
   {
-    name: "Data Analysis",
-    skills: [
-      "Python (Pandas, Matplotlib)",
-      "SQL",
-      "Excel avance",
-      "Nettoyage de donnees",
-      "EDA",
-      "Tests statistiques",
-    ],
+    name: "Software Engineering",
+    skills: ["Python", "FastAPI", "React", "Flutter", "Node.js", "TypeScript"],
   },
   {
-    name: "BI & Visualisation",
-    skills: [
-      "Power BI",
-      "Tableau",
-      "Dashboards interactifs",
-      "KPIs",
-      "Storytelling data",
-      "Visualisation de donnees",
-    ],
+    name: "IA & Machine Learning",
+    skills: ["XGBoost", "PyTorch", "NLP", "SHAP", "SMOTE", "Modelisation"],
   },
   {
-    name: "Machine Learning",
-    skills: ["Regression", "Modelisation", "Evaluation", "Feature engineering"],
+    name: "Data & BI",
+    skills: ["SQL", "Power BI", "Tableau", "Excel avance", "KPIs", "EDA"],
   },
   {
-    name: "Communication",
-    skills: ["Communication metier", "Restitution", "Documentation", "Presentation"],
+    name: "MLOps & Qualite",
+    skills: ["Docker", "CI/CD", "Monitoring", "Tests", "Data quality"],
   },
 ]
 

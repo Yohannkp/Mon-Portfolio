@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { dataProjects } from "@/lib/data-projects"
+import { visibleDataProjects } from "@/lib/data-projects"
 import { dataCategories } from "@/lib/data-projects"
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -35,16 +35,19 @@ const categoryColors: Record<string, string> = {
   nlp: "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20",
 }
 
-const featuredDataProjects = dataProjects.slice(0, 6)
+const featuredDataProjects = visibleDataProjects.filter((project) =>
+  ["finance-credit-scoring", "snake-reinforcement-learning"].includes(project.slug)
+)
 
 const categoryCounts = dataCategories
   .filter((c) => c.id !== "all")
   .map((cat) => ({
     ...cat,
-    count: dataProjects.filter((p) => p.category === cat.id).length,
+    count: visibleDataProjects.filter((p) => p.category === cat.id).length,
     icon: categoryIcons[cat.id],
     color: categoryColors[cat.id],
   }))
+  .filter((cat) => cat.count > 0)
 
 export function DataProjectsPreview() {
   return (
@@ -203,7 +206,7 @@ export function DataProjectsPreview() {
         >
           <Button asChild variant="outline" className="gap-2 bg-transparent">
             <Link href="/data-projects">
-              Voir les {dataProjects.length} projets data
+              Voir les {visibleDataProjects.length} projets data
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>

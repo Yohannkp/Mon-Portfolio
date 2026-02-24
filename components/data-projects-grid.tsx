@@ -51,7 +51,9 @@ export function DataProjectsGrid({ projects }: DataProjectsGridProps) {
     <div className="mt-12">
       {/* Category Filters */}
       <div className="flex flex-wrap gap-2">
-        {dataCategories.map((cat) => (
+        {dataCategories
+          .filter((cat) => cat.id === "all" || projects.some((p) => p.category === cat.id))
+          .map((cat) => (
           <Button
             key={cat.id}
             variant={selectedCategory === cat.id ? "default" : "outline"}

@@ -44,7 +44,7 @@ export const dataProjects: DataProject[] = [
     slug: "finance-credit-scoring",
     title: "Finance Analytics - Credit Scoring",
     description:
-      "Modele de scoring de credit capable d'identifier les clients a risque de defaut de paiement grave. Techniques avancees de machine learning et de gestion des desequilibres de classes.",
+      "Mise en place d'un modele de credit scoring pour estimer la probabilite de defaut et prioriser le risque. Pipeline complet : EDA, gestion du desequilibre (SMOTE), modeles avances (XGBoost) et explicabilite (SHAP). Restitution via dashboards Power BI et app Streamlit.",
     image: "/projects/Finance Analytics - Credit Scoring.png",
     tags: ["Power BI", "Python", "Scikit-learn", "XGBoost", "SHAP", "SMOTE"],
     category: "machine-learning",
@@ -324,20 +324,12 @@ export const dataProjects: DataProject[] = [
     category: "machine-learning",
   },
   {
-    slug: "montgomery-fleet-part1",
-    title: "Montgomery Fleet Inventory Analysis - Part 1",
+    slug: "analyse-inventaire-excel",
+    title: "Analyse d'Inventaire Complexe sous Excel",
     description:
-      "Nettoyage et analyse d'un ensemble de donnees relatif a l'inventaire des equipements de la flotte du comte de Montgomery avec Excel.",
-    tags: ["Excel", "Nettoyage de donnees", "Tableaux croises dynamiques", "Reporting"],
-    category: "data-analysis",
-  },
-  {
-    slug: "montgomery-fleet-part2",
-    title: "Montgomery Fleet Inventory Analysis - Part 2",
-    description:
-      "Suite de l'analyse de l'inventaire Montgomery avec exploration avancee, doublons, validation de donnees et formules.",
+      "Analyse complete de l'inventaire de flotte du comte de Montgomery : nettoyage, doublons, validation, formules et reporting avance avec tableaux croises dynamiques.",
     image: "/projects/Montgomery Fleet Inventory Analysis part2.png",
-    tags: ["Excel", "Nettoyage de donnees", "Validation", "AutoSum"],
+    tags: ["Excel", "Nettoyage de donnees", "Validation", "AutoSum", "Reporting"],
     category: "data-analysis",
     links: {
       github:
@@ -359,6 +351,26 @@ export const dataProjects: DataProject[] = [
   },
 ]
 
+const visibleDataProjectSlugs = [
+  "finance-credit-scoring",
+  "snake-reinforcement-learning",
+  "prediction-productivite",
+  "analyse-emotions-temps-reel",
+  "cnn-classification-formes",
+  "transfer-learning-pytorch",
+  "fake-news-detection",
+  "supermarket-sales-analysis",
+  "prediction-depart-employes",
+  "optimisation-ventes-chips",
+  "tableau-bord-automobiles",
+  "analyse-churn-client",
+  "detection-fraudes-bancaires",
+]
+
+export const visibleDataProjects = dataProjects.filter((project) =>
+  visibleDataProjectSlugs.includes(project.slug)
+)
+
 export const dataCategories = [
   { id: "all", label: "Tous" },
   { id: "machine-learning", label: "Machine Learning" },
@@ -370,7 +382,7 @@ export const dataCategories = [
 
 export function getAllDataTags(): string[] {
   const tags = new Set<string>()
-  dataProjects.forEach((project) => {
+  visibleDataProjects.forEach((project) => {
     project.tags.forEach((tag) => tags.add(tag))
   })
   return Array.from(tags).sort()

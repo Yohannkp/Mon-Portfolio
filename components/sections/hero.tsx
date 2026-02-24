@@ -33,9 +33,9 @@ export function Hero() {
             className="max-w-3xl"
           >
             <h1 className="text-4xl font-semibold leading-tight tracking-tight text-balance md:text-5xl lg:text-6xl">
-              Développeur Fullstack & Data
-              <span className="block text-muted-foreground">
-                Des applications robustes aux analyses data actionnables.
+              Ingénieur Big Data & IA | Spécialiste IA & Software
+              <span className="block text-muted-foreground font-semibold">
+                Je ne fais pas que des graphiques, je construis des systèmes intelligents de bout en bout.
               </span>
             </h1>
           </motion.div>
@@ -47,8 +47,8 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl"
           >
-            Je conçois des applications web et mobiles, et je construis des projets data pour transformer les donnees en decisions.
-            En cycle ingenieur Big Data & IA a l&apos;ECE Paris, je relie produit, data et IA pour livrer des solutions utiles et mesurables.
+            Software Engineer spécialisé en IA, je conçois des applications full-stack et des pipelines intelligents qui vont de la donnée au produit.
+            En cycle ingénieur Big Data & IA à l&apos;ECE Paris, je combine IA, software engineering et sens produit pour livrer des solutions mesurables.
           </motion.p>
 
           {/* CTA buttons */}

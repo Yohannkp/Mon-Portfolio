@@ -5,8 +5,8 @@ import { BookOpen } from "lucide-react"
 
 const learningItems = [
   {
-    title: "Testing avancé",
-    description: "Playwright, Vitest, et les patterns de tests E2E",
+    title: "LLMOps & Déploiement de modèles",
+    description: "CI/CD ML, monitoring, drift et inference en production",
   },
   {
     title: "Architecture",

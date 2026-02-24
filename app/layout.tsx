@@ -12,25 +12,25 @@ const _geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono
 
 export const metadata: Metadata = {
   title: {
-    default: 'Yendi Yohann | Développeur Web Junior',
+    default: 'Yendi Yohann | Ingénieur Big Data & IA',
     template: '%s | Yendi Yohann',
   },
-  description: 'Développeur Web Junior spécialisé en front-end et full-stack. Je transforme des idées en applications propres et utiles.',
-  keywords: ['développeur web', 'junior', 'front-end', 'full-stack', 'React', 'Next.js', 'TypeScript'],
+  description: 'Ingénieur Big Data & IA spécialisé en IA appliquée et software full-stack.',
+  keywords: ['ingénieur', 'big data', 'IA', 'software', 'machine learning', 'full-stack', 'Python', 'React'],
   authors: [{ name: 'Yendi Yohann' }],
   creator: 'Yendi Yohann',
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
     url: 'https://alexmartin.dev',
-    title: 'Yendi Yohann | Développeur Web Junior',
-    description: 'Développeur Web Junior spécialisé en front-end et full-stack. Je transforme des idées en applications propres et utiles.',
+    title: 'Yendi Yohann | Ingénieur Big Data & IA',
+    description: 'Ingénieur Big Data & IA spécialisé en IA appliquée et software full-stack.',
     siteName: 'Yendi Yohann Portfolio',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Yendi Yohann | Développeur Web Junior',
-    description: 'Développeur Web Junior spécialisé en front-end et full-stack.',
+    title: 'Yendi Yohann | Ingénieur Big Data & IA',
+    description: 'Ingénieur Big Data & IA spécialisé en IA appliquée et software full-stack.',
   },
   robots: {
     index: true,

@@ -38,19 +38,19 @@ export function AboutPreview() {
                 Yendi Yohann
               </h2>
               <p className="mt-2 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                Data Analyst / Data Scientist · Base en France
+                Ingénieur Big Data & IA en alternance · Basé en France
               </p>
             </div>
 
             <div className="space-y-4 text-muted-foreground">
               <p className="leading-relaxed">
-                Developpeur fullstack et data, je construis des applications web et mobiles et je developpe des analyses et modeles
-                pour produire des insights utiles. Base a Paris, je propose une approche complete, du backend au frontend,
-                avec une attention particuliere a la qualite des donnees et a l&apos;impact produit.
+                Software Engineer spécialisé en IA, je construis des applications full-stack et des systèmes intelligents
+                qui relient données, modèles et expérience utilisateur. Basé à Paris, je propose une approche complète,
+                du backend au frontend, avec un focus sur l&apos;impact produit.
               </p>
               <p className="leading-relaxed">
-                En cycle ingenieur Big Data & IA a l&apos;ECE Paris, j&apos;allie developpement, data science et IA pour concevoir
-                des solutions mesurables : tableaux de bord clairs, modeles predicitfs et integrations fluides dans les apps.
+                En cycle ingénieur Big Data & IA à l&apos;ECE Paris, j&apos;allie IA, software engineering et data pour livrer
+                des solutions mesurables : pipelines fiables, modèles prédictifs et intégrations propres dans les apps.
               </p>
             </div>
 
