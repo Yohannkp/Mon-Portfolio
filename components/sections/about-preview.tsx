@@ -37,6 +37,9 @@ export function AboutPreview() {
               <h2 className="mt-2 text-3xl font-semibold tracking-tight">
                 Yendi Yohann
               </h2>
+              <p className="mt-2 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                Data Analyst / Data Scientist · Base en France
+              </p>
             </div>
 
             <div className="space-y-4 text-muted-foreground">

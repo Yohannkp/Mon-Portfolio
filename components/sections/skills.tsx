@@ -5,20 +5,34 @@ import { Badge } from "@/components/ui/badge"
 
 const skillCategories = [
   {
-    name: "Développement Fullstack",
-    skills: ["React", "Flutter", "Symfony", "Node.js", "PHP 8", "Python"],
+    name: "Data Analysis",
+    skills: [
+      "Python (Pandas, Matplotlib)",
+      "SQL",
+      "Excel avance",
+      "Nettoyage de donnees",
+      "EDA",
+      "Tests statistiques",
+    ],
   },
   {
-    name: "Intelligence Artificielle & Data",
-    skills: ["Machine Learning", "Data Analytics", "Tableau", "SQL", "TensorFlow", "Pandas"],
+    name: "BI & Visualisation",
+    skills: [
+      "Power BI",
+      "Tableau",
+      "Dashboards interactifs",
+      "KPIs",
+      "Storytelling data",
+      "Visualisation de donnees",
+    ],
   },
   {
-    name: "Base de données",
-    skills: ["MySQL", "MongoDB", "Firebase", "PostgreSQL"],
+    name: "Machine Learning",
+    skills: ["Regression", "Modelisation", "Evaluation", "Feature engineering"],
   },
   {
-    name: "Outils & DevOps",
-    skills: ["Docker", "Git", "CI/CD", "Firebase", "Vercel", "Matplotlib"],
+    name: "Communication",
+    skills: ["Communication metier", "Restitution", "Documentation", "Presentation"],
   },
 ]
 

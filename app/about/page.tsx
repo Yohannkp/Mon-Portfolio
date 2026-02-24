@@ -65,14 +65,13 @@ export default function AboutPage() {
           <h1 className="text-4xl font-semibold tracking-tight">À propos</h1>
           <div className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground">
             <p>
-              Bonjour, je m&apos;appelle Yendi Yohann. Je suis développeur fullstack & mobile 
-              avec une solide formation en développement et une passion pour l&apos;innovation technologique.
+              Bonjour, je m&apos;appelle Yendi Yohann. Je suis Data Analyst / Data Scientist
+              base en France, avec une solide formation en data et une passion pour l&apos;innovation.
             </p>
             <p>
-              Basé à Paris, j&apos;ai développé une expertise technique diversifiée qui me permet de concevoir 
-              des solutions complètes, du backend au frontend, en passant par les applications mobiles. 
-              Actuellement en cycle ingénieur Big Data & IA à l&apos;ECE Paris, je combine mes compétences 
-              en développement avec une approche data-driven pour créer des applications intelligentes et performantes.
+              Je conçois des analyses actionnables, des dashboards clairs et des modeles predictifs.
+              Actuellement en cycle ingenieur Big Data & IA a l&apos;ECE Paris, j&apos;allie data, IA et sens produit
+              pour livrer des solutions mesurables.
             </p>
           </div>
 

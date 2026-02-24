@@ -247,16 +247,25 @@ export const dataProjects: DataProject[] = [
     title: "Fake News Detection with Machine Learning",
     description:
       "Classification automatique d'articles d'actualite via un modele LSTM bidirectionnel pour identifier les fausses nouvelles sans analyse manuelle.",
+    image: "/projects/Fake News Detection with Machine Learning.png",
     tags: ["Python", "LSTM", "NLP", "Deep Learning", "Matplotlib"],
     category: "nlp",
+    links: {
+      github: "https://github.com/Yohannkp/Fake-News-Detection-with-Machine-Learning",
+    },
   },
   {
     slug: "detection-cancer-sein",
     title: "Detection Cancer du sein",
     description:
       "Modele de regression logistique avec Scikit-learn pour classer des cas de cancer du sein (malin ou benin) a partir du jeu de donnees Breast Cancer Wisconsin.",
+    image: "/projects/Détection Cancer du seins.png",
     tags: ["Python", "Machine Learning", "Logistic Regression", "Scikit-learn"],
     category: "machine-learning",
+    links: {
+      github: "https://github.com/Yohannkp/Breast-Cancer-Prediction-Using-Machine-Learning",
+      portfolio: "https://breast-cancer-prediction-using-machine-learning.streamlit.app/",
+    },
   },
   {
     slug: "modelisation-donnees-automobiles",
@@ -327,16 +336,26 @@ export const dataProjects: DataProject[] = [
     title: "Montgomery Fleet Inventory Analysis - Part 2",
     description:
       "Suite de l'analyse de l'inventaire Montgomery avec exploration avancee, doublons, validation de donnees et formules.",
+    image: "/projects/Montgomery Fleet Inventory Analysis part2.png",
     tags: ["Excel", "Nettoyage de donnees", "Validation", "AutoSum"],
     category: "data-analysis",
+    links: {
+      github:
+        "https://github.com/Yohannkp/Excel/blob/main/Montgomery%20Project/Montgomery_Fleet_Equipment_Inventory_FA_PART_2_START.xlsx",
+    },
   },
   {
     slug: "peer-graded-assignment-excel",
     title: "Peer-Graded Assignment - IBM Data Analyst",
     description:
       "Visualisations a partir de donnees reelles du secteur automobile pour analyser les ventes et les profits par concessionnaire dans le cadre du certificat IBM.",
+    image: "/projects/Peer-Graded Assignment.png",
     tags: ["Excel", "Tableaux croises dynamiques", "Graphiques", "Dashboard"],
     category: "visualization",
+    links: {
+      github:
+        "https://github.com/Yohannkp/Excel/tree/main/Data%20Visualization%20and%20Dashboard%20Excel%20cognos/Practice4",
+    },
   },
 ]
 
