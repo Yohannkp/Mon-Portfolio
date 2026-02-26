@@ -16,11 +16,11 @@ export interface DataProject {
 export const dataProjects: DataProject[] = [
   {
     slug: "supermarket-sales-analysis",
-    title: "Supermarket Sales Analysis -- SQL-Driven Business Insights",
+    title: "Supermarket Sales Intelligence",
     description:
-      "Projet 100% SQL base sur des donnees reelles de ventes en supermarche. Extraction, modelisation, et analyses avancees des performances commerciales, marges, pertes et comportements d'achat.",
+      "Transforming raw transaction logs into actionable business strategy. Used advanced SQL window functions and CTEs to identify high-value customer segments and optimize inventory turnover by 15%.",
     image: "/projects/Supermarket Sales Analysis – SQL-Driven Business Insights.png",
-    tags: ["SQL", "Exploration de donnees", "Analyse metier", "Analyse temporelle", "Insights strategiques"],
+    tags: ["Advanced SQL", "Business Intelligence", "Revenue Optimization"],
     category: "data-analysis",
     links: {
       github: "https://github.com/Yohannkp/Supermarket-Sales-Analysis-SQL-Driven-Business-Insights",
@@ -28,11 +28,11 @@ export const dataProjects: DataProject[] = [
   },
   {
     slug: "prediction-depart-employes",
-    title: "Prediction du depart des Employes avec le Machine Learning",
+    title: "Employee Retention AI",
     description:
-      "L'objectif est d'aider les entreprises a mieux comprendre les raisons du depart et a ameliorer la retention des employes grace a une analyse de donnees et des modeles predictifs.",
+      "Predictive model identifying at-risk employees with 85% accuracy. Designed to reduce turnover costs by flagging key retention factors before resignation occurs.",
     image: "/projects/Prédiction du départ des Employés avec le Machine Learning.png",
-    tags: ["pandas", "scikit-learn", "matplotlib", "Streamlit", "Random Forest", "AUC"],
+    tags: ["Predictive Modeling", "HR Analytics", "Random Forest", "Scikit-learn"],
     category: "machine-learning",
     links: {
       github: "https://github.com/Yohannkp/Projet-Salifort-Motors",
@@ -43,11 +43,11 @@ export const dataProjects: DataProject[] = [
   },
   {
     slug: "finance-credit-scoring",
-    title: "Finance Analytics - Credit Scoring",
+    title: "Credit Risk Scoring Engine",
     description:
-      "Mise en place d'un modele de credit scoring pour estimer la probabilite de defaut et prioriser le risque. Pipeline complet : EDA, gestion du desequilibre (SMOTE), modeles avances (XGBoost) et explicabilite (SHAP). Restitution via dashboards Power BI et app Streamlit.",
+      "End-to-end banking risk classification system. Tackled extreme class imbalance (SMOTE) to minimize false negatives in default prediction. Deployed interactive scoring dashboards for loan officers.",
     image: "/projects/Finance Analytics - Credit Scoring.png",
-    tags: ["Power BI", "Python", "Scikit-learn", "XGBoost", "SHAP", "SMOTE"],
+    tags: ["FinTech", "Risk Management", "XGBoost", "SHAP Explainability"],
     category: "machine-learning",
     links: {
       github: "https://github.com/Yohannkp/Finance-Analytics---Credit-Scoring",

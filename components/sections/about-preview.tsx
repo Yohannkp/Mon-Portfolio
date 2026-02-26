@@ -35,29 +35,24 @@ export function AboutPreview() {
                 À propos
               </span>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight">
-                Yendi Yohann
+                Plus qu'un développeur, un partenaire technique.
               </h2>
-              <p className="mt-2 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                Ingénieur Big Data & IA en alternance · Basé en France
-              </p>
             </div>
 
             <div className="space-y-4 text-muted-foreground">
               <p className="leading-relaxed">
-                Software Engineer spécialisé en IA, je construis des applications full-stack et des systèmes intelligents
-                qui relient données, modèles et expérience utilisateur. Basé à Paris, je propose une approche complète,
-                du backend au frontend, avec un focus sur l&apos;impact produit.
+                Je ne code pas juste pour coder. Je construis des solutions qui ont du sens. 
+                Mon parcours hybride entre <strong>Algorithmie avancée</strong> et <strong>Développement Produit</strong> me permet de comprendre à la fois les enjeux techniques complexes (Deep Learning, Cloud Architecture) et les impératifs business.
               </p>
               <p className="leading-relaxed">
-                En cycle ingénieur Big Data & IA à l&apos;ECE Paris, j&apos;allie IA, software engineering et data pour livrer
-                des solutions mesurables : pipelines fiables, modèles prédictifs et intégrations propres dans les apps.
+                Aujourd'hui, je cherche à rejoindre une équipe ambitieuse où l'excellence technique sert une vision claire.
               </p>
             </div>
 
             <div>
               <Button asChild variant="outline" className="gap-2 bg-transparent">
                 <Link href="/about">
-                  En savoir plus
+                  Découvrir mon parcours
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

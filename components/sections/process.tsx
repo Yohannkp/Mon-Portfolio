@@ -6,28 +6,28 @@ import { Search, Palette, Code, TestTube, Repeat } from "lucide-react"
 const steps = [
   {
     icon: Search,
-    title: "Analyse",
-    description: "Comprendre le besoin, définir les objectifs et identifier les contraintes techniques.",
+    title: "Discovery & Strategy",
+    description: "Aligner les besoins business avec la faisabilité technique. Définition claire des KPIs et scope.",
   },
   {
     icon: Palette,
-    title: "Design",
-    description: "Concevoir l'architecture et prototyper l'interface utilisateur.",
+    title: "System Design",
+    description: "Architecture scalable et résiliente. Choix des technos adaptés (SQL vs NoSQL, Microservices).",
   },
   {
     icon: Code,
-    title: "Développement",
-    description: "Écrire du code propre, modulaire et bien documenté.",
+    title: "Clean Code",
+    description: "Développement modulaire, typé (TypeScript/Python) et auto-documenté. Focus sur la maintenabilité.",
   },
   {
     icon: TestTube,
-    title: "Tests",
-    description: "Valider le fonctionnement avec des tests unitaires et d'intégration.",
+    title: "Quality Assurance",
+    description: "Tests unitaires et d'intégration systématiques. Pipeline CI/CD pour des déploiements sans stress.",
   },
   {
     icon: Repeat,
-    title: "Amélioration",
-    description: "Itérer sur les retours et optimiser les performances.",
+    title: "Feedback Loop",
+    description: "Monitoring en production, analyse des logs et itérations rapides basées sur la donnée réelle.",
   },
 ]
 

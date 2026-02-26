@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://alexmartin.dev',
+    url: 'https://yendiyohann.dev',
     title: 'Yendi Yohann | Ingénieur Big Data & IA',
     description: 'Ingénieur Big Data & IA spécialisé en IA appliquée et software full-stack.',
     siteName: 'Yendi Yohann Portfolio',

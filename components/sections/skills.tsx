@@ -10,7 +10,7 @@ const skillCategories = [
   },
   {
     name: "IA & Machine Learning",
-    skills: ["XGBoost", "PyTorch", "NLP", "SHAP", "SMOTE", "Modelisation"],
+    skills: ["GenAI / LLMs", "XGBoost", "PyTorch", "NLP", "RAG", "Modelisation"],
   },
   {
     name: "Data & BI",
