@@ -36,9 +36,9 @@ export const dataProjects: DataProject[] = [
   },
   {
     slug: "finance-credit-scoring",
-    title: "Credit Risk Scoring Engine",
+    title: "Scoring de risque crédit",
     description:
-      "End-to-end banking risk classification system. Tackled extreme class imbalance (SMOTE) to minimize false negatives in default prediction. Deployed interactive scoring dashboards for loan officers.",
+      "Classification du risque de défaut sur des données bancaires fortement déséquilibrées : rééquilibrage par SMOTE pour limiter les faux négatifs, XGBoost et explicabilité SHAP — AUC 0,88 sur le jeu de test. Tableau de bord de scoring destiné aux chargés de prêt.",
     image: "/projects/Finance Analytics - Credit Scoring.png",
     tags: ["FinTech", "Risk Management", "XGBoost", "SHAP Explainability"],
     category: "machine-learning",
@@ -52,9 +52,9 @@ export const dataProjects: DataProject[] = [
   },
   {
     slug: "prediction-depart-employes",
-    title: "Employee Retention AI",
+    title: "Prédiction du départ des employés",
     description:
-      "Predictive model identifying at-risk employees with 85% accuracy. Designed to reduce turnover costs by flagging key retention factors before resignation occurs.",
+      "Modèle de classification qui identifie les salariés à risque de départ avec 85 % de précision sur le jeu de test, et met en évidence les facteurs de rétention les plus explicatifs avant la démission. Random Forest, Scikit-learn, tableau de bord Power BI.",
     image: "/projects/Prédiction du départ des Employés avec le Machine Learning.png",
     tags: ["Predictive Modeling", "HR Analytics", "Random Forest", "Scikit-learn"],
     category: "machine-learning",
@@ -67,9 +67,9 @@ export const dataProjects: DataProject[] = [
   },
   {
     slug: "prediction-productivite",
-    title: "Application de Prediction de Productivite d'une equipe",
+    title: "Prédiction de la productivité d'une équipe",
     description:
-      "Solution complete combinant une application Flutter multi-plateforme et un workspace avance de Machine Learning pour le suivi et la prediction de la productivite.",
+      "Chaîne complète : un modèle entraîné puis servi par une API FastAPI, consommée par une application Flutter multiplateforme qui affiche le suivi et les prédictions.",
     image: "/projects/Application de Prédiction de Productivité d'une équipe.png",
     tags: ["Flutter", "Machine Learning", "FastAPI", "Python"],
     category: "machine-learning",
@@ -79,9 +79,9 @@ export const dataProjects: DataProject[] = [
   },
   {
     slug: "analyse-emotions-temps-reel",
-    title: "Analyse d'Emotions en Temps Reel avec PyTorch",
+    title: "Détection d'émotions en temps réel",
     description:
-      "Systeme de reconnaissance d'emotions en temps reel utilisant un CNN avec PyTorch et OpenCV pour la detection via webcam.",
+      "Reconnaissance d'émotions image par image sur un flux webcam : réseau convolutif entraîné avec PyTorch, capture et prétraitement avec OpenCV.",
     image: "/projects/Projet d'Analyse d'Émotions en Temps Réel avec PyTorch.png",
     tags: ["Python", "PyTorch", "Deep Learning", "OpenCV", "CNN"],
     category: "deep-learning",
@@ -91,9 +91,9 @@ export const dataProjects: DataProject[] = [
   },
   {
     slug: "supermarket-sales-analysis",
-    title: "Supermarket Sales Intelligence",
+    title: "Analyse des ventes en supermarché — SQL",
     description:
-      "Transforming raw transaction logs into actionable business strategy. Used advanced SQL window functions and CTEs to identify high-value customer segments and optimize inventory turnover by 15%.",
+      "Requêtes SQL analytiques (CTE, fonctions de fenêtrage) sur plus de 300 000 transactions pour identifier les segments de clients à forte valeur ; les leviers dégagés ont contribué à une hausse de 15 % de la rotation des stocks.",
     image: "/projects/Supermarket Sales Analysis – SQL-Driven Business Insights.png",
     tags: ["Advanced SQL", "Business Intelligence", "Revenue Optimization"],
     category: "data-analysis",

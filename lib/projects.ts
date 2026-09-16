@@ -66,7 +66,7 @@ export const projects: Project[] = [
   },
   {
     slug: "movies-database",
-    name: "Movies Graph DB",
+    name: "Recommandation de films",
     pitch: "Moteur de recommandation de films propulsé par Neo4j et FastAPI.",
     description: "Plus qu'une simple base de données, ce projet exploite la puissance des graphes pour révéler les connexions cachées entre films. Utilise des algorithmes de similarité pour offrir des recommandations contextuelles ultra-rapides.",
     image: "/projects/movie_database.png",
@@ -109,7 +109,7 @@ export const projects: Project[] = [
   },
   {
     slug: "cloudus-api",
-    name: "CloudUs - API de Gestion de Fichiers",
+    name: "CloudUs — API de gestion de fichiers",
     pitch: "API REST sécurisée pour la gestion de fichiers et d'espace de stockage cloud.",
     description: "API REST complète développée avec Symfony pour gérer les fichiers et l'espace de stockage. Authentification JWT sécurisée, gestion des rôles (Admin/User), système d'achat d'espace et génération automatique de factures PDF.",
     image: "/projects/api_gestion_fichier.png",
@@ -153,7 +153,7 @@ export const projects: Project[] = [
   },
   {
     slug: "minisearch",
-    name: "MiniSearch - Moteur de Recherche Interne Intelligent",
+    name: "MiniSearch — moteur de recherche interne",
     pitch: "Moteur de recherche haute performance avec full-text search, filtres dynamiques et ranking avancé construit avec React, TypeScript et Supabase.",
     description: "Plateforme de recherche documentaire avancée avec support multilingue (FR/EN), full-text search natif PostgreSQL, scoring intelligent avec décomposition des scores, filtrage dynamique par catégories, sources, langues, tags et dates. Interface responsive moderne avec composants Shadcn/ui.",
     image: "/projects/MiniSearch.png",

@@ -43,7 +43,7 @@ De l'affinage du modèle à son déploiement.
               <p className="leading-relaxed">
                 Un modèle qui reste dans un notebook ne sert à personne. Ce qui m'intéresse, c'est la partie
                 que la plupart des gens sautent : <strong>rendre un résultat reproductible</strong> et
-                <strong> savoir le mesurer</strong> — puis le servir derrière une API qui tient la charge.
+                <strong>savoir le mesurer</strong> — puis le servir derrière une API qui tient la charge.
               </p>
               <p className="leading-relaxed">
                 Je viens du développement backend, et c'est ce qui fait la différence : je ne découvre pas
