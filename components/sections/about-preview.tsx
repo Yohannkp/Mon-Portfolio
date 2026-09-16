@@ -35,17 +35,20 @@ export function AboutPreview() {
                 À propos
               </span>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight">
-                Plus qu'un développeur, un partenaire technique.
+De l'affinage du modèle à son déploiement.
               </h2>
             </div>
 
             <div className="space-y-4 text-muted-foreground">
               <p className="leading-relaxed">
-                Je ne code pas juste pour coder. Je construis des solutions qui ont du sens. 
-                Mon parcours hybride entre <strong>Algorithmie avancée</strong> et <strong>Développement Produit</strong> me permet de comprendre à la fois les enjeux techniques complexes (Deep Learning, Cloud Architecture) et les impératifs business.
+                Un modèle qui reste dans un notebook ne sert à personne. Ce qui m'intéresse, c'est la partie
+                que la plupart des gens sautent : <strong>rendre un résultat reproductible</strong> et
+                <strong> savoir le mesurer</strong> — puis le servir derrière une API qui tient la charge.
               </p>
               <p className="leading-relaxed">
-                Aujourd'hui, je cherche à rejoindre une équipe ambitieuse où l'excellence technique sert une vision claire.
+                Je viens du développement backend, et c'est ce qui fait la différence : je ne découvre pas
+                Docker, les tests et l'intégration continue au moment de déployer. Je cherche un stage de
+                4 à 6 mois à partir d'avril 2027, en MLOps ou en data engineering.
               </p>
             </div>
 

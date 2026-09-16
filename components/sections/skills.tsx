@@ -5,20 +5,20 @@ import { Badge } from "@/components/ui/badge"
 
 const skillCategories = [
   {
-    name: "Software Engineering",
-    skills: ["Python", "FastAPI", "React", "Flutter", "Node.js", "TypeScript"],
+    name: "Langages",
+    skills: ["Python", "SQL", "Go", "TypeScript", "Java"],
   },
   {
-    name: "IA & Machine Learning",
-    skills: ["GenAI / LLMs", "XGBoost", "PyTorch", "NLP", "RAG", "Modelisation"],
+    name: "ML & modeles",
+    skills: ["PyTorch", "Scikit-learn", "XGBoost", "SHAP", "Fine-tuning LoRA / QLoRA"],
   },
   {
-    name: "Data & BI",
-    skills: ["SQL", "Power BI", "Tableau", "Excel avance", "KPIs", "EDA"],
+    name: "Mise en production",
+    skills: ["Docker", "CI/CD", "FastAPI", "Git", "Tests automatises"],
   },
   {
-    name: "MLOps & Qualite",
-    skills: ["Docker", "CI/CD", "Monitoring", "Tests", "Data quality"],
+    name: "Donnees",
+    skills: ["PostgreSQL", "Neo4j", "ETL", "Power BI"],
   },
 ]
 

@@ -12,25 +12,25 @@ const _geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono
 
 export const metadata: Metadata = {
   title: {
-    default: 'Yendi Yohann | Ingénieur Big Data & IA',
+    default: 'Yendi Yohann | MLOps & Machine Learning Engineering',
     template: '%s | Yendi Yohann',
   },
-  description: 'Ingénieur Big Data & IA spécialisé en IA appliquée et software full-stack.',
-  keywords: ['ingénieur', 'big data', 'IA', 'software', 'machine learning', 'full-stack', 'Python', 'React'],
+  description: "Élève ingénieur Big Data & IA à l'ECE Paris. J'affine des modèles et je les mets en production : pipelines de données, APIs, conteneurisation, déploiement continu.",
+  keywords: ['MLOps', 'machine learning engineering', 'data engineering', 'Python', 'SQL', 'Go', 'Docker', 'PyTorch', 'FastAPI', 'fine-tuning LLM', 'ECE Paris'],
   authors: [{ name: 'Yendi Yohann' }],
   creator: 'Yendi Yohann',
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://yendiyohann.dev',
-    title: 'Yendi Yohann | Ingénieur Big Data & IA',
-    description: 'Ingénieur Big Data & IA spécialisé en IA appliquée et software full-stack.',
-    siteName: 'Yendi Yohann Portfolio',
+    url: 'https://v0-junior-developer-portfolio-bay.vercel.app',
+    title: 'Yendi Yohann | MLOps & Machine Learning Engineering',
+    description: "Élève ingénieur Big Data & IA à l'ECE Paris. J'affine des modèles et je les mets en production : pipelines de données, APIs, conteneurisation, déploiement continu.",
+    siteName: 'Yendi Yohann — Portfolio',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Yendi Yohann | Ingénieur Big Data & IA',
-    description: 'Ingénieur Big Data & IA spécialisé en IA appliquée et software full-stack.',
+    title: 'Yendi Yohann | MLOps & Machine Learning Engineering',
+    description: "Élève ingénieur Big Data & IA à l'ECE Paris. J'affine des modèles et je les mets en production : pipelines de données, APIs, conteneurisation, déploiement continu.",
   },
   robots: {
     index: true,

@@ -102,7 +102,7 @@ export function Hero() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
               </span>
-              Disponible pour opportunités
+              Stage de 4 à 6 mois — à partir d&apos;avril 2027
             </span>
           </motion.div>
 
@@ -114,9 +114,9 @@ export function Hero() {
             className="max-w-3xl"
           >
             <h1 className="text-4xl font-semibold leading-tight tracking-tight text-balance md:text-5xl lg:text-6xl">
-              Ingénieur Big Data & IA | Spécialiste IA & Software
+              MLOps &amp; Machine Learning Engineering
               <span className="block text-muted-foreground font-semibold">
-                Je ne fais pas que des graphiques, je construis des systèmes intelligents de bout en bout.
+                J&apos;affine des modèles, je les mets en production, et je sais prouver qu&apos;ils marchent.
               </span>
             </h1>
           </motion.div>
@@ -128,8 +128,9 @@ export function Hero() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl"
           >
-            Software Engineer spécialisé en IA, je conçois des applications full-stack et des pipelines intelligents qui vont de la donnée au produit.
-            En cycle ingénieur Big Data & IA à l&apos;ECE Paris, je combine IA, software engineering et sens produit pour livrer des solutions mesurables.
+Élève ingénieur Big Data &amp; IA à l&apos;ECE Paris. Ce qui m&apos;intéresse est la chaîne complète :
+            affiner un modèle, le servir derrière une API, le conteneuriser et le déployer de façon reproductible.
+            Deux stages en développement, dont un en Go sur un système déjà en production, et des projets personnels menés jusqu&apos;au déploiement.
           </motion.p>
 
           {/* CTA buttons */}

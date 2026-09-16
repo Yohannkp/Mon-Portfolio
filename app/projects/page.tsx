@@ -1,10 +1,13 @@
 import type { Metadata } from "next"
 import { ProjectsGrid } from "@/components/projects-grid"
+import { DataProjectsGrid } from "@/components/data-projects-grid"
 import { projects, getAllTags } from "@/lib/projects"
+import { visibleDataProjects } from "@/lib/data-projects"
 
 export const metadata: Metadata = {
   title: "Projets",
-  description: "Découvrez mes projets de développement web : applications, sites et expérimentations techniques.",
+  description:
+    "Modeles affines et mis en production, APIs, pipelines de donnees et applications deployees.",
 }
 
 export default function ProjectsPage() {
@@ -15,12 +18,25 @@ export default function ProjectsPage() {
       <div className="max-w-2xl">
         <h1 className="text-4xl font-semibold tracking-tight">Projets</h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          Une sélection de projets personnels et d&apos;études de cas qui 
-          illustrent mes compétences techniques et ma façon de résoudre des problèmes.
+          Des mod&egrave;les affin&eacute;s et mis en production, des APIs, des pipelines de
+          donn&eacute;es et des applications d&eacute;ploy&eacute;es. Chaque projet indique ce qu&apos;il
+          r&eacute;sout et comment il tourne.
         </p>
       </div>
 
-      <ProjectsGrid projects={projects} allTags={allTags} />
+      <section aria-labelledby="ml" className="mt-16">
+        <h2 id="ml" className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+          Mod&egrave;les &amp; donn&eacute;es
+        </h2>
+        <DataProjectsGrid projects={visibleDataProjects} />
+      </section>
+
+      <section aria-labelledby="soft" className="mt-24 border-t border-border/40 pt-16">
+        <h2 id="soft" className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+          Applications &amp; APIs
+        </h2>
+        <ProjectsGrid projects={projects} allTags={allTags} />
+      </section>
     </div>
   )
 }
