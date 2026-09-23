@@ -22,7 +22,7 @@ export const dataProjects: DataProject[] = [
     tags: ["Fine-tuning", "QLoRA", "LLM", "FastAPI", "Speech-to-Text"],
     category: "nlp",
     links: {
-      github: "https://github.com/Yohannkp/Api-Fran-ais-a-Mina",
+      github: "https://github.com/Yohannkp/mina-translator",
     },
   },
   {
@@ -35,6 +35,39 @@ export const dataProjects: DataProject[] = [
     links: {},
   },
   {
+    slug: "snake-rl-dqn",
+    title: "Snake RL — agent Deep Q-Network entraîné sur GPU",
+    description:
+      "Agent d'apprentissage par renforcement qui apprend à jouer à Snake sans aucune règle écrite à la main. Environnement sur mesure compatible Gymnasium, DQN PyTorch avec target network et experience replay, entraînement accéléré sur GPU. Projet structuré en modules — agent, entraînement, évaluation, démonstration — plutôt qu'en notebook, avec sauvegarde et rechargement des modèles.",
+    tags: ["Reinforcement Learning", "DQN", "PyTorch", "GPU", "Gymnasium"],
+    category: "deep-learning",
+    links: {
+      github: "https://github.com/Yohannkp/Apprentissage-par-renforcement-Snake-Game",
+    },
+  },
+  {
+    slug: "ab-test-landing-page",
+    title: "Test A/B d'une page d'atterrissage — mesure d'effet",
+    description:
+      "Comparaison de deux versions d'une page pour décider laquelle convertit le mieux. La méthode prime sur le résultat : vérification de la normalité (Shapiro) avant de choisir entre test de Student et Mann-Whitney, test du khi-deux sur les taux de conversion, lecture des p-values. Restitution dans une application Streamlit.",
+    tags: ["Experimentation", "Tests statistiques", "scipy", "pandas", "Streamlit"],
+    category: "data-analysis",
+    links: {
+      github: "https://github.com/Yohannkp/Tests-Statistiques-Landing-Page",
+    },
+  },
+  {
+    slug: "fake-news-lstm",
+    title: "Détection de fausses actualités — LSTM bidirectionnel",
+    description:
+      "Classification d'articles de presse en vrai ou faux par réseau de neurones récurrent. Nettoyage et tokenisation du texte, couche d'embedding, LSTM bidirectionnel entraîné sous Keras, et analyse des mots caractéristiques de chaque classe.",
+    tags: ["NLP", "LSTM", "Keras", "Deep Learning", "Text Mining"],
+    category: "deep-learning",
+    links: {
+      github: "https://github.com/Yohannkp/Fake-News-Detection-with-Machine-Learning",
+    },
+  },
+  {
     slug: "finance-credit-scoring",
     title: "Scoring de risque crédit",
     description:
@@ -44,9 +77,6 @@ export const dataProjects: DataProject[] = [
     category: "machine-learning",
     links: {
       github: "https://github.com/Yohannkp/Finance-Analytics---Credit-Scoring",
-      portfolio: "https://finance-analytics---credit-scoring.streamlit.app/",
-      dashboard:
-        "https://app.powerbi.com/groups/me/reports/1247c610-71ea-4df2-b8cc-b71f992e27aa/1bdb29f134b7576fc281?experience=power-bi",
       article: "https://github.com/Yohannkp/Finance-Analytics---Credit-Scoring#readme",
     },
   },
@@ -59,10 +89,7 @@ export const dataProjects: DataProject[] = [
     tags: ["Predictive Modeling", "HR Analytics", "Random Forest", "Scikit-learn"],
     category: "machine-learning",
     links: {
-      github: "https://github.com/Yohannkp/Projet-Salifort-Motors",
-      portfolio: "https://projet-salifort-motors-app.streamlit.app/",
-      dashboard:
-        "https://app.powerbi.com/groups/me/reports/b183b9be-a9f1-43d1-82a3-b4e6f0c88b3a/156f70583003d97a3e26?experience=power-bi",
+      github: "https://github.com/Yohannkp/Projet-Salifort-Motors.",
     },
   },
   {
@@ -111,6 +138,9 @@ const visibleDataProjectSlugs = [
   "prediction-productivite",
   "analyse-emotions-temps-reel",
   "supermarket-sales-analysis",
+  "snake-rl-dqn",
+  "ab-test-landing-page",
+  "fake-news-lstm",
 ]
 
 export const visibleDataProjects = dataProjects.filter((project) =>

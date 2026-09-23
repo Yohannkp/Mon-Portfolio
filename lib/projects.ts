@@ -39,7 +39,6 @@ export const projects: Project[] = [
     },
     links: {
       demo: "https://v0-apply-flow-saa-s-app.vercel.app/",
-      github: "https://github.com/Yohannkp/ApplyFlowFinal",
     },
     problem: "Quand on cherche un emploi, on postule à des dizaines d'offres. Sans un système organisé, on perd le fil : quel poste, quelle entreprise, où en est-on dans le processus ? Les spreadsheets deviennent vite un cauchemar à maintenir.",
     solution: "ApplyFlow centralise toutes les candidatures dans une interface claire avec un système de kanban. Chaque candidature a sa fiche détaillée avec notes, contacts et rappels. Le dashboard offre une vue d'ensemble de la progression.",
@@ -78,7 +77,7 @@ export const projects: Project[] = [
       tools: ["Docker Compose", "Swagger UI"],
     },
     links: {
-      github: "https://github.com/fayesarah555/movies-webapp.git",
+      github: "https://github.com/fayesarah555/movies-webapp",
     },
     problem: "Explorer de grandes bases de données de films peut être complexe sans une interface intuitive. Les relations entre films, acteurs, réalisateurs et genres sont difficiles à naviguer avec des bases de données traditionnelles. Les utilisateurs ont besoin d'une recherche performante et tolérante aux erreurs.",
     solution: "Movies Database utilise Neo4j comme base de données graphique pour modéliser naturellement les relations entre entités. L'architecture React + FastAPI offre une interface moderne et performante. La recherche floue et les recommandations basées sur les similitudes améliorent l'expérience utilisateur.",
@@ -165,7 +164,6 @@ export const projects: Project[] = [
       tools: ["Vitest", "ESLint", "PostCSS", "Bun"],
     },
     links: {
-      github: "https://github.com/Yohannkp/minisearch-engine",
       demo: "https://find-all-finder.lovable.app/",
     },
     problem: "Les organisations ont besoin d'un moteur de recherche interne performant capable de rechercher parmi des milliers de documents tout en fournissant des résultats pertinents, filtrables et rapides.",
