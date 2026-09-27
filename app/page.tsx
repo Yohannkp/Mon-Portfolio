@@ -1,8 +1,9 @@
 import { Hero } from "@/components/sections/hero"
 import { RagPipeline } from "@/components/sections/rag-pipeline"
 import { ReadingRail } from "@/components/reading-rail"
+import { Counters } from "@/components/sections/counters"
+import { Stations } from "@/components/sections/stations"
 import { AboutPreview } from "@/components/sections/about-preview"
-import { FeaturedProjects } from "@/components/sections/featured-projects"
 import { Skills } from "@/components/sections/skills"
 import { Process } from "@/components/sections/process"
 import { CurrentlyLearning } from "@/components/sections/currently-learning"
@@ -14,8 +15,9 @@ export default function HomePage() {
       <ReadingRail />
       <Hero />
       <RagPipeline />
+      <Counters />
+      <Stations />
       <AboutPreview />
-      <FeaturedProjects />
       <Skills />
       <Process />
       <CurrentlyLearning />
