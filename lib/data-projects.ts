@@ -29,7 +29,7 @@ export const dataProjects: DataProject[] = [
     slug: "mina-translator",
     title: "Mina-Translator — traduction français / mina par LLM affiné",
     description:
-      "Traduction entre le français et le mina, une langue du Togo sans ressources numériques. Qwen2-0.5B affiné en QLoRA 4 bits, précédé de Whisper pour la transcription. Corpus parallèle de 500 paires construit à la main, complété par ~19 600 transcriptions Common Voice, et service exposé par une API FastAPI. Sur une langue peu dotée, la difficulté est la donnée, pas l'entraînement.",
+      "Traduction entre le français et le mina, une langue du Togo sans ressources numériques. Qwen2-0.5B affiné en QLoRA 4 bits, précédé de Whisper pour la transcription. Corpus parallèle de 360 paires réparties en sept domaines, complété par ~19 600 transcriptions Common Voice, et service exposé par une API FastAPI. Sur une langue peu dotée, la difficulté est la donnée, pas l'entraînement.",
     tags: ["Fine-tuning", "QLoRA", "LLM", "FastAPI", "Speech-to-Text"],
     category: "nlp",
     links: {

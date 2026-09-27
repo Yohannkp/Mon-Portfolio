@@ -31,7 +31,7 @@ const STATIONS: Station[] = [
     role: "traduction FR ↔ mina",
     titre: "Une langue sans corpus",
     texte:
-      "Le mina n'a aucun corpus parallèle public. J'en ai construit un à la main — 500 paires — pour affiner Qwen2-0.5B en QLoRA 4 bits, et une application de collecte participative pour l'étendre.",
+      "Le mina n'a aucun corpus parallèle public. J'en ai constitué un — 360 paires sur sept domaines — pour affiner Qwen2-0.5B en QLoRA 4 bits, et une application de collecte participative pour l'étendre et le fiabiliser.",
     pile: ["QLoRA", "Whisper", "FastAPI", "Streamlit"],
     depot: "https://github.com/Yohannkp/mina-translator",
   },

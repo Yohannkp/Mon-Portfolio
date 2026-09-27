@@ -30,7 +30,7 @@ const featured: Card[] = [
     key: "mina-translator",
     title: "Mina-Translator",
     blurb:
-      "Un LLM affiné en QLoRA pour traduire entre le français et le mina, une langue du Togo sans ressources numériques. Corpus parallèle construit à la main et service exposé par une API FastAPI.",
+      "Un LLM affiné en QLoRA pour traduire entre le français et le mina, une langue du Togo sans ressources numériques. Corpus parallèle constitué pour l'occasion et service exposé par une API FastAPI.",
     tags: mina?.tags ?? [],
     github: mina?.links?.github,
   },

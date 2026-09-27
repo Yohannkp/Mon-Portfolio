@@ -322,3 +322,34 @@
 @media (prefers-reduced-motion: reduce) {
   .demo__morceau, .demo__reponse, .demo__source, .demo__journal div { opacity: 1 !important; }
 }
+
+/* ---------- terminal de l'agent ---------- */
+.term { background: oklch(0.1 0.005 255); border: 1px solid var(--input); border-radius: 3px;
+  padding: 1rem 1.1rem; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 12.5px;
+  line-height: 1.85; min-height: 290px; color: var(--muted-foreground); overflow-x: auto; }
+.term__l { opacity: 0; white-space: pre-wrap; }
+.term .inv { color: var(--accent); }
+.term .out { color: var(--muted-foreground); padding-left: 1rem; }
+.term .ok { color: oklch(0.78 0.15 160); }
+.term .ko { color: oklch(0.68 0.19 25); }
+.term .fic { color: var(--foreground); }
+.term .moins { color: oklch(0.68 0.19 25); }
+.term .plus { color: oklch(0.78 0.15 160); }
+.term__outil { display: inline-block; font-size: 10.5px; letter-spacing: .06em; color: var(--background);
+  background: var(--accent); border-radius: 2px; padding: 1px 6px; margin-right: .45rem; }
+
+/* ---------- chaine mina ---------- */
+.onde { display: flex; align-items: center; gap: 3px; height: 52px; padding: 0 4px;
+  border: 1px solid var(--input); border-radius: 3px; background: var(--background); }
+.onde i { flex: 1; background: var(--input); border-radius: 1px; height: 6px; }
+.chaine { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: .6rem; align-items: center; }
+.chaine__boite { border: 1px solid var(--border); border-radius: 3px; background: var(--background);
+  padding: .7rem .8rem; opacity: .38; }
+.chaine__boite b { display: block; font-size: 11.5px; font-weight: 600; }
+.chaine__boite span { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px; line-height: 1.5; color: var(--muted-foreground); margin-top: .2rem; }
+.chaine__fleche { color: var(--input); font-size: 1rem; }
+.demo__champ--sortie { border-left: 2px solid oklch(0.78 0.15 160); }
+
+@media (max-width: 720px) { .chaine { grid-template-columns: 1fr; gap: .4rem; } .chaine__fleche { display: none; } }
+@media (prefers-reduced-motion: reduce) { .term__l { opacity: 1 !important; } }
