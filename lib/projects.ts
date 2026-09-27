@@ -25,6 +25,44 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    slug: "leboncoin-mern",
+    name: "Le Bon Coin — clone MERN",
+    pitch: "Plateforme de petites annonces : authentification, CRUD complet et autorisation par propriétaire.",
+    description: "Une application de petites annonces construite de bout en bout : un backend Express structuré en contrôleurs, modèles, routes et middleware, une authentification par jeton, et une interface React. Le projet a ensuite été migré de MongoDB vers SQLite, ce qui a demandé de remplacer Mongoose par Sequelize dans les modèles et les contrôleurs.",
+    image: "/projects/leboncoin.png",
+    tags: ["Fullstack", "MERN", "Authentification", "CRUD"],
+    stack: {
+      frontend: ["React", "JavaScript"],
+      backend: ["Node.js", "Express", "JWT", "bcryptjs"],
+      database: ["MongoDB (Mongoose)", "SQLite (Sequelize)"],
+      tools: ["GitHub Actions", "Git"],
+    },
+    links: {
+      github: "https://github.com/Yohannkp/React-MERN-Project",
+    },
+    problem: "Une plateforme d'annonces pose deux questions qu'on ne peut pas éluder : comment authentifier les utilisateurs sans stocker de mot de passe en clair, et comment garantir qu'un utilisateur ne modifie que ses propres annonces.",
+    solution: "Mots de passe hachés avec bcrypt, jeton JWT vérifié par un middleware qui recharge l'utilisateur à chaque requête protégée, et contrôle de propriété sur les opérations d'écriture. Le backend est découpé en contrôleurs, modèles, routes et middleware plutôt qu'en un seul fichier de serveur.",
+    features: [
+      "Inscription et connexion avec mots de passe hachés",
+      "Création, consultation, modification et suppression d'annonces",
+      "Autorisation : seul l'auteur peut modifier ou supprimer son annonce",
+      "Navigation conditionnelle selon l'état de connexion",
+      "Interface responsive",
+      "Déploiement automatisé par GitHub Actions",
+    ],
+    challenges: [
+      "Migrer la persistance de MongoDB vers SQLite : passer d'un ODM documentaire à un ORM relationnel oblige à repenser les modèles et à réécrire chaque requête des contrôleurs",
+      "Protéger les routes sans alourdir chaque contrôleur, en centralisant la vérification du jeton dans un middleware",
+      "Séparer proprement le déploiement du frontend et celui du backend dans deux workflows distincts",
+    ],
+    learnings: [
+      "Une authentification par jeton se conçoit comme une couche traversante, pas comme un contrôle recopié dans chaque route",
+      "Changer de base de données touche les modèles et les contrôleurs, jamais seulement la configuration",
+      "Un backend découpé en contrôleurs, modèles et middleware reste lisible quand le projet grossit",
+    ],
+    screenshots: ["/projects/leboncoin.png"],
+  },
+  {
     slug: "applyflow",
     name: "ApplyFlow",
     pitch: "SaaS de suivi de candidatures : kanban, fiches détaillées et tableau de bord de progression.",

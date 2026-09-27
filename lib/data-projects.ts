@@ -15,10 +15,21 @@ export interface DataProject {
 
 export const dataProjects: DataProject[] = [
   {
+    slug: "rag-local",
+    title: "RAG-Local — assistant documentaire 100 % local",
+    description:
+      "Un assistant qui répond sur vos documents sans qu'aucune donnée ne quitte la machine. Recherche hybride BM25 + vectorielle fusionnée par Reciprocal Rank Fusion, reranking cross-encoder, réécriture de requête multi-tour, et réponses citées renvoyant à la page source. FastAPI, Chroma, Ollama et Next.js, le tout orchestré par Docker Compose, avec une suite d'évaluation RAGAS.",
+    tags: ["RAG", "LLM", "FastAPI", "Chroma", "Ollama", "Docker"],
+    category: "nlp",
+    links: {
+      github: "https://github.com/Yohannkp/RAG-Local",
+    },
+  },
+  {
     slug: "mina-translator",
     title: "Mina-Translator — traduction français / mina par LLM affiné",
     description:
-      "Traduction entre le français et le mina, une langue du Togo sans ressources numériques. Qwen2-0.5B affiné en QLoRA 4 bits, chaîne Whisper → LLM → synthèse vocale. Corpus parallèle de 500+ paires construit à la main, complété par ~19 600 clips Common Voice validés, et service exposé par une API FastAPI. Sur une langue peu dotée, la difficulté est la donnée, pas l'entraînement.",
+      "Traduction entre le français et le mina, une langue du Togo sans ressources numériques. Qwen2-0.5B affiné en QLoRA 4 bits, précédé de Whisper pour la transcription. Corpus parallèle de 500 paires construit à la main, complété par ~19 600 transcriptions Common Voice, et service exposé par une API FastAPI. Sur une langue peu dotée, la difficulté est la donnée, pas l'entraînement.",
     tags: ["Fine-tuning", "QLoRA", "LLM", "FastAPI", "Speech-to-Text"],
     category: "nlp",
     links: {
@@ -141,6 +152,18 @@ const visibleDataProjectSlugs = [
   "snake-rl-dqn",
   "ab-test-landing-page",
   "fake-news-lstm",
+  {
+    slug: "optimisation-ventes-chips",
+    title: "Optimisation des ventes — analyse comportementale et test d'impact",
+    description:
+      "Mesurer l'effet d'un nouvel agencement en magasin quand on ne peut pas tirer au sort. Chaque magasin test est apparié à un magasin contrôle choisi par corrélation sur les ventes et la fréquentation avant l'intervention, puis l'écart est testé statistiquement. Préparation et agrégation mensuelle des données transactionnelles, segmentation de la clientèle, et restitution pour un Category Manager.",
+    image: "/projects/optimisation-ventes-chips.png",
+    tags: ["Inférence causale", "Test statistique", "Segmentation", "pandas"],
+    category: "data-analysis",
+    links: {
+      github: "https://github.com/Yohannkp/Optimisation-des-ventes",
+    },
+  },
 ]
 
 export const visibleDataProjects = dataProjects.filter((project) =>
