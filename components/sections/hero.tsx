@@ -2,144 +2,100 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+const TITRE_1 = "MLOps & Machine Learning Engineering"
+const TITRE_2 = "J'affine des modèles, je les mets en production, et je sais prouver qu'ils marchent."
+
+/** Decoupe une phrase en mots enveloppes, pour les animer un par un. */
+function Mots({ texte, className }: { texte: string; className?: string }) {
+  return (
+    <span className={className}>
+      {texte.split(" ").map((mot, i) => (
+        <span className="mot-masque" key={`${mot}-${i}`}>
+          <span className="mot">{mot}</span>
+          {i < texte.split(" ").length - 1 ? " " : ""}
+        </span>
+      ))}
+    </span>
+  )
+}
+
 export function Hero() {
-  const squarePositions = [
-    "-140",
-    "-90",
-    "-40",
-    "10",
-    "60",
-    "110",
-    "160",
-    "210",
-    "260",
-    "310",
-    "360",
-    "410",
-  ]
+  const racine = React.useRef<HTMLElement>(null)
 
   React.useEffect(() => {
-    console.log("Hero mounted, checking for squares...")
-    const squares = document.querySelectorAll('.hero-square')
-    console.log(`Found ${squares.length} squares`)
-    
-    // Charger anime.js
-    const script = document.createElement('script')
-    script.src = 'https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js'
-    script.onload = () => {
-      const anime = (window as any).anime
-      console.log("Anime.js loaded:", !!anime)
-      if (!anime) return
+    const el = racine.current
+    if (!el) return
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
 
-      // Test simple d'abord
-      anime({
-        targets: '.hero-square',
-        translateX: function(el: HTMLElement) {
-          const x = el.getAttribute('data-x')
-          console.log("Animating square with x:", x)
-          return x
-        },
-        translateY: function(_: any, i: number) {
-          return 50 + (-50 * i)
-        },
-        scale: function(_: any, i: number, l: number) {
-          return (l - i) * 0.75
-        },
-        rotate: function() {
-          return anime.random(-360, 360)
-        },
-        duration: function() {
-          return anime.random(1200, 1800)
-        },
-        delay: function() {
-          return anime.random(0, 400)
-        },
-        easing: 'easeOutElastic(1, .5)',
-        loop: true,
+    let annule = false
+    // Regle de securite : l'etat de repos du titre est VISIBLE. On anime depuis
+    // l'invisible avec des images-cles, jamais en masquant d'abord — si anime.js
+    // ne se charge pas ou echoue, le titre reste lisible au lieu de disparaitre.
+    import("animejs")
+      .then((A) => {
+        if (annule || !racine.current) return
+        const ressort = (A.spring ?? A.createSpring) as (o: object) => unknown
+        const mots = el.querySelectorAll(".mot")
+        const suite = el.querySelectorAll("[data-apres]")
+
+        A.animate(mots, {
+          opacity: [0, 1],
+          y: ["0.5em", "0em"],
+          ease: ressort({ stiffness: 105, damping: 16 }),
+          delay: A.stagger(38),
+        })
+        A.animate(suite, {
+          opacity: [0, 1],
+          y: [16, 0],
+          duration: 760,
+          ease: "out(3)",
+          delay: A.stagger(110, { start: 520 }),
+        })
       })
+      .catch(() => {
+        /* rien a faire : tout est deja visible */
+      })
+
+    return () => {
+      annule = true
     }
-    document.head.appendChild(script)
   }, [])
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Background decoration avec carrés animés */}
+    <section ref={racine} className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: -1 }}>
         <div className="absolute -right-1/4 -top-1/4 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
         <div className="absolute -bottom-1/4 -left-1/4 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="hero-squares">
-            {squarePositions.map((x, index) => (
-              <span
-                key={`${x}-${index}`}
-                className="hero-square"
-                data-x={x}
-                style={{ 
-                  visibility: 'visible',
-                  opacity: 1,
-                  willChange: 'transform'
-                }}
-              />
-            ))}
-          </div>
-        </div>
+        <div className="hero-grille" />
       </div>
 
-      <div className="mx-auto max-w-6xl px-6 py-24 md:py-32" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="mx-auto max-w-6xl px-6 py-24 md:py-32" style={{ position: "relative", zIndex: 1 }}>
         <div className="flex flex-col items-start gap-8">
-          {/* Availability badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div data-apres>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-4 py-1.5 text-sm">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
               </span>
               Stage de 4 à 6 mois — à partir d&apos;avril 2027
             </span>
-          </motion.div>
+          </div>
 
-          {/* Main heading */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="max-w-3xl"
-          >
-            <h1 className="text-4xl font-semibold leading-tight tracking-tight text-balance md:text-5xl lg:text-6xl">
-              MLOps &amp; Machine Learning Engineering
-              <span className="block text-muted-foreground font-semibold">
-                J&apos;affine des modèles, je les mets en production, et je sais prouver qu&apos;ils marchent.
-              </span>
-            </h1>
-          </motion.div>
+          <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-balance md:text-5xl lg:text-6xl">
+            <Mots texte={TITRE_1} />
+            <Mots texte={TITRE_2} className="mt-2 block font-semibold text-muted-foreground" />
+          </h1>
 
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl"
-          >
-Élève ingénieur Big Data &amp; IA à l&apos;ECE Paris. Ce qui m&apos;intéresse est la chaîne complète :
-            affiner un modèle, le servir derrière une API, le conteneuriser et le déployer de façon reproductible.
-            Deux stages en développement, dont un en Go sur un système déjà en production, et des projets personnels menés jusqu&apos;au déploiement.
-          </motion.p>
+          <p data-apres className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+            Élève ingénieur Big Data &amp; IA à l&apos;ECE Paris. Ce qui m&apos;intéresse est la chaîne complète :
+            affiner un modèle, le servir derrière une API, le conteneuriser et le déployer de façon reproductible. Deux
+            stages en développement, dont un en Go sur un système déjà en production.
+          </p>
 
-          {/* CTA buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-wrap gap-4"
-          >
+          <div data-apres className="flex flex-wrap gap-4">
             <Button asChild size="lg" className="gap-2">
               <Link href="/projects">
                 Voir mes projets
@@ -147,12 +103,9 @@ export function Hero() {
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="gap-2 bg-transparent">
-              <Link href="/contact">
-                Me contacter
-              </Link>
+              <Link href="/contact">Me contacter</Link>
             </Button>
-            {/* CV download removed */}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
