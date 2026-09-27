@@ -139,6 +139,18 @@ export const dataProjects: DataProject[] = [
       github: "https://github.com/Yohannkp/Supermarket-Sales-Analysis-SQL-Driven-Business-Insights",
     },
   },
+  {
+    slug: "optimisation-ventes-chips",
+    title: "Optimisation des ventes — analyse comportementale et test d'impact",
+    description:
+      "Mesurer l'effet d'un nouvel agencement en magasin quand on ne peut pas tirer au sort. Chaque magasin test est apparié à un magasin contrôle choisi par corrélation sur les ventes et la fréquentation avant l'intervention, puis l'écart est testé statistiquement. Préparation et agrégation mensuelle des données transactionnelles, segmentation de la clientèle, et restitution pour un Category Manager.",
+    image: "/projects/optimisation-ventes-chips.png",
+    tags: ["Inférence causale", "Test statistique", "Segmentation", "pandas"],
+    category: "data-analysis",
+    links: {
+      github: "https://github.com/Yohannkp/Optimisation-des-ventes",
+    },
+  },
 ]
 
 const visibleDataProjectSlugs = [
@@ -152,18 +164,8 @@ const visibleDataProjectSlugs = [
   "snake-rl-dqn",
   "ab-test-landing-page",
   "fake-news-lstm",
-  {
-    slug: "optimisation-ventes-chips",
-    title: "Optimisation des ventes — analyse comportementale et test d'impact",
-    description:
-      "Mesurer l'effet d'un nouvel agencement en magasin quand on ne peut pas tirer au sort. Chaque magasin test est apparié à un magasin contrôle choisi par corrélation sur les ventes et la fréquentation avant l'intervention, puis l'écart est testé statistiquement. Préparation et agrégation mensuelle des données transactionnelles, segmentation de la clientèle, et restitution pour un Category Manager.",
-    image: "/projects/optimisation-ventes-chips.png",
-    tags: ["Inférence causale", "Test statistique", "Segmentation", "pandas"],
-    category: "data-analysis",
-    links: {
-      github: "https://github.com/Yohannkp/Optimisation-des-ventes",
-    },
-  },
+  "rag-local",
+  "optimisation-ventes-chips",
 ]
 
 export const visibleDataProjects = dataProjects.filter((project) =>
