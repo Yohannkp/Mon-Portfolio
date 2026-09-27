@@ -1,8 +1,6 @@
 import { Hero } from "@/components/sections/hero"
 import { RagPipeline } from "@/components/sections/rag-pipeline"
-import { DemoRag } from "@/components/sections/demo-rag"
-import { DemoAgent } from "@/components/sections/demo-agent"
-import { DemoMina } from "@/components/sections/demo-mina"
+import { Demos } from "@/components/sections/demos"
 import { ReadingRail } from "@/components/reading-rail"
 import { Counters } from "@/components/sections/counters"
 import { Stations } from "@/components/sections/stations"
@@ -18,11 +16,9 @@ export default function HomePage() {
       <ReadingRail />
       <Hero />
       <RagPipeline />
-      <DemoRag />
       <Counters />
       <Stations />
-      <DemoAgent />
-      <DemoMina />
+      <Demos />
       <AboutPreview />
       <Skills />
       <Process />

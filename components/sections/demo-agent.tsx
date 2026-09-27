@@ -29,7 +29,7 @@ const LIGNES: Ligne[] = [
   { classe: "ok", texte: "✓ Corrigé et vérifié. La correction n'est pas proposée : elle est testée." },
 ]
 
-export function DemoAgent() {
+export function DemoAgent({ nu = false }: { nu?: boolean } = {}) {
   const racine = useRef<HTMLDivElement>(null)
   const lib = useRef<typeof import("animejs") | null>(null)
   const tl = useRef<{ pause: () => void } | null>(null)
@@ -79,17 +79,8 @@ export function DemoAgent() {
     t.add({ v: 0 }, { v: 1, duration: 10, onComplete: () => setEnCours(false) }, pos + 300)
   }, [reinitialiser])
 
-  return (
-    <section className="border-t border-border/40">
-      <div className="mx-auto max-w-4xl px-6 py-24">
-        <p className="rag__kicker">Démonstration</p>
-        <h2 className="rag__h2">SELF_DEV_AGENT corrige un bug</h2>
-        <p className="rag__lede mb-8">
-          Un modèle local de 7 milliards de paramètres n&apos;est pas fiable. Alors l&apos;agent ne propose pas une
-          correction : il la teste.
-        </p>
-
-        <div className="demo">
+  const carte = (
+    <div className="demo">
           <div className="demo__bar">
             <span className="demo__titre">Démonstration</span>
             <span className="demo__sim">Simulation — aucun agent n&apos;est exécuté</span>
@@ -119,6 +110,21 @@ export function DemoAgent() {
             </div>
           </div>
         </div>
+  )
+
+  if (nu) return carte
+
+  return (
+    <section className="border-t border-border/40">
+      <div className="mx-auto max-w-4xl px-6 py-24">
+        <p className="rag__kicker">Démonstration</p>
+        <h2 className="rag__h2">SELF_DEV_AGENT corrige un bug</h2>
+        <p className="rag__lede mb-8">
+          Un modèle local de 7 milliards de paramètres n&apos;est pas fiable. Alors l&apos;agent ne propose pas une
+          correction : il la teste.
+        </p>
+
+        {carte}
       </div>
     </section>
   )

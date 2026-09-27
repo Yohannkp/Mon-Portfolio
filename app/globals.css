@@ -353,3 +353,22 @@
 
 @media (max-width: 720px) { .chaine { grid-template-columns: 1fr; gap: .4rem; } .chaine__fleche { display: none; } }
 @media (prefers-reduced-motion: reduce) { .term__l { opacity: 1 !important; } }
+
+/* ---------- onglets de demonstration ---------- */
+.onglets { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 2rem;
+  border-bottom: 1px solid var(--border); padding-bottom: .75rem; }
+.onglet { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11.5px;
+  letter-spacing: .06em; color: var(--muted-foreground); background: transparent;
+  border: 1px solid var(--border); border-radius: 3px; padding: .5rem .8rem; cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s; }
+.onglet:hover { color: var(--foreground); border-color: var(--input); }
+.onglet--actif { color: var(--background); background: var(--accent); border-color: var(--accent); }
+.onglets__entete { margin: 1.6rem 0 0; }
+.onglets__entete h3 { font-size: 1.15rem; font-weight: 600; letter-spacing: -.015em; }
+.onglets__entete p { color: var(--muted-foreground); font-size: .9rem; margin-top: .35rem; }
+
+/* ---------- respiration de la piece maitresse ---------- */
+.rag { padding: 6rem 0 0; }
+.rag__intro { margin-bottom: 2.5rem; }
+/* 55vh par etape au lieu de 80 : la traversee reste lisible sans temps mort */
+.rag__spacer { height: 55vh; }

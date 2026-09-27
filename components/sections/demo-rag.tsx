@@ -23,7 +23,7 @@ const JOURNAL = [
 
 type Anime = typeof import("animejs")
 
-export function DemoRag() {
+export function DemoRag({ nu = false }: { nu?: boolean } = {}) {
   const racine = useRef<HTMLDivElement>(null)
   const lib = useRef<Anime | null>(null)
   const timeline = useRef<{ pause: () => void } | null>(null)
@@ -159,16 +159,8 @@ export function DemoRag() {
     tl.add({ v: 0 }, { v: 1, duration: 10, onComplete: () => setEnCours(false) }, 8200)
   }, [reinitialiser])
 
-  return (
-    <section className="border-t border-border/40">
-      <div className="mx-auto max-w-4xl px-6 py-24">
-        <p className="rag__kicker">Démonstration</p>
-        <h2 className="rag__h2">Voir RAG-Local à l&apos;œuvre</h2>
-        <p className="rag__lede mb-8">
-          Un exemple concret, du moment où la question est posée jusqu&apos;à la réponse citée.
-        </p>
-
-        <div className="demo" ref={racine}>
+  const carte = (
+    <div className="demo" ref={racine}>
           <div className="demo__bar">
             <span className="demo__titre">Démonstration</span>
             <span className="demo__sim">Simulation — aucun modèle n&apos;est exécuté</span>
@@ -228,6 +220,20 @@ export function DemoRag() {
             </div>
           </div>
         </div>
+  )
+
+  if (nu) return carte
+
+  return (
+    <section className="border-t border-border/40">
+      <div className="mx-auto max-w-4xl px-6 py-24">
+        <p className="rag__kicker">Démonstration</p>
+        <h2 className="rag__h2">Voir RAG-Local à l&apos;œuvre</h2>
+        <p className="rag__lede mb-8">
+          Un exemple concret, du moment où la question est posée jusqu&apos;à la réponse citée.
+        </p>
+
+        {carte}
       </div>
     </section>
   )
