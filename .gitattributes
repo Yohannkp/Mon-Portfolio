@@ -1,0 +1,13 @@
+# Normalisation des fins de ligne : LF dans le depot, convention locale au checkout.
+# Sans ca, git voit 30 fichiers « modifies » en permanence sous Windows.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
