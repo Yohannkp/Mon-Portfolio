@@ -145,7 +145,7 @@
 @media (max-width: 1100px) { .rail { display: none; } }
 
 .rag { position: relative; }
-.rag__intro { max-width: 68ch; margin: 0 auto; padding: 0 1.5rem; }
+.rag__intro { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem; }
 .sec__kicker,
 .rag__kicker { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; font-weight: 500;
   letter-spacing: .22em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.25rem; }
@@ -155,10 +155,10 @@
 .rag__lede { color: var(--muted-foreground); margin-top: .9rem; max-width: 64ch; font-size: 1.02rem; line-height: 1.65; }
 
 .rag__sticky { position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; }
-.rag__svgbox { width: 100%; max-width: 980px; padding: 0 1.5rem; }
+  align-items: stretch; justify-content: center; }
+.rag__svgbox { width: 100%; max-width: 72rem; margin-inline: auto; padding: 0 1.5rem; }
 .rag__diagram { width: 100%; height: auto; display: block; overflow: visible; }
-.rag__spacer { height: 80vh; }
+.rag__spacer { height: 40vh; }
 
 .rag__arrow { fill: var(--border); }
 .rag__flow { fill: none; stroke: var(--border); stroke-width: 1.5; }
@@ -172,7 +172,7 @@
 
 .rag__notebox { position: relative; width: 100%; max-width: 980px; height: 160px; margin-top: 1.6rem; padding: 0 1.5rem; }
 .rag-note { position: absolute; left: 1.5rem; top: 0; max-width: 46ch; background: var(--card);
-  border: 1px solid var(--border); border-left: 2px solid var(--accent); padding: 1rem 1.15rem; border-radius: 2px;
+  border: 1px solid var(--border); border-left: 2px solid var(--accent); padding: 1rem 1.15rem; border-radius: 6px;
   opacity: 0; will-change: transform, opacity; }
 .rag-note b { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px;
   font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: .5rem; }
@@ -220,7 +220,8 @@
 
 /* ---------- compteurs ---------- */
 .compteurs { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 2.5rem; }
+  gap: 1px; background: var(--bord-doux); border: 1px solid var(--bord-doux); margin-top: 2.5rem;
+  border-radius: var(--r-carte); overflow: hidden; }
 .compteur { background: var(--card); padding: 1.9rem 1.6rem; }
 .compteur b { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 2.5rem; line-height: 1; font-weight: 600; letter-spacing: -.03em; color: var(--foreground);
@@ -232,7 +233,7 @@
 /* ---------- stations projets ---------- */
 .stations { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 2.5rem; }
 .station { display: grid; grid-template-columns: 150px 1fr auto; gap: 1.9rem; align-items: start;
-  border: 1px solid var(--border); border-radius: 3px; padding: 1.75rem 1.9rem; background: var(--card);
+  border: 1px solid var(--bord-doux); border-radius: var(--r-carte); padding: 1.75rem 1.9rem; background: var(--card);
   will-change: transform, opacity; transition: border-color .35s ease; }
 .station:hover { border-color: color-mix(in oklch, var(--accent) 45%, var(--border)); }
 .station__id { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px;
@@ -242,7 +243,7 @@
 .station__corps p { color: var(--muted-foreground); font-size: .92rem; margin-top: .6rem; max-width: 62ch; }
 .station__pile { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1rem; }
 .station__pile span { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px;
-  line-height: 1; color: var(--muted-foreground); border: 1px solid var(--border); border-radius: 2px;
+  line-height: 1; color: var(--muted-foreground); border: 1px solid var(--border); border-radius: 6px;
   padding: .4rem .55rem; }
 .station__lien { display: inline-block; margin-top: 1rem; font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 12px; color: var(--accent); text-decoration: none;
@@ -260,7 +261,7 @@
 }
 
 /* ---------- demonstrations de projet ---------- */
-.demo { border: 1px solid var(--border); border-radius: 4px; background: var(--card); overflow: hidden; margin-top: 1.5rem; }
+.demo { border: 1px solid var(--bord-doux); border-radius: var(--r-carte); background: var(--card); overflow: hidden; margin-top: 1.5rem; }
 .demo__bar { display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem;
   border-bottom: 1px solid var(--border); background: var(--secondary); }
 .demo__titre { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; font-weight: 500;
@@ -273,12 +274,12 @@
 .demo__etiq { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px; font-weight: 500;
   letter-spacing: .14em; text-transform: uppercase; color: var(--muted-foreground); margin: 1.25rem 0 .55rem; }
 .demo__etiq:first-child { margin-top: 0; }
-.demo__champ { border: 1px solid var(--input); border-radius: 3px; background: var(--background);
+.demo__champ { border: 1px solid var(--input); border-radius: var(--r-puce); background: var(--background);
   padding: .8rem .95rem; min-height: 46px; font-size: .9rem; line-height: 1.5; display: flex; align-items: center; gap: .5rem; }
 .demo__curseur { display: inline-block; width: 7px; height: 16px; background: var(--accent); opacity: 0; }
 
 .demo__etapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: .55rem; }
-.demo__etape { border: 1px solid var(--border); border-radius: 3px; background: var(--background);
+.demo__etape { border: 1px solid var(--border); border-radius: var(--r-puce); background: var(--background);
   padding: .7rem .75rem; opacity: .4; }
 .demo__etape b { display: block; font-size: 11.5px; font-weight: 600; }
 .demo__etape span { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px;
@@ -294,20 +295,20 @@
 .demo__morceau.garde { background: var(--accent); box-shadow: 0 0 9px color-mix(in oklch, var(--accent) 60%, transparent); }
 .demo__morceau.rejete { opacity: .16 !important; }
 
-.demo__reponse { border: 1px solid var(--border); border-left: 2px solid oklch(0.78 0.15 160); border-radius: 3px;
+.demo__reponse { border: 1px solid var(--border); border-left: 2px solid oklch(0.78 0.15 160); border-radius: var(--r-puce);
   background: var(--background); padding: .9rem 1.05rem; min-height: 70px; font-size: .9rem; line-height: 1.62; opacity: 0; }
 .demo__cit { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px;
   padding: 0 4px; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px; font-weight: 600;
-  color: var(--background); background: var(--accent); border: 0; border-radius: 2px; cursor: pointer;
+  color: var(--background); background: var(--accent); border: 0; border-radius: 6px; cursor: pointer;
   vertical-align: 2px; margin: 0 2px; }
-.demo__source { margin-top: .75rem; border: 1px solid var(--input); border-radius: 3px; background: var(--secondary);
+.demo__source { margin-top: .75rem; border: 1px solid var(--input); border-radius: var(--r-puce); background: var(--secondary);
   padding: .85rem 1rem; opacity: 0; }
 .demo__source-tete { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px;
   color: var(--muted-foreground); letter-spacing: .06em; margin-bottom: .6rem; }
 .demo__source-corps { font-size: .81rem; line-height: 1.7; color: var(--muted-foreground); }
 .demo__surligne { background: color-mix(in oklch, var(--accent) 22%, transparent);
   border-bottom: 1px solid color-mix(in oklch, var(--accent) 60%, transparent); color: var(--foreground);
-  padding: 1px 2px; border-radius: 2px; }
+  padding: 1px 2px; border-radius: 6px; }
 
 .demo__journal { margin-top: 1.1rem; font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 11px; line-height: 1.9; color: var(--muted-foreground); }
@@ -316,7 +317,7 @@
 
 .demo__actions { margin-top: 1.4rem; display: flex; gap: .6rem; }
 .demo__bouton { font-size: .82rem; font-weight: 500; color: var(--background); background: var(--accent);
-  border: 0; border-radius: 3px; padding: .7rem 1.1rem; cursor: pointer; transition: filter .2s; }
+  border: 0; border-radius: var(--r-puce); padding: .7rem 1.1rem; cursor: pointer; transition: filter .2s; }
 .demo__bouton:hover:not(:disabled) { filter: brightness(1.1); }
 .demo__bouton:disabled { opacity: .45; cursor: default; }
 .demo__bouton--fantome { background: transparent; color: var(--muted-foreground); border: 1px solid var(--input); }
@@ -327,7 +328,7 @@
 }
 
 /* ---------- terminal de l'agent ---------- */
-.term { background: oklch(0.1 0.005 255); border: 1px solid var(--input); border-radius: 3px;
+.term { background: oklch(0.1 0.005 255); border: 1px solid var(--input); border-radius: var(--r-puce);
   padding: 1rem 1.1rem; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 12.5px;
   line-height: 1.85; min-height: 290px; color: var(--muted-foreground); overflow-x: auto; }
 .term__l { opacity: 0; white-space: pre-wrap; }
@@ -339,14 +340,14 @@
 .term .moins { color: oklch(0.68 0.19 25); }
 .term .plus { color: oklch(0.78 0.15 160); }
 .term__outil { display: inline-block; font-size: 10.5px; letter-spacing: .06em; color: var(--background);
-  background: var(--accent); border-radius: 2px; padding: 1px 6px; margin-right: .45rem; }
+  background: var(--accent); border-radius: 6px; padding: 1px 6px; margin-right: .45rem; }
 
 /* ---------- chaine mina ---------- */
 .onde { display: flex; align-items: center; gap: 3px; height: 52px; padding: 0 4px;
-  border: 1px solid var(--input); border-radius: 3px; background: var(--background); }
+  border: 1px solid var(--input); border-radius: var(--r-puce); background: var(--background); }
 .onde i { flex: 1; background: var(--input); border-radius: 1px; height: 6px; }
 .chaine { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: .6rem; align-items: center; }
-.chaine__boite { border: 1px solid var(--border); border-radius: 3px; background: var(--background);
+.chaine__boite { border: 1px solid var(--border); border-radius: var(--r-puce); background: var(--background);
   padding: .7rem .8rem; opacity: .38; }
 .chaine__boite b { display: block; font-size: 11.5px; font-weight: 600; }
 .chaine__boite span { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace;
@@ -362,7 +363,7 @@
   border-bottom: 1px solid var(--border); padding-bottom: .75rem; }
 .onglet { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11.5px;
   letter-spacing: .06em; color: var(--muted-foreground); background: transparent;
-  border: 1px solid var(--border); border-radius: 3px; padding: .5rem .8rem; cursor: pointer;
+  border: 1px solid var(--border); border-radius: var(--r-puce); padding: .5rem .8rem; cursor: pointer;
   transition: color .2s, border-color .2s, background .2s; }
 .onglet:hover { color: var(--foreground); border-color: var(--input); }
 .onglet--actif { color: var(--background); background: var(--accent); border-color: var(--accent); }
@@ -374,24 +375,24 @@
 .rag { padding: 6rem 0 0; }
 .rag__intro { margin-bottom: 2.5rem; }
 /* 55vh par etape au lieu de 80 : la traversee reste lisible sans temps mort */
-.rag__spacer { height: 55vh; }
+.rag__spacer { height: 30vh; }
 
 /* ---------- demo : indexation d'un dossier ---------- */
-.idx { border: 1px solid var(--input); border-radius: 3px; background: var(--background); padding: .8rem .95rem; }
+.idx { border: 1px solid var(--input); border-radius: var(--r-puce); background: var(--background); padding: .8rem .95rem; }
 .idx__tete { display: flex; justify-content: space-between; align-items: baseline;
   font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; color: var(--muted-foreground); }
 .idx__tete b { color: var(--foreground); font-weight: 500; }
 .idx__barre { height: 3px; background: var(--input); margin: .6rem 0 .55rem; position: relative;
-  overflow: hidden; border-radius: 2px; }
+  overflow: hidden; border-radius: 6px; }
 .idx__barre i { position: absolute; inset: 0 auto 0 0; width: 0;
   background: linear-gradient(90deg, var(--accent), oklch(0.72 0.14 295)); }
 .idx__ligne { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11.5px; line-height: 1.7;
   color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .res { display: flex; flex-direction: column; gap: .5rem; }
-.fic { border: 1px solid var(--border); border-radius: 3px; background: var(--background); padding: .75rem .9rem;
+.fic { border: 1px solid var(--border); border-radius: var(--r-puce); background: var(--background); padding: .75rem .9rem;
   display: grid; grid-template-columns: 44px 1fr auto; gap: .8rem; align-items: center; opacity: 0; }
-.vign { width: 44px; height: 44px; border-radius: 2px; position: relative; overflow: hidden; }
+.vign { width: 44px; height: 44px; border-radius: 6px; position: relative; overflow: hidden; }
 .vign span { position: absolute; inset: 0; display: grid; place-items: center;
   font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 9px; font-weight: 600;
   color: #0a0c10; letter-spacing: .04em; }
@@ -405,14 +406,14 @@
 .fic__score b { display: block; color: oklch(0.78 0.15 160); font-size: 12px; font-weight: 600; }
 
 .note-vision { margin-top: .85rem; border: 1px solid var(--border); border-left: 2px solid oklch(0.72 0.14 295);
-  border-radius: 2px; background: var(--background); padding: .7rem .9rem; opacity: 0; }
+  border-radius: 6px; background: var(--background); padding: .7rem .9rem; opacity: 0; }
 .note-vision b { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px;
   font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: oklch(0.72 0.14 295); margin-bottom: .45rem; }
 .note-vision span { font-size: 13px; color: var(--muted-foreground); line-height: 1.6; }
 
 /* ---------- demo : page scannee ---------- */
 .colonnes { display: grid; grid-template-columns: 230px 1fr; gap: 1.1rem; align-items: start; }
-.page { position: relative; background: #e9e6df; border: 1px solid var(--input); border-radius: 2px;
+.page { position: relative; background: #e9e6df; border: 1px solid var(--input); border-radius: 6px;
   padding: 1rem .9rem; aspect-ratio: 1 / 1.35; overflow: hidden; box-shadow: 0 8px 22px rgba(0,0,0,.35); }
 .page__bande { height: 6px; background: #b9b2a6; border-radius: 1px; margin-bottom: .5rem; }
 .page__bande.court { width: 52%; } .page__bande.moyen { width: 78%; }
@@ -424,12 +425,12 @@
   background: linear-gradient(180deg, transparent, rgba(167,139,250,.55), transparent); }
 .page__etiq { position: absolute; left: .6rem; bottom: .6rem; font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: #6b6358;
-  background: rgba(255,255,255,.72); border-radius: 2px; padding: .25rem .4rem; }
+  background: rgba(255,255,255,.72); border-radius: 6px; padding: .25rem .4rem; }
 .avant { margin-top: .5rem; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px;
   line-height: 1.6; color: var(--muted-foreground); text-align: center; }
 .avant b { color: oklch(0.8 0.13 75); font-weight: 500; }
 .avant b.violet, .violet { color: oklch(0.75 0.14 295); }
-.zone { border: 1px solid var(--input); border-radius: 3px; background: var(--background);
+.zone { border: 1px solid var(--input); border-radius: var(--r-puce); background: var(--background);
   padding: .85rem 1rem; min-height: 184px; }
 .scan__l { font-size: 13px; line-height: 1.75; color: var(--muted-foreground); opacity: 0; }
 .scan__l.cle { color: var(--foreground); }
@@ -538,3 +539,7 @@
 /* Etiquette de carte : meme famille que le kicker, sans son respir. */
 .carte__etiquette { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px;
   font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--muted-foreground); }
+
+/* Les demos gardent une largeur de lecture confortable, mais calees a gauche
+   sur la meme gouttiere que le reste : rien ne doit se recentrer en cours de page. */
+.demo-zone { max-width: none; }

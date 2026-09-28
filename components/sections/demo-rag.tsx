@@ -226,7 +226,7 @@ export function DemoRag({ nu = false }: { nu?: boolean } = {}) {
 
   return (
     <section className="border-t border-border/40">
-      <div className="mx-auto max-w-4xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-24">
         <p className="rag__kicker">Démonstration</p>
         <h2 className="rag__h2">Voir RAG-Local à l&apos;œuvre</h2>
         <p className="rag__lede mb-8">

@@ -131,6 +131,29 @@ export function DemoScan({ nu = false }: { nu?: boolean } = {}) {
     t.add({ v: 0 }, { v: 1, duration: 10, onComplete: () => setEnCours(false) }, 6400)
   }, [reinitialiser])
 
+  // Lancement automatique a l'entree dans le champ de vision : un recruteur ne
+  // doit jamais tomber sur un panneau vide en attendant de cliquer. Une seule
+  // fois, puis l'observateur se debranche ; le bouton reste pour rejouer.
+  useEffect(() => {
+    const el = racine.current
+    if (!pret || !el || typeof IntersectionObserver === "undefined") return
+    let lance = false
+    const io = new IntersectionObserver(
+      (entrees) => {
+        for (const e of entrees) {
+          if (e.isIntersecting && !lance) {
+            lance = true
+            io.disconnect()
+            jouer()
+          }
+        }
+      },
+      { threshold: 0.3 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [pret, jouer])
+
   const carte = (
     <div className="demo" ref={racine}>
       <div className="demo__bar">
@@ -208,7 +231,7 @@ export function DemoScan({ nu = false }: { nu?: boolean } = {}) {
 
   return (
     <section className="border-t border-border/40">
-      <div className="mx-auto max-w-4xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-24">
         <p className="rag__kicker">Démonstration</p>
         <h2 className="rag__h2">Un document scanné devient cherchable</h2>
         <p className="rag__lede mb-8">
