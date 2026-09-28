@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
 /**
@@ -86,6 +87,7 @@ function surLeChemin(p: number) {
 export function Objet3D() {
   const racine = useRef<HTMLDivElement>(null)
   const [section, setSection] = useState<(typeof SECTIONS)[number] | null>(null)
+  const [fin, setFin] = useState(false)
 
   useEffect(() => {
     const el = racine.current
@@ -99,6 +101,7 @@ export function Objet3D() {
     let temps = 0
     let rafId = 0
     let dernierId = "—"
+    let dernierFin = false
 
     const avancement = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight
@@ -151,6 +154,16 @@ export function Objet3D() {
         dernierId = id
         setSection(s)
       }
+      // Le robot se replie en bouton quand on ARRIVE dans la section contact,
+      // pas a un pourcentage fixe de la page : le pied de page compte dans la
+      // hauteur totale, et 94 % tombait encore deux sections plus haut.
+      // On monte le lien seulement a ce moment-la : un lien invisible en
+      // permanence serait atteignable au clavier sans rien donner a voir.
+      const f = id === "sec-contact"
+      if (f !== dernierFin) {
+        dernierFin = f
+        setFin(f)
+      }
     }
 
     const surDefilement = () => {
@@ -165,11 +178,22 @@ export function Objet3D() {
       rafId = requestAnimationFrame(boucle)
     }
 
+    // Au retour sur l'onglet : le navigateur a suspendu les images et les
+    // evenements pendant l'absence, et la position a pu changer entre-temps.
+    // Sans ce rattrapage, l'objet reprend dans l'etat qu'il avait en partant.
+    const surReveil = () => {
+      if (document.visibilityState === "visible") {
+        dernierY = window.scrollY
+        peindre(false)
+      }
+    }
+    document.addEventListener("visibilitychange", surReveil)
     window.addEventListener("scroll", surDefilement, { passive: true })
     window.addEventListener("resize", surDefilement, { passive: true })
     peindre(false) // juste des la premiere peinture, sans attendre une image
     if (!fige) rafId = requestAnimationFrame(boucle)
     return () => {
+      document.removeEventListener("visibilitychange", surReveil)
       window.removeEventListener("scroll", surDefilement)
       window.removeEventListener("resize", surDefilement)
       cancelAnimationFrame(rafId)
@@ -177,9 +201,9 @@ export function Objet3D() {
   }, [])
 
   return (
-    <div ref={racine} className={`obj ${section ? "obj--parle" : ""}`} aria-hidden="true">
-      <div className="obj__halo" />
-      <div className="obj__scene">
+    <div ref={racine} className={`obj ${section && !fin ? "obj--parle" : ""} ${fin ? "obj--bouton" : ""}`}>
+      <div className="obj__halo" aria-hidden="true" />
+      <div className="obj__scene" aria-hidden="true">
         <div className="obj__cube">
           <div className="obj__f" />
           <div className="obj__f" />
@@ -204,10 +228,15 @@ export function Objet3D() {
         </div>
         <div className="obj__noyau" />
       </div>
-      <div className="obj__bulle">
+      <div className="obj__bulle" aria-hidden="true">
         <b>{section?.nom ?? ""}</b>
         <span>{section?.dit ?? ""}</span>
       </div>
+      {fin ? (
+        <Link href="/contact" className="obj__bouton">
+          Me contacter
+        </Link>
+      ) : null}
     </div>
   )
 }

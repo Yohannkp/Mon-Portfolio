@@ -599,3 +599,40 @@
 
 @media (max-width: 1280px) { .obj { display: none; } }
 @media (prefers-reduced-motion: reduce) { .obj__oeil { animation: none; } }
+
+/* ---------- fin de page : le robot se replie en bouton ------------------- */
+/* Le volume disparait, la pastille s'ouvre en pilule : c'est le meme objet
+   qui se pose, pas un bouton qui apparait a cote. */
+.obj__bot { transition: opacity .45s ease; }
+.obj.obj--bouton .obj__bot,
+.obj.obj--bouton .obj__halo { opacity: 0; }
+.obj.obj--bouton .obj__bulle { opacity: 0; }
+
+/* Etat de REPOS = etat final. L'animation ne joue que l'entree : si elle ne
+   demarre pas (images suspendues, moteur qui la refuse), le bouton est quand
+   meme la, a la bonne taille et cliquable. Un bouton n'a pas le droit de
+   dependre d'une animation pour exister. */
+.obj__bouton { position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%); opacity: 1;
+  width: 186px; padding: 0 1.4rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 54px; border-radius: 999px; white-space: nowrap; overflow: hidden;
+  background: var(--accent); color: var(--background);
+  font-size: .95rem; font-weight: 600; letter-spacing: -.01em;
+  text-decoration: none; pointer-events: auto;
+  box-shadow: 0 20px 48px -18px color-mix(in oklch, var(--accent) 85%, transparent);
+  animation: obj-deplie .6s cubic-bezier(.2, .75, .2, 1);
+  transition: filter .2s ease, transform .2s ease; }
+.obj__bouton:hover { filter: brightness(1.08); transform: translate(-50%, -50%) scale(1.04); }
+.obj__bouton:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+/* L'animation ne touche QUE la transformation. Ni largeur ni opacite : une
+   animation peut rester figee sur sa premiere image (images suspendues), et
+   elle ecrase alors l'etat de repos. Figee ici, le bouton est simplement un
+   peu plus petit — visible, lisible, cliquable. */
+@keyframes obj-deplie {
+  from { transform: translate(-50%, -50%) scale(.72) ; }
+  60%  { transform: translate(-50%, -50%) scale(1.06); }
+  to   { transform: translate(-50%, -50%) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .obj__bouton { animation: none; } }
