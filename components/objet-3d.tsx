@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
 /**
@@ -87,7 +86,6 @@ function surLeChemin(p: number) {
 export function Objet3D() {
   const racine = useRef<HTMLDivElement>(null)
   const [section, setSection] = useState<(typeof SECTIONS)[number] | null>(null)
-  const [fin, setFin] = useState(false)
 
   useEffect(() => {
     const el = racine.current
@@ -101,7 +99,6 @@ export function Objet3D() {
     let temps = 0
     let rafId = 0
     let dernierId = "—"
-    let dernierFin = false
 
     const avancement = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight
@@ -131,9 +128,50 @@ export function Objet3D() {
      *  continuent d'arriver quand le navigateur suspend les images (onglet en
      *  arriere-plan, fenetre reduite), les images non. Sans ce second appel,
      *  on revient sur l'onglet et le robot commente encore la section d'avant. */
+    /** L'atterrissage.
+     *
+     *  En bas de page, le robot ne se change pas en bouton : il va se POSER sur
+     *  celui qui existe deja dans la section contact, puis s'efface. Creer un
+     *  second bouton serait un doublon — pour l'oeil comme pour un lecteur
+     *  d'ecran. On mesure donc la cible a chaque image et on ramene l'objet
+     *  dessus. `pose` vaut 0 tant qu'elle est loin, 1 quand il est arrive.
+     */
+    const viserLaCible = () => {
+      const cible = document.querySelector<HTMLElement>("[data-cible-robot]")
+      if (!cible) return null
+      const r = cible.getBoundingClientRect()
+      if (r.width === 0) return null
+      const H = window.innerHeight
+      // la descente commence quand le bouton entre par le bas de l'ecran
+      const t = Math.min(Math.max((H * 0.95 - r.top) / (H * 0.4), 0), 1)
+      if (t <= 0) return null
+      const cx = r.left + r.width / 2
+      const cy = r.top + r.height / 2
+      // clientWidth, PAS innerWidth : innerWidth compte la barre de defilement,
+      // que le positionnement CSS ignore. L'ecart mesure faisait exactement ses
+      // 15 px, et le robot se posait a cote du bouton.
+      const largeur = document.documentElement.clientWidth
+      // .obj fait 340 de large, ancre par son bord droit, et sa hauteur est
+      // compensee par margin-top:-170 — son centre est donc a (largeur - bx - 170, by).
+      return { pose: t, bx: largeur - cx - 170, by: cy }
+    }
+
     const peindre = (anime: boolean) => {
       const p = avancement()
-      const { bx, by } = surLeChemin(p)
+      let { bx, by } = surLeChemin(p)
+      let bxPx: number | null = null
+      let byPx: number | null = null
+      let pose = 0
+      const cible = viserLaCible()
+      if (cible) {
+        pose = cible.pose
+        const d = pose * pose * (3 - 2 * pose)
+        // on melange la trajectoire libre et la cible, en pixels
+        const bxLibre = (bx / 100) * document.documentElement.clientWidth
+        const byLibre = (by / 100) * document.documentElement.clientHeight
+        bxPx = bxLibre + (cible.bx - bxLibre) * d
+        byPx = byLibre + (cible.by - byLibre) * d
+      }
       if (anime) {
         vitesse = vitesse * 0.9 + brut * 0.01
         brut = 0
@@ -146,23 +184,14 @@ export function Objet3D() {
       el.style.setProperty("--prog", p.toFixed(4))
       el.style.setProperty("--mut", mut.toFixed(4))
       el.style.setProperty("--ry", `${(angle + p * 420).toFixed(2)}deg`)
-      el.style.setProperty("--bx", `${bx.toFixed(2)}%`)
-      el.style.setProperty("--by", `${by.toFixed(2)}%`)
-      const s = sectionVue()
+      el.style.setProperty("--bx", bxPx === null ? `${bx.toFixed(2)}%` : `${bxPx.toFixed(1)}px`)
+      el.style.setProperty("--by", byPx === null ? `${by.toFixed(2)}%` : `${byPx.toFixed(1)}px`)
+      el.style.setProperty("--pose", pose.toFixed(4))
+      const s = pose > 0.25 ? null : sectionVue()
       const id = s?.id ?? "—"
       if (id !== dernierId) {
         dernierId = id
         setSection(s)
-      }
-      // Le robot se replie en bouton quand on ARRIVE dans la section contact,
-      // pas a un pourcentage fixe de la page : le pied de page compte dans la
-      // hauteur totale, et 94 % tombait encore deux sections plus haut.
-      // On monte le lien seulement a ce moment-la : un lien invisible en
-      // permanence serait atteignable au clavier sans rien donner a voir.
-      const f = id === "sec-contact"
-      if (f !== dernierFin) {
-        dernierFin = f
-        setFin(f)
       }
     }
 
@@ -201,7 +230,7 @@ export function Objet3D() {
   }, [])
 
   return (
-    <div ref={racine} className={`obj ${section && !fin ? "obj--parle" : ""} ${fin ? "obj--bouton" : ""}`}>
+    <div ref={racine} className={`obj ${section ? "obj--parle" : ""}`}>
       <div className="obj__halo" aria-hidden="true" />
       <div className="obj__scene" aria-hidden="true">
         <div className="obj__cube">
@@ -232,11 +261,6 @@ export function Objet3D() {
         <b>{section?.nom ?? ""}</b>
         <span>{section?.dit ?? ""}</span>
       </div>
-      {fin ? (
-        <Link href="/contact" className="obj__bouton">
-          Me contacter
-        </Link>
-      ) : null}
     </div>
   )
 }
