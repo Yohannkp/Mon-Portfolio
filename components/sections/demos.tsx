@@ -1,16 +1,25 @@
 "use client"
 
 import { useState } from "react"
-import { DemoRag } from "@/components/sections/demo-rag"
+import { DemoFichiers } from "@/components/sections/demo-fichiers"
+import { DemoScan } from "@/components/sections/demo-scan"
 import { DemoAgent } from "@/components/sections/demo-agent"
 import { DemoMina } from "@/components/sections/demo-mina"
 
 const ONGLETS = [
   {
-    cle: "rag",
-    nom: "RAG-Local",
-    titre: "Une question traverse le pipeline",
-    texte: "De la question posée jusqu'à la réponse citée, avec la page source qui s'ouvre.",
+    cle: "fichiers",
+    nom: "Mes fichiers",
+    titre: "Où sont mes photos prises à la plage ?",
+    texte:
+      "RAG-Local indexe un dossier de l'ordinateur et retrouve des images par leur contenu — elles ne contiennent pourtant aucun texte.",
+  },
+  {
+    cle: "scan",
+    nom: "Un scan cherchable",
+    titre: "Une page scannée devient interrogeable",
+    texte:
+      "Une page scannée est une image : zéro texte extractible. Un modèle de vision local la transcrit, puis elle entre dans l'index.",
   },
   {
     cle: "agent",
@@ -27,7 +36,7 @@ const ONGLETS = [
 ] as const
 
 export function Demos() {
-  const [actif, setActif] = useState<(typeof ONGLETS)[number]["cle"]>("rag")
+  const [actif, setActif] = useState<(typeof ONGLETS)[number]["cle"]>("fichiers")
   const courant = ONGLETS.find((o) => o.cle === actif)!
 
   return (
@@ -36,7 +45,7 @@ export function Demos() {
         <p className="rag__kicker">Démonstrations</p>
         <h2 className="rag__h2">Voir les projets à l&apos;œuvre</h2>
         <p className="rag__lede">
-          Trois scénarios joués au clic. Rien n&apos;est exécuté pour de vrai — ce sont des simulations, et elles le
+          Quatre scénarios joués au clic. Rien n&apos;est exécuté pour de vrai — ce sont des simulations, et elles le
           disent.
         </p>
 
@@ -59,7 +68,8 @@ export function Demos() {
           <p>{courant.texte}</p>
         </div>
 
-        {actif === "rag" ? <DemoRag nu /> : null}
+        {actif === "fichiers" ? <DemoFichiers nu /> : null}
+        {actif === "scan" ? <DemoScan nu /> : null}
         {actif === "agent" ? <DemoAgent nu /> : null}
         {actif === "mina" ? <DemoMina nu /> : null}
       </div>
