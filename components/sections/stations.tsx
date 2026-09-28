@@ -125,7 +125,7 @@ export function Stations() {
   }, [])
 
   return (
-    <section className="border-t border-border/40">
+    <section id="sec-stations" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <p className="rag__kicker">Stations</p>
         <h2 className="rag__h2">Six projets, menés jusqu&apos;au déploiement</h2>

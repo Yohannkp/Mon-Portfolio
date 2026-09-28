@@ -2,6 +2,7 @@ import { Hero } from "@/components/sections/hero"
 import { RagPipeline } from "@/components/sections/rag-pipeline"
 import { Demos } from "@/components/sections/demos"
 import { ReadingRail } from "@/components/reading-rail"
+import { Compagnon3D } from "@/components/compagnon-3d"
 import { Counters } from "@/components/sections/counters"
 import { Stations } from "@/components/sections/stations"
 import { AboutPreview } from "@/components/sections/about-preview"
@@ -24,6 +25,7 @@ export default function HomePage() {
       <Process />
       <CurrentlyLearning />
       <ContactCTA />
+      <Compagnon3D />
     </>
   )
 }

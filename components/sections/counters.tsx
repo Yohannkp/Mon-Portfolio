@@ -62,7 +62,7 @@ export function Counters() {
   }, [])
 
   return (
-    <section className="border-t border-border/40">
+    <section id="sec-chiffres" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <p className="rag__kicker">En chiffres</p>
         <h2 className="rag__h2">Ce qui existe vraiment</h2>

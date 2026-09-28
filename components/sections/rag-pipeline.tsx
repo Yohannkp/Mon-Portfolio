@@ -125,7 +125,7 @@ export function RagPipeline() {
   }, [])
 
   return (
-    <section className="rag" aria-labelledby="rag-titre">
+    <section id="sec-rag" className="rag" aria-labelledby="rag-titre">
       <div className="rag__intro">
         <p className="rag__kicker">Pièce maîtresse</p>
         <h2 id="rag-titre" className="rag__h2">

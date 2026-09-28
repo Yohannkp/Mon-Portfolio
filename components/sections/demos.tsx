@@ -40,7 +40,7 @@ export function Demos() {
   const courant = ONGLETS.find((o) => o.cle === actif)!
 
   return (
-    <section className="border-t border-border/40">
+    <section id="sec-demos" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <div className="demo-zone">
         <p className="rag__kicker">Démonstrations</p>

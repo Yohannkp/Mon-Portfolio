@@ -543,3 +543,65 @@
 /* Les demos gardent une largeur de lecture confortable, mais calees a gauche
    sur la meme gouttiere que le reste : rien ne doit se recentrer en cours de page. */
 .demo-zone { max-width: none; }
+
+/* ==========================================================================
+   Le compagnon : petit objet 3D fixe qui suit la lecture.
+   Trois formes, une seule scene. Ce qui change d'une section a l'autre,
+   c'est quelles primitives sont visibles — la scene, elle, tourne en continu.
+   ========================================================================== */
+
+.comp { position: fixed; right: 30px; bottom: 30px; z-index: 30; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: .6rem;
+  opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+.comp--visible { opacity: 1; transform: none; }
+.comp__objet { width: 104px; height: 104px; perspective: 600px; position: relative; }
+.comp__scene { position: absolute; inset: 0; transform-style: preserve-3d;
+  transform: rotateX(-22deg) rotateY(0deg); }
+
+/* Toutes les primitives partent invisibles ; la forme active les revele. */
+.comp__f, .comp__b, .comp__t {
+  position: absolute; left: 50%; top: 50%;
+  border: 1px solid color-mix(in oklch, var(--accent) 60%, transparent);
+  opacity: 0; transition: opacity .5s ease; }
+
+/* --- forme "index" : trois plans horizontaux empiles --------------------- */
+.comp__f { width: 76px; height: 76px; margin: -38px 0 0 -38px;
+  background: color-mix(in oklch, var(--accent) 6%, transparent); }
+.comp__f:nth-of-type(1) { transform: rotateX(90deg) translateZ(26px); }
+.comp__f:nth-of-type(2) { transform: rotateX(90deg) translateZ(0px); }
+.comp__f:nth-of-type(3) { transform: rotateX(90deg) translateZ(-26px); }
+.comp[data-forme="index"] .comp__f { opacity: 1; }
+
+/* --- forme "chaine" : trois boites alignees ------------------------------ */
+.comp__b { width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  background: color-mix(in oklch, var(--accent) 8%, transparent); }
+.comp__b:nth-of-type(1) { transform: translateX(-38px); }
+.comp__b:nth-of-type(2) { transform: translateX(0px) translateZ(14px); }
+.comp__b:nth-of-type(3) { transform: translateX(38px); }
+.comp[data-forme="chaine"] .comp__b { opacity: 1; }
+
+/* --- forme "treillis" : trois carres orthogonaux ------------------------- */
+.comp__t { width: 72px; height: 72px; margin: -36px 0 0 -36px; }
+.comp__t:nth-of-type(1) { transform: rotateZ(45deg); }
+.comp__t:nth-of-type(2) { transform: rotateY(90deg) rotateZ(45deg); }
+.comp__t:nth-of-type(3) { transform: rotateX(90deg) rotateZ(45deg); }
+.comp[data-forme="treillis"] .comp__t { opacity: 1; }
+
+/* --- forme "noyau" : tout s'efface, le point reste ----------------------- */
+.comp[data-forme="noyau"] .comp__t { opacity: .28; }
+.comp[data-forme="noyau"] .comp__noyau { width: 16px; height: 16px; margin: -8px 0 0 -8px;
+  box-shadow: 0 0 34px 12px color-mix(in oklch, var(--accent) 60%, transparent); }
+
+.comp__noyau { position: absolute; left: 50%; top: 50%; width: 7px; height: 7px;
+  margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 20px 5px color-mix(in oklch, var(--accent) 45%, transparent);
+  transition: width .5s ease, height .5s ease, margin .5s ease, box-shadow .5s ease; }
+
+.comp__nom { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 9.5px;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--muted-foreground);
+  white-space: nowrap; }
+
+@media (max-width: 1200px) { .comp { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .comp__scene { transform: rotateX(-22deg) rotateY(32deg); }
+}

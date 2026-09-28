@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 
 export function ContactCTA() {
   return (
-    <section className="border-t border-border/40">
+    <section id="sec-contact" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
