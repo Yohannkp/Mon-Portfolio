@@ -16,14 +16,18 @@ import { useEffect, useRef, useState } from "react"
  */
 
 /** Trajectoire : a quel avancement, a quelle distance du bord droit et a quelle hauteur. */
+/* Le robot passe derriere le contenu, donc un chevauchement ne gene pas la
+   lecture — mais derriere une carte opaque il disparait. La trajectoire est
+   donc calee vers le bord droit, la ou la marge le laisse visible, tout en
+   gardant une vraie amplitude verticale. */
 const CHEMIN = [
   { p: 0.0, bx: 7, by: 50 },
-  { p: 0.2, bx: 4, by: 26 },
-  { p: 0.36, bx: 13, by: 66 },
-  { p: 0.52, bx: 4, by: 30 },
-  { p: 0.68, bx: 14, by: 68 },
-  { p: 0.84, bx: 5, by: 28 },
-  { p: 1.0, bx: 10, by: 54 },
+  { p: 0.2, bx: 2, by: 26 },
+  { p: 0.36, bx: 9, by: 66 },
+  { p: 0.52, bx: 2, by: 30 },
+  { p: 0.68, bx: 10, by: 68 },
+  { p: 0.84, bx: 3, by: 28 },
+  { p: 1.0, bx: 7, by: 54 },
 ]
 
 /** Ce que le robot dit, section par section. */
@@ -94,6 +98,18 @@ export function Objet3D() {
     const el = racine.current
     if (typeof window === "undefined" || !el) return
     const fige = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+    // Le bouton de la section contact ne doit jamais se montrer quand le robot
+    // est en service : c'est LUI le bouton. On le masque des le montage, pas
+    // seulement a l'atterrissage — sinon on voit un bouton blanc apparaitre
+    // puis se faire remplacer, ce qui est exactement ce qu'on veut eviter.
+    // Sous 1280px le robot n'existe pas : le bouton de la page reprend son role.
+    const large = window.matchMedia("(min-width: 1281px)")
+    const majService = () => {
+      document.documentElement.dataset.robotActif = large.matches ? "1" : "0"
+    }
+    majService()
+    large.addEventListener("change", majService)
 
     let angle = 0
     let vitesse = 0
@@ -257,6 +273,8 @@ export function Objet3D() {
     peindre(false) // juste des la premiere peinture, sans attendre une image
     if (!fige) rafId = requestAnimationFrame(boucle)
     return () => {
+      large.removeEventListener("change", majService)
+      delete document.documentElement.dataset.robotActif
       delete document.documentElement.dataset.robotPose
       document.removeEventListener("visibilitychange", surReveil)
       window.removeEventListener("scroll", surDefilement)
@@ -266,7 +284,7 @@ export function Objet3D() {
   }, [])
 
   return (
-    <div ref={racine} className={`obj ${section ? "obj--parle" : ""}`}>
+    <div ref={racine} className={`obj ${section ? "obj--parle" : ""} ${pilule ? "obj--pose" : ""}`}>
       <div className="obj__halo" aria-hidden="true" />
       <div className="obj__scene" aria-hidden="true">
         <div className="obj__cube">

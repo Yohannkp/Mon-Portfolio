@@ -504,8 +504,14 @@
    aucune dependance, ni canvas ni WebGL.
    ========================================================================== */
 
+/* Le robot passe DERRIERE le contenu : il ne doit jamais se poser sur le texte
+   qu'on est en train de lire. Les sections remontent au-dessus de lui, et comme
+   elles n'ont pas de fond, il reste visible dans les respirations de la page.
+   Une fois pose sur le bouton, il repasse devant — il faut pouvoir cliquer. */
+main > section, main > div { position: relative; z-index: 1; }
+
 .obj {
-  position: fixed; z-index: 30; pointer-events: none;
+  position: fixed; z-index: 0; pointer-events: none;
   /* --mut : 0 = cube, 1 = robot, ecrit par le JS. Le calcul est fait la-bas et
      pas ici : un clamp() sur des nombres sans unite fait echouer le parseur de
      Tailwind 4, qui abandonne silencieusement tout le bloc qui suit. */
@@ -604,6 +610,7 @@
    place dans la mise en page et donne la mesure a viser. Il ne s'efface que
    lorsque le robot commence reellement a se poser — sinon une panne du robot
    (ecran etroit, JS en echec) laisserait la page sans bouton de contact. */
+[data-robot-actif="1"] [data-cible-robot],
 [data-robot-pose="1"] [data-cible-robot] { visibility: hidden; }
 
 .obj { transform: scale(var(--ech, 1)); }
@@ -627,3 +634,9 @@
   transition: filter .2s ease; }
 .obj__pilule:hover { filter: brightness(1.08); }
 .obj__pilule:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+/* Derriere le texte, un objet trop present gene la lecture meme sans le
+   recouvrir : on l'attenue, et on le rend franc a nouveau une fois pose. */
+.obj { opacity: .62; transition: opacity .4s ease; }
+.obj--pose { z-index: 40; opacity: 1; pointer-events: none; }
+.obj--pose .obj__pilule { pointer-events: auto; }
