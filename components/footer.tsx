@@ -15,7 +15,7 @@ export function Footer() {
           <div className="flex flex-col items-center gap-2 md:items-start">
             <span className="text-sm font-medium">Yendi Yohann</span>
             <span className="text-sm text-muted-foreground">
-              Ingénieur Big Data & IA en alternance
+              Élève ingénieur Big Data &amp; IA — ECE Paris
             </span>
           </div>
 

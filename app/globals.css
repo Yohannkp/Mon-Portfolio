@@ -599,13 +599,31 @@
 @media (max-width: 1280px) { .obj { display: none; } }
 @media (prefers-reduced-motion: reduce) { .obj__oeil { animation: none; } }
 
-/* ---------- atterrissage : le robot se pose sur le bouton existant ------ */
-/* Il ne devient pas un bouton — il rejoint celui de la section contact et
-   s'efface dessus. Un second bouton aurait ete un doublon, a l'oeil comme
-   pour un lecteur d'ecran. --pose va de 0 (loin) a 1 (arrive). */
-.obj__bot { opacity: calc(var(--mut, 0) * (1 - var(--pose, 0))); }
-.obj__halo { opacity: calc((1 - var(--mut, 0) * 0.4) * (1 - var(--pose, 0))); }
-.obj__cube, .obj__coeur, .obj__noyau { opacity: calc((1 - var(--mut, 0)) * (1 - var(--pose, 0))); }
+/* ---------- le robot DEVIENT le bouton ---------------------------------- */
+/* L'element de la section contact n'est qu'un emplacement : il reserve la
+   place dans la mise en page et donne la mesure a viser. Il ne s'efface que
+   lorsque le robot commence reellement a se poser — sinon une panne du robot
+   (ecran etroit, JS en echec) laisserait la page sans bouton de contact. */
+[data-robot-pose="1"] [data-cible-robot] { visibility: hidden; }
+
+.obj { transform: scale(var(--ech, 1)); }
+.obj__bot { opacity: calc(var(--mut, 0) * (1 - var(--pilule, 0))); }
+.obj__halo { opacity: calc((1 - var(--mut, 0) * 0.4) * (1 - var(--pilule, 0))); }
+.obj__cube, .obj__coeur, .obj__noyau { opacity: calc(1 - var(--mut, 0)); }
 .obj--parle .obj__bulle { opacity: calc(1 - var(--pose, 0)); }
-/* En approche il se ramasse a la taille du bouton, puis disparait dedans. */
-.obj { transform: scale(calc((1 - var(--mut, 0) * 0.36) * (1 - var(--pose, 0) * 0.62))); }
+
+/* La pilule prend exactement la taille de l'emplacement qu'elle remplace.
+   Son opacite vient d'une variable, jamais d'une animation : une animation
+   figee sur sa premiere image laisserait un bouton invisible. */
+.obj__pilule { position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--pl, 145px); height: var(--ph, 40px);
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; white-space: nowrap;
+  background: var(--accent); color: var(--background);
+  font-size: .9rem; font-weight: 600; letter-spacing: -.01em; text-decoration: none;
+  opacity: var(--pilule, 0); pointer-events: auto;
+  box-shadow: 0 18px 44px -18px color-mix(in oklch, var(--accent) 85%, transparent);
+  transition: filter .2s ease; }
+.obj__pilule:hover { filter: brightness(1.08); }
+.obj__pilule:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
 /**
@@ -86,6 +87,8 @@ function surLeChemin(p: number) {
 export function Objet3D() {
   const racine = useRef<HTMLDivElement>(null)
   const [section, setSection] = useState<(typeof SECTIONS)[number] | null>(null)
+  // Le robot DEVIENT le bouton : on monte le lien quand il commence a se poser.
+  const [pilule, setPilule] = useState(false)
 
   useEffect(() => {
     const el = racine.current
@@ -99,6 +102,7 @@ export function Objet3D() {
     let temps = 0
     let rafId = 0
     let dernierId = "—"
+    let dernierePilule = false
 
     const avancement = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight
@@ -130,11 +134,12 @@ export function Objet3D() {
      *  on revient sur l'onglet et le robot commente encore la section d'avant. */
     /** L'atterrissage.
      *
-     *  En bas de page, le robot ne se change pas en bouton : il va se POSER sur
-     *  celui qui existe deja dans la section contact, puis s'efface. Creer un
-     *  second bouton serait un doublon — pour l'oeil comme pour un lecteur
-     *  d'ecran. On mesure donc la cible a chaque image et on ramene l'objet
-     *  dessus. `pose` vaut 0 tant qu'elle est loin, 1 quand il est arrive.
+     *  Le robot ne se pose pas A COTE du bouton : il EST le bouton. L'element
+     *  de la section contact ne sert que d'emplacement — il reserve la place
+     *  dans la mise en page et donne la mesure exacte a viser. Il reste visible
+     *  tant que le robot n'a pas commence a se poser (ecran etroit, mouvement
+     *  reduit, JS en echec) : sans ce garde-fou, une panne du robot laisserait
+     *  la page sans aucun bouton de contact.
      */
     const viserLaCible = () => {
       const cible = document.querySelector<HTMLElement>("[data-cible-robot]")
@@ -142,8 +147,18 @@ export function Objet3D() {
       const r = cible.getBoundingClientRect()
       if (r.width === 0) return null
       const H = window.innerHeight
-      // la descente commence quand le bouton entre par le bas de l'ecran
-      const t = Math.min(Math.max((H * 0.95 - r.top) / (H * 0.4), 0), 1)
+      // Deux rampes, et on garde la plus avancee des deux.
+      //
+      // 1. la position : la descente commence quand l'emplacement entre par le
+      //    bas de l'ecran.
+      const parPosition = Math.min(Math.max((H * 0.95 - r.top) / (H * 0.4), 0), 1)
+      // 2. le fond de page : l'emplacement est dans la DERNIERE section, donc
+      //    il ne remonte jamais assez haut pour que la rampe 1 atteigne 1 —
+      //    mesure ici, elle plafonnait a 0,89, et le robot restait suspendu a
+      //    mi-chemin, visible derriere une pilule a 89 % d'opacite.
+      const reste = document.documentElement.scrollHeight - window.scrollY - H
+      const parLaFin = Math.min(Math.max(1 - reste / (H * 0.5), 0), 1)
+      const t = Math.max(parPosition, parLaFin)
       if (t <= 0) return null
       const cx = r.left + r.width / 2
       const cy = r.top + r.height / 2
@@ -153,15 +168,19 @@ export function Objet3D() {
       const largeur = document.documentElement.clientWidth
       // .obj fait 340 de large, ancre par son bord droit, et sa hauteur est
       // compensee par margin-top:-170 — son centre est donc a (largeur - bx - 170, by).
-      return { pose: t, bx: largeur - cx - 170, by: cy }
+      return { pose: t, bx: largeur - cx - 170, by: cy, l: r.width, h: r.height }
     }
 
     const peindre = (anime: boolean) => {
       const p = avancement()
+      // 0 = cube, 1 = robot ; la mutation se joue entre 8 % et 20 % de la page
+      const mutPrecalc = Math.min(Math.max((p - 0.08) / 0.12, 0), 1)
+      el.style.setProperty("--mut", mutPrecalc.toFixed(4))
       let { bx, by } = surLeChemin(p)
       let bxPx: number | null = null
       let byPx: number | null = null
       let pose = 0
+      let pil = 0
       const cible = viserLaCible()
       if (cible) {
         pose = cible.pose
@@ -171,6 +190,25 @@ export function Objet3D() {
         const byLibre = (by / 100) * document.documentElement.clientHeight
         bxPx = bxLibre + (cible.bx - bxLibre) * d
         byPx = byLibre + (cible.by - byLibre) * d
+        // La pilule prend le relais sur la derniere moitie de la descente.
+        const q = Math.min(Math.max((pose - 0.45) / 0.55, 0), 1)
+        pil = q * q * (3 - 2 * q)
+        // Elle adopte la taille exacte de l'emplacement qu'elle remplace.
+        el.style.setProperty("--pl", `${cible.l.toFixed(1)}px`)
+        el.style.setProperty("--ph", `${cible.h.toFixed(1)}px`)
+      }
+      // L'echelle de l'objet revient a 1 quand la pilule prend le dessus, pour
+      // qu'elle s'affiche a sa taille reelle et non a celle du robot reduit.
+      const echRobot = 1 - mutPrecalc * 0.36
+      el.style.setProperty("--ech", (echRobot + (1 - echRobot) * pil).toFixed(4))
+      el.style.setProperty("--pilule", pil.toFixed(4))
+      if (pil > 0.05 !== dernierePilule) {
+        dernierePilule = pil > 0.05
+        setPilule(dernierePilule)
+        // L'emplacement ne s'efface qu'une fois le robot en train de se poser.
+        // Tant qu'il ne se passe rien, le bouton de la page reste visible :
+        // une panne du robot ne doit pas priver la page de son bouton.
+        document.documentElement.dataset.robotPose = dernierePilule ? "1" : "0"
       }
       if (anime) {
         vitesse = vitesse * 0.9 + brut * 0.01
@@ -179,10 +217,7 @@ export function Objet3D() {
         temps += 1
         el.style.setProperty("--bob", `${(Math.sin(temps / 52) * 9).toFixed(2)}px`)
       }
-      // 0 = cube, 1 = robot ; la mutation se joue entre 8 % et 20 % de la page
-      const mut = Math.min(Math.max((p - 0.08) / 0.12, 0), 1)
       el.style.setProperty("--prog", p.toFixed(4))
-      el.style.setProperty("--mut", mut.toFixed(4))
       el.style.setProperty("--ry", `${(angle + p * 420).toFixed(2)}deg`)
       el.style.setProperty("--bx", bxPx === null ? `${bx.toFixed(2)}%` : `${bxPx.toFixed(1)}px`)
       el.style.setProperty("--by", byPx === null ? `${by.toFixed(2)}%` : `${byPx.toFixed(1)}px`)
@@ -222,6 +257,7 @@ export function Objet3D() {
     peindre(false) // juste des la premiere peinture, sans attendre une image
     if (!fige) rafId = requestAnimationFrame(boucle)
     return () => {
+      delete document.documentElement.dataset.robotPose
       document.removeEventListener("visibilitychange", surReveil)
       window.removeEventListener("scroll", surDefilement)
       window.removeEventListener("resize", surDefilement)
@@ -261,6 +297,11 @@ export function Objet3D() {
         <b>{section?.nom ?? ""}</b>
         <span>{section?.dit ?? ""}</span>
       </div>
+      {pilule ? (
+        <Link href="/contact" className="obj__pilule">
+          Me contacter
+        </Link>
+      ) : null}
     </div>
   )
 }
