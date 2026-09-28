@@ -42,10 +42,10 @@ export function Process() {
           transition={{ duration: 0.5 }}
           className="text-center"
         >
-          <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+          <span className="sec__kicker">
             Méthode
           </span>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+          <h2 className="sec__h2">
             Comment je travaille
           </h2>
         </motion.div>

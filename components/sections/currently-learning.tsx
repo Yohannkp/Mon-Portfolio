@@ -42,7 +42,7 @@ export function CurrentlyLearning() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="rounded-lg border border-border/40 bg-card p-4"
+                  className="carte"
                 >
                   <h3 className="font-medium">{item.title}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>

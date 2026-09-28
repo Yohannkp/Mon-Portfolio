@@ -55,7 +55,7 @@ export function ProjectsGrid({ projects, allTags }: ProjectsGridProps) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.3 }}
-              className="group flex flex-col overflow-hidden rounded-xl border border-border/40 bg-card transition-all hover:border-border hover:shadow-lg"
+              className="carte carte--plate group flex flex-col"
             >
               {/* Image */}
               <Link href={`/projects/${project.slug}`} className="relative aspect-video overflow-hidden bg-secondary">

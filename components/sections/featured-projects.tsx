@@ -66,10 +66,10 @@ export function FeaturedProjects() {
           className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
           <div>
-            <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            <span className="sec__kicker">
               Projets
             </span>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+            <h2 className="sec__h2">
               Ce que j&apos;ai mis en production
             </h2>
           </div>
@@ -89,7 +89,7 @@ export function FeaturedProjects() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="flex flex-col rounded-xl border border-border/40 bg-card p-6 transition-colors hover:border-border"
+              className="carte carte--3d flex flex-col"
             >
               <h3 className="text-lg font-semibold tracking-tight">{item.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.blurb}</p>

@@ -70,6 +70,28 @@ export function Hero() {
         <div className="absolute -right-1/4 -top-1/4 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
         <div className="absolute -bottom-1/4 -left-1/4 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
         <div className="hero-grille" />
+
+        {/* Cube filaire + octaedre interne en contre-rotation, en CSS 3D pur.
+            Deux animations de transform, composees par le GPU. */}
+        <div className="o3d" aria-hidden="true">
+          <div className="o3d__halo" />
+          <div className="o3d__scene">
+            <div className="o3d__cube">
+              <div className="o3d__f" />
+              <div className="o3d__f" />
+              <div className="o3d__f" />
+              <div className="o3d__f" />
+              <div className="o3d__f" />
+              <div className="o3d__f" />
+            </div>
+            <div className="o3d__coeur">
+              <div className="o3d__d" />
+              <div className="o3d__d" />
+              <div className="o3d__d" />
+            </div>
+            <div className="o3d__noyau" />
+          </div>
+        </div>
       </div>
 
       <div className="mx-auto max-w-6xl px-6 py-24 md:py-32" style={{ position: "relative", zIndex: 1 }}>

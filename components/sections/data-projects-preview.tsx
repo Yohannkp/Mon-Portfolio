@@ -62,13 +62,13 @@ export function DataProjectsPreview() {
           className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
           <div>
-            <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            <span className="sec__kicker">
               Data Science & ML
             </span>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+            <h2 className="sec__h2">
               Projets Data
             </h2>
-            <p className="mt-2 max-w-lg text-muted-foreground">
+            <p className="sec__lede">
               Analyses exploratoires, modeles predictifs, deep learning et
               dashboards interactifs.
             </p>
@@ -110,7 +110,7 @@ export function DataProjectsPreview() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.07 }}
-              className="group flex flex-col rounded-xl border border-border/40 bg-card p-5 transition-all hover:border-border hover:shadow-lg"
+              className="carte carte--3d group flex flex-col"
             >
               {project.image && (
                 <div className="relative mb-4 h-32 w-full overflow-hidden rounded-lg">

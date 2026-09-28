@@ -32,10 +32,10 @@ export function Skills() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+          <span className="sec__kicker">
             Compétences
           </span>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+          <h2 className="sec__h2">
             Technologies maîtrisées
           </h2>
         </motion.div>
@@ -48,9 +48,9 @@ export function Skills() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: categoryIndex * 0.1 }}
-              className="rounded-xl border border-border/40 bg-card p-6"
+              className="carte carte--3d"
             >
-              <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              <h3 className="carte__etiquette">
                 {category.name}
               </h3>
               <div className="mt-4 flex flex-wrap gap-2">

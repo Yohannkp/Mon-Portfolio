@@ -22,10 +22,10 @@ export function ProjectsPreview() {
           className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
           <div>
-            <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            <span className="sec__kicker">
               Portfolio
             </span>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+            <h2 className="sec__h2">
               Projets phares
             </h2>
           </div>
@@ -45,7 +45,7 @@ export function ProjectsPreview() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group flex flex-col overflow-hidden rounded-xl border border-border/40 bg-card transition-all hover:border-border hover:shadow-lg"
+              className="carte carte--plate group flex flex-col"
             >
               {/* Image */}
               <Link href={`/projects/${project.slug}`} className="relative aspect-video overflow-hidden bg-secondary">

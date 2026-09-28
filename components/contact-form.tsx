@@ -24,7 +24,7 @@ export function ContactForm() {
 
   if (isSubmitted) {
     return (
-      <div className="mt-8 rounded-lg border border-border/40 bg-card p-8 text-center">
+      <div className="carte mt-8 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
           <CheckCircle className="h-6 w-6" />
         </div>

@@ -146,10 +146,13 @@
 
 .rag { position: relative; }
 .rag__intro { max-width: 68ch; margin: 0 auto; padding: 0 1.5rem; }
-.rag__kicker { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; font-weight: 500;
+.sec__kicker,
+.rag__kicker { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; font-weight: 500;
   letter-spacing: .22em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.25rem; }
+.sec__h2,
 .rag__h2 { font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1.1; letter-spacing: -.03em; font-weight: 600; }
-.rag__lede { color: var(--muted-foreground); margin-top: .9rem; }
+.sec__lede,
+.rag__lede { color: var(--muted-foreground); margin-top: .9rem; max-width: 64ch; font-size: 1.02rem; line-height: 1.65; }
 
 .rag__sticky { position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column;
   align-items: center; justify-content: center; }
@@ -433,3 +436,105 @@
 
 @media (max-width: 720px) { .colonnes { grid-template-columns: 1fr; } .fic { grid-template-columns: 36px 1fr; } .fic__score { display: none; } }
 @media (prefers-reduced-motion: reduce) { .fic, .note-vision, .scan__l { opacity: 1 !important; } }
+
+
+/* ==========================================================================
+   Systeme visuel unifie — un seul jeu de rayons, d'ombres et de rythmes.
+   Toute carte du site passe par .carte ; toute section par .sec.
+   ========================================================================== */
+
+:root {
+  --r-carte: 14px;
+  --r-puce: 8px;
+  --pad-carte: 1.5rem;
+  --sec-y: 7rem;
+  --ombre-carte: 0 1px 2px rgba(0,0,0,.04), 0 10px 30px -16px rgba(0,0,0,.14);
+  --bord-doux: color-mix(in oklch, var(--border) 65%, transparent);
+}
+.dark {
+  --ombre-carte: 0 1px 0 rgba(255,255,255,.025), 0 20px 44px -24px rgba(0,0,0,.85);
+  --bord-doux: color-mix(in oklch, var(--border) 85%, transparent);
+}
+@media (max-width: 760px) { :root { --sec-y: 4.5rem; --pad-carte: 1.25rem; } }
+
+.sec { max-width: 72rem; margin-inline: auto; padding-inline: 1.5rem;
+  padding-block: var(--sec-y); }
+.sec--etroite { max-width: 58rem; }
+.sec__tete { margin-bottom: 3rem; }
+.sec__tete .sec__lede { margin-top: .9rem; }
+
+/* La carte : une seule definition, partout. */
+.carte { position: relative; border: 1px solid var(--bord-doux); background: var(--card);
+  border-radius: var(--r-carte); padding: var(--pad-carte);
+  transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease; }
+.carte:hover { border-color: color-mix(in oklch, var(--accent) 40%, var(--border));
+  box-shadow: var(--ombre-carte); }
+.carte--plate { padding: 0; overflow: hidden; }
+
+/* Inclinaison 3D partagee : la carte suit le curseur, de quelques degres.
+   Les variables sont posees par components/tilt-3d.tsx ; sans JS, rien ne bouge. */
+.carte--3d { transform-style: preserve-3d; will-change: transform;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0); }
+.carte--3d::after { content: ""; position: absolute; inset: 0; border-radius: inherit;
+  pointer-events: none; opacity: var(--brillance, 0); transition: opacity .3s ease;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in oklch, var(--accent) 16%, transparent), transparent 60%); }
+
+/* Puces et pastilles : meme rayon partout. */
+.puce { display: inline-flex; align-items: center; gap: .4rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px;
+  letter-spacing: .06em; padding: .22rem .5rem; border-radius: var(--r-puce);
+  border: 1px solid var(--bord-doux); color: var(--muted-foreground); background: var(--secondary); }
+
+/* ==========================================================================
+   Objet 3D du hero : un octaedre filaire, en CSS pur.
+   Douze aretes, trois carres orthogonaux. Aucune dependance, une seule
+   animation composee (transform) — le GPU s'en occupe, le CPU non.
+   ========================================================================== */
+
+.o3d { position: absolute; right: 5%; top: 50%; width: 340px; height: 340px;
+  margin-top: -170px; perspective: 1000px; pointer-events: none; z-index: 0; }
+.o3d__scene { position: absolute; inset: 0; transform-style: preserve-3d;
+  animation: o3d-tourne 40s linear infinite; }
+.o3d__cube { position: absolute; inset: 0; transform-style: preserve-3d; }
+.o3d__f { position: absolute; left: 50%; top: 50%; width: 170px; height: 170px;
+  margin: -85px 0 0 -85px; border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+  background: color-mix(in oklch, var(--accent) 3.5%, transparent); }
+.o3d__f:nth-child(1) { transform: translateZ(85px); }
+.o3d__f:nth-child(2) { transform: rotateY(180deg) translateZ(85px); }
+.o3d__f:nth-child(3) { transform: rotateY(90deg)  translateZ(85px); }
+.o3d__f:nth-child(4) { transform: rotateY(-90deg) translateZ(85px); }
+.o3d__f:nth-child(5) { transform: rotateX(90deg)  translateZ(85px); }
+.o3d__f:nth-child(6) { transform: rotateX(-90deg) translateZ(85px); }
+/* Octaedre interne, tournant en sens inverse : c'est ce contre-mouvement
+   qui donne la profondeur, pas l'objet lui-meme. */
+.o3d__coeur { position: absolute; inset: 0; transform-style: preserve-3d;
+  animation: o3d-contre 26s linear infinite; }
+.o3d__d { position: absolute; left: 50%; top: 50%; width: 112px; height: 112px;
+  margin: -56px 0 0 -56px; border: 1px solid color-mix(in oklch, var(--accent) 75%, transparent); }
+.o3d__d:nth-child(1) { transform: rotateZ(45deg); }
+.o3d__d:nth-child(2) { transform: rotateY(90deg) rotateZ(45deg); }
+.o3d__d:nth-child(3) { transform: rotateX(90deg) rotateZ(45deg); }
+.o3d__noyau { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px;
+  margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 30px 8px color-mix(in oklch, var(--accent) 55%, transparent); }
+.o3d__halo { position: absolute; inset: -25%; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in oklch, var(--accent) 14%, transparent), transparent 62%); }
+
+@keyframes o3d-tourne {
+  from { transform: rotateX(-20deg) rotateY(0deg); }
+  to   { transform: rotateX(-20deg) rotateY(360deg); }
+}
+@keyframes o3d-contre {
+  from { transform: rotateX(12deg) rotateY(360deg); }
+  to   { transform: rotateX(12deg) rotateY(0deg); }
+}
+@media (max-width: 1200px) { .o3d { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .o3d__scene, .o3d__coeur { animation: none; transform: rotateX(-20deg) rotateY(28deg); }
+  .carte--3d { transform: none !important; }
+}
+
+/* Etiquette de carte : meme famille que le kicker, sans son respir. */
+.carte__etiquette { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px;
+  font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--muted-foreground); }

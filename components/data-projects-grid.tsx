@@ -89,7 +89,7 @@ export function DataProjectsGrid({ projects }: DataProjectsGridProps) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.25 }}
-              className="group flex flex-col rounded-xl border border-border/40 bg-card p-5 transition-all hover:border-border hover:shadow-lg"
+              className="carte carte--3d group flex flex-col"
             >
               {project.image && (
                 <div className="relative mb-4 h-40 w-full overflow-hidden rounded-lg">

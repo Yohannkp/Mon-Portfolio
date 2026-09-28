@@ -31,10 +31,10 @@ export function AboutPreview() {
           {/* Content */}
           <div className="flex flex-col gap-6">
             <div>
-              <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              <span className="sec__kicker">
                 À propos
               </span>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+              <h2 className="sec__h2">
 De l'affinage du modèle à son déploiement.
               </h2>
             </div>
