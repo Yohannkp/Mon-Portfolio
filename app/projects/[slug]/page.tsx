@@ -2,10 +2,11 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, ExternalLink, Github, Check } from "lucide-react"
+import { ArrowLeft, ArrowRight, ExternalLink, Github, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { projects, getProjectBySlug } from "@/lib/projects"
+import { AXES, DOSSIERS } from "@/lib/dossiers"
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>
@@ -39,6 +40,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound()
   }
 
+  // Ce que ce projet demontre : le meme dossier que celui de la page /projects.
+  const dossier = DOSSIERS.find((d) => d.slug === slug)
+  const axe = dossier ? AXES.find((a) => a.id === dossier.axe) : undefined
+  const suivant = projects[(projects.findIndex((p) => p.slug === slug) + 1) % projects.length]
+
   return (
     <article className="mx-auto max-w-4xl px-6 py-24">
       {/* Back link */}
@@ -54,6 +60,30 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <header className="mt-8">
         <h1 className="text-4xl font-semibold tracking-tight">{project.name}</h1>
         <p className="mt-4 text-xl text-muted-foreground">{project.pitch}</p>
+
+        {dossier && axe ? (
+          <div className="mt-8 rounded-xl border border-border/40 bg-card p-5">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Ce que ce projet démontre ·{" "}
+              <Link href={`/projects#${axe.id}`} className="text-accent underline-offset-4 hover:underline">
+                {axe.titre}
+              </Link>
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {dossier.prouve.map((p) => (
+                <span key={p} className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 font-mono text-xs text-accent">
+                  {p}
+                </span>
+              ))}
+            </div>
+            {dossier.chiffre ? (
+              <p className="mt-4 text-sm text-muted-foreground">
+                <span className="mr-2 font-mono text-lg text-foreground">{dossier.chiffre.valeur}</span>
+                {dossier.chiffre.unite}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
         
         {/* Tags */}
         <div className="mt-6 flex flex-wrap gap-2">
@@ -87,16 +117,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
       {/* Main image */}
       <div className="mt-12 overflow-hidden rounded-xl border border-border/40 bg-secondary">
-        <div className="relative aspect-video">
-          <Image
-            src={project.image || "/placeholder.svg"}
-            alt={project.name}
-            fill
-            className="object-cover"
-            priority
-            sizes="(max-width: 896px) 100vw, 896px"
-          />
-        </div>
+        <Image
+          src={project.image || "/placeholder.svg"}
+          alt={`Aperçu de ${project.name}`}
+          width={1600}
+          height={900}
+          className="h-auto w-full"
+          priority
+          sizes="(max-width: 896px) 100vw, 896px"
+        />
       </div>
 
       {/* Content */}
@@ -203,7 +232,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           N&apos;hésitez pas à me contacter pour en discuter ou voir d&apos;autres projets.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-4">
-          <Button asChild>
+          <Button asChild className="bg-accent text-background hover:bg-accent/90">
             <Link href="/contact">Me contacter</Link>
           </Button>
           <Button asChild variant="outline">
@@ -211,6 +240,19 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </Button>
         </div>
       </footer>
+
+      {suivant && suivant.slug !== slug ? (
+        <Link
+          href={`/projects/${suivant.slug}`}
+          className="group mt-6 flex items-center justify-between gap-4 rounded-xl border border-border/40 p-5 transition-colors hover:border-accent/50"
+        >
+          <span>
+            <span className="block text-xs font-medium uppercase tracking-wider text-muted-foreground">Étude de cas suivante</span>
+            <span className="mt-1 block font-semibold">{suivant.name}</span>
+          </span>
+          <ArrowRight className="h-5 w-5 text-accent transition-transform group-hover:translate-x-1" />
+        </Link>
+      ) : null}
     </article>
   )
 }

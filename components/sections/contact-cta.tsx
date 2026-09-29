@@ -25,8 +25,8 @@ export function ContactCTA() {
             Vous avez un projet en tête ou une opportunité à me proposer ? 
             Je suis toujours ouvert à la discussion.
           </p>
-          <Button asChild size="lg" className="mt-8 gap-2">
-            <Link href="/contact" data-cible-robot>
+          <Button asChild size="lg" className="mt-8 gap-2 bg-accent text-background hover:bg-accent/90 hover:shadow-[0_10px_28px_-12px_var(--accent)]">
+            <Link href="/contact">
               Me contacter
               <ArrowRight className="h-4 w-4" />
             </Link>

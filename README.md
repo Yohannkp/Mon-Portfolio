@@ -13,8 +13,9 @@ Le site cherche un stage de 4 à 6 mois à partir d'avril 2027.
 | `/` | Page d'accueil : l'essentiel du parcours, dans l'ordre décrit ci-dessous |
 | `/projects` | Les 17 projets, classés par ce qu'ils démontrent (voir ci-dessous). `/data-projects` y redirige |
 | `/projects/[slug]` | Étude de cas détaillée des applications (problème, solution, défis, apprentissages) |
-| `/about` | Parcours, formation, expériences |
-| `/contact` | Formulaire de contact |
+| `/about` | Parcours (dont les stages), ce que je recherche, valeurs |
+| `/contact` | Formulaire de contact et coordonnées |
+| `/sitemap.xml`, `/robots.txt`, image d'aperçu | Générés au build : plan du site, indexation, et image affichée quand on partage le lien |
 
 ### La page d'accueil, section par section
 
@@ -41,7 +42,7 @@ Un cube filaire, à droite du hero, se transforme en petit robot dès qu'on desc
 | Compétences | Il s'arrête sous chaque famille, sur le badge dont le site contient la preuve |
 | Méthode | Il parcourt les étapes et les allume derrière lui |
 | Veille | Il lit les trois chantiers en cours |
-| Contact | Il grossit, puis rétrécit et devient le bouton « Me contacter » |
+| Contact | Il reste grand dans son cercle, au-dessus du titre, et regarde le bouton « Me contacter » |
 
 Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se pose sur ce qu'on survole, il s'incline avec la vitesse de défilement, et un clic sur un onglet attire son attention.
 
@@ -68,7 +69,7 @@ Règles de conception :
 
 - Il ne se pose jamais sur du texte : il vit dans la marge droite, dans les respirations entre deux blocs, ou sur le schéma lui-même.
 - Aucune dépendance en plus : pas de canvas, pas de WebGL. Le JavaScript écrit des variables CSS, le GPU compose le reste.
-- Il n'existe qu'à partir de 1281 px de large. En dessous, la page est identique sans lui, et le bouton de contact reprend sa place normale.
+- Il n'existe qu'à partir de 1281 px de large. En dessous, la page se lit à l'identique sans lui : son cercle en fin de page disparaît, et le bouton « Me contacter » reste le même.
 - Avec `prefers-reduced-motion`, il se positionne sans lissage ni oscillation.
 
 Le code est dans `components/objet-3d.tsx` (les scènes) et dans la fin de `app/globals.css` (le volume, les expressions et les effets posés sur la page).
@@ -80,6 +81,12 @@ Une liste de technologies ne dit pas pourquoi un projet compte. Chaque projet es
 - **Aucun chiffre inventé.** Chaque valeur vient d'un projet documenté (360 paires, AUC 0,88, 85 % de précision, +15 % de rotation des stocks, 0 requête sortante…). Un projet sans chiffre n'en reçoit pas : il a un enjeu et un résultat.
 - **Sur l'accueil**, six projets phares sont des études de cas. Chacun répond à une question de recruteur (« Peut-il livrer un système d'IA sans exposer les données ? »), avec un schéma qui illustre l'idée (`components/glyphes.tsx`). Le schéma est une illustration, jamais une mesure.
 - **Sur `/projects`**, un bandeau réunit les huit preuves chiffrées, puis les 17 projets sont classés en quatre axes : mettre des modèles en production, affiner et entraîner, mesurer et prouver, construire des applications. Un sommaire collant suit l'axe lu. Il remplace l'ancien mur de filtres techniques.
+
+## Contact : ce que fait vraiment le formulaire
+
+Ce site n'a pas de serveur de courrier. Le formulaire **ne prétend donc pas envoyer** : il prépare le message dans l'application e-mail du visiteur (`mailto:` avec sujet et corps remplis), lui dit clairement qu'il lui reste à l'envoyer, et lui donne l'adresse si rien ne s'ouvre (boutons « Rouvrir » et « Copier l'adresse »). La saisie est conservée si on clique sur « Modifier le message ». Les coordonnées viennent d'un seul endroit : `lib/contact.ts`.
+
+Pour recevoir les messages directement dans une boîte, sans passer par l'application e-mail du visiteur, il faudrait un service d'envoi (Formspree, Web3Forms, Resend…) et sa clé : c'est une décision à part.
 
 ## Transitions et interactions
 
@@ -123,6 +130,7 @@ components/
   reading-rail.tsx      le rail de lecture
   page-transition.tsx   la transition entre les pages
 lib/
+  contact.ts            l'adresse e-mail et le lien du message (formulaire, page Contact, pied de page)
   dossiers.ts           les projets : enjeu, résultat, preuve chiffrée, axe (source unique de l'accueil et de /projects)
   projects.ts           le détail des études de cas des applications (/projects/[slug])
 public/                 images et icônes

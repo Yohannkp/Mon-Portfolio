@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 
 export const metadata: Metadata = {
   title: "À propos",
-  description: "Découvrez mon parcours et mon positionnement en tant qu'ingénieur Big Data & IA.",
+  description: "Élève ingénieur Big Data & IA à l'ECE Paris, en recherche d'un stage MLOps ou data engineering à partir d'avril 2027.",
 }
 
 const values = [
@@ -30,7 +30,13 @@ const values = [
 
 const timeline = [
   {
-    year: "2025 - Present",
+    year: "2026",
+    title: "Stage — développement backend en Go",
+    description:
+      "Backend d'un moteur de traitement de données (ETL) déjà en production : Go, Docker Compose.",
+  },
+  {
+    year: "2025 - Présent",
     title: "Cycle ingénieur Big Data & IA - ECE Paris",
     description: "Formation avancée en intelligence artificielle et analyse de données massives. Spécialisation dans les algorithmes de machine learning, architectures distribuées et développement de solutions IA innovantes.",
   },
@@ -65,13 +71,14 @@ export default function AboutPage() {
           <h1 className="text-4xl font-semibold tracking-tight">À propos</h1>
           <div className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground">
             <p>
-              Bonjour, je m&apos;appelle Yendi Yohann. Je suis Software Engineer spécialisé en IA,
-              basé en France, avec une solide formation en data et une passion pour l&apos;innovation.
+              Je m&apos;appelle Yendi Yohann, élève ingénieur Big Data &amp; IA à l&apos;ECE Paris. Ce qui
+              m&apos;intéresse, c&apos;est la chaîne complète : affiner un modèle, le servir derrière une API, le
+              conteneuriser et le déployer de façon reproductible.
             </p>
             <p>
-              Je ne fais pas que des graphiques, je construis des systèmes intelligents de bout en bout.
-              Actuellement en cycle ingénieur Big Data & IA à l&apos;ECE Paris, j&apos;allie IA, software engineering
-              et sens produit pour livrer des solutions mesurables.
+              Je viens du développement backend, et c&apos;est ce qui fait la différence : je ne découvre pas
+              Docker, les tests et l&apos;intégration continue au moment de déployer. Deux stages en
+              développement, dont un en Go sur un système déjà en production.
             </p>
           </div>
 
@@ -104,18 +111,19 @@ export default function AboutPage() {
         <h2 className="text-2xl font-semibold tracking-tight">Ce que je recherche</h2>
         <div className="mt-6 rounded-xl border border-border/40 bg-card p-6">
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="text-sm">Stage</Badge>
-            <Badge variant="secondary" className="text-sm">Alternance</Badge>
-            <Badge variant="secondary" className="text-sm">Premier CDI</Badge>
+            <Badge variant="secondary" className="text-sm">Stage de 4 à 6 mois</Badge>
+            <Badge variant="secondary" className="text-sm">À partir d&apos;avril 2027</Badge>
+            <Badge variant="secondary" className="text-sm">MLOps</Badge>
+            <Badge variant="secondary" className="text-sm">Data engineering</Badge>
           </div>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Je cherche une opportunité en <strong className="text-foreground">région parisienne ou en remote</strong> où 
-            je pourrai m&apos;intégrer à une équipe technique bienveillante. L&apos;idéal serait 
-            de travailler sur des projets concrets avec des technologies modernes (React, 
-            Next.js, TypeScript) tout en bénéficiant d&apos;un accompagnement pour progresser.
+            Je cherche une équipe technique, en <strong className="text-foreground">région parisienne ou en remote</strong>,
+            où je pourrai mettre des modèles en production : les servir, les conteneuriser, les déployer, et
+            mesurer qu&apos;ils font ce qu&apos;on attend d&apos;eux.
           </p>
           <p className="mt-3 text-sm text-muted-foreground">
-            Rythme d&apos;alternance : 3 jours en entreprise / 2 jours à l&apos;école.
+            Mes <Link href="/projects" className="text-accent underline-offset-4 hover:underline">projets</Link> sont
+            classés par ce qu&apos;ils démontrent : c&apos;est le plus rapide pour juger si cela correspond à votre besoin.
           </p>
         </div>
       </section>
@@ -161,24 +169,24 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Pourquoi le dev */}
+      {/* Pourquoi le MLOps */}
       <section className="mt-20">
-        <h2 className="text-2xl font-semibold tracking-tight">Pourquoi le développement ?</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">Pourquoi le MLOps ?</h2>
         <div className="mt-6 space-y-4 leading-relaxed text-muted-foreground">
           <p>
-            Ce qui m&apos;a attiré vers le développement, c&apos;est la capacité de créer des solutions 
-            qui résolvent de vrais problèmes. Combiner développement fullstack, mobile et intelligence 
-            artificielle me permet d&apos;apporter une vision globale et innovante à chaque projet.
+            Un modèle qui reste dans un notebook ne sert à personne. Ce qui m&apos;intéresse, c&apos;est la partie que
+            la plupart des gens sautent : rendre un résultat reproductible et savoir le mesurer, puis le servir
+            derrière une API qui tient la charge.
           </p>
           <p>
-            Ma formation en Big Data & IA complète parfaitement mes compétences en développement. 
-            Je peux concevoir des applications qui ne sont pas seulement fonctionnelles, mais aussi 
-            intelligentes et data-driven. C&apos;est cette double expertise qui me passionne et me différencie.
+            Mon parcours en développement (fullstack, mobile, DevOps) est un atout : je sais construire
+            l&apos;application autour du modèle. Ma formation en Big Data &amp; IA m&apos;apporte l&apos;autre moitié :
+            la donnée, l&apos;entraînement, l&apos;évaluation.
           </p>
           <p>
-            Du mobile avec Flutter au backend avec Symfony et Node.js, en passant par l&apos;analyse de données 
-            et le machine learning, j&apos;aime maîtriser toute la chaîne de développement. Cette polyvalence 
-            me permet de m&apos;adapter à différents projets et de toujours apporter une valeur ajoutée.
+            Du mobile avec Flutter au backend avec Symfony, Node.js et Go, en passant par l&apos;analyse de données
+            et le machine learning, j&apos;aime maîtriser toute la chaîne. C&apos;est cette polyvalence qui me permet
+            de m&apos;adapter à un projet plutôt que d&apos;adapter le projet à mes outils.
           </p>
         </div>
       </section>
@@ -190,7 +198,7 @@ export default function AboutPage() {
           Consultez mes projets ou contactez-moi directement.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-4">
-          <Button asChild>
+          <Button asChild className="bg-accent text-background hover:bg-accent/90">
             <Link href="/projects">Voir mes projets</Link>
           </Button>
           <Button asChild variant="outline">

@@ -1,7 +1,6 @@
 "use client"
 
-import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 
 /**
  * L'objet : un cube filaire qui devient un robot, puis accompagne la lecture.
@@ -19,8 +18,8 @@ import { useEffect, useRef, useState } from "react"
  *   competences   il s'arrete sous chaque carte sur le badge dont il a la preuve
  *   methode       il parcourt les etapes et les allume derriere lui
  *   veille        il lit les trois chantiers
- *   contact       il grossit dans sa scene, puis se replie sur l'emplacement
- *                 du bouton et devient le bouton
+ *   contact       il reste grand dans son cercle, au-dessus du titre, et
+ *                 regarde le bouton « Me contacter »
  *
  * Fil conducteur : la page suit le trajet d'un modele, de la donnee brute au
  * deploiement. Le robot publie l'etape en cours (data-robot-scene sur <html>),
@@ -50,12 +49,6 @@ type Sortie = {
   fantome?: { x: number; y: number; regard?: Point | null; force: number; ech: number } | null
   /** Passe devant le contenu : pour se poser dans un emplacement reserve (le guide d'une demonstration). */
   devant?: boolean
-  /** 0..1 : le robot rejoint l'emplacement du bouton. */
-  pose?: number
-  /** 0..1 : la pilule cliquable remplace le robot. */
-  pil?: number
-  pl?: number
-  ph?: number
 }
 
 type Ctx = {
@@ -159,8 +152,6 @@ export function Objet3D() {
   const bulle = useRef<HTMLDivElement>(null)
   const bulleTitre = useRef<HTMLElement>(null)
   const bulleTexte = useRef<HTMLSpanElement>(null)
-  // Le robot DEVIENT le bouton : on monte le lien quand il se pose.
-  const [pilule, setPilule] = useState(false)
 
   useEffect(() => {
     const el = racine.current
@@ -206,7 +197,6 @@ export function Objet3D() {
       marques: new Map<string, Set<Element>>(),
       bulleCle: "",
       bulleMin: 0,
-      dernierePilule: false,
       survol: null as Element | null,
     }
 
@@ -555,44 +545,22 @@ export function Objet3D() {
       }
     }
 
-    /** CONTACT — il grossit dans sa scene, puis se replie et devient le bouton. */
+    /**
+     * CONTACT — il reste dans son cercle, au-dessus du titre, et garde un oeil sur le bouton.
+     * Le bouton « Me contacter » est un vrai bouton de la page : le robot ne le remplace pas.
+     */
     const contact = (c: Ctx): Sortie => {
-      const cib = q("[data-cible-robot]")
-      const r = cib?.getBoundingClientRect()
-      if (!r || r.width === 0) return marge(c, c.H * 0.5)
-      // Deux rampes, on garde la plus avancee : la position, et le fond de page.
-      // L'emplacement est dans la DERNIERE section, il ne remonte jamais assez
-      // haut pour que la premiere seule atteigne 1.
-      const parPosition = rampe(r.top, c.H * 0.95, c.H * 0.55)
-      const reste = html.scrollHeight - c.Y - c.H
-      const parLaFin = borne(1 - reste / (c.H * 0.5), 0, 1)
-      const pose = Math.max(parPosition, parLaFin)
-      const pil = lisse(rampe(pose, 0.8, 1))
-      const p = centre(r)
-      const d = lisse(pose)
-
-      // Sa scene : un emplacement reserve au-dessus du titre. C'est le seul
-      // endroit de la page ou il est grand, et il est seul : rien ne le recouvre.
       const scene = rect("[data-scene-robot]")
-      let x0 = c.xM
-      let y0 = c.H * 0.5
-      let e0 = c.echM
-      let regard: Point | null = null
-      if (scene && scene.height > 0) {
-        const s0 = centre(scene)
-        e0 = borne((scene.height - 44) / 190, 0.5, 1.05)
-        x0 = s0.x
-        y0 = s0.y + 10
-        // Il regarde le titre qui suit, puis le bouton quand il s'en approche.
-        regard = { x: p.x, y: mix(scene.bottom + 60, p.y, d) }
-      }
-      // Le titre et le texte sont entre la scene et le bouton : il les contourne
-      // par la droite au lieu de les traverser.
-      const detour = Math.sin(Math.PI * rampe(d, 0, 0.85)) * Math.min(460, Math.max(c.W - p.x - 110, 0))
+      if (!scene || scene.height === 0) return marge(c, c.H * 0.5)
+      const bouton = rect("#sec-contact a[href='/contact']")
+      const s0 = centre(scene)
       return {
-        x: mix(x0, p.x, d) + detour, y: mix(y0, p.y, d),
-        ech: mix(mix(e0, 0.7, d), 1, pil), op: 1, humeur: "content", regard,
-        pose, pil, pl: r.width, ph: r.height,
+        x: s0.x,
+        y: s0.y + 10,
+        ech: borne((scene.height - 44) / 190, 0.5, 1.05),
+        op: 1,
+        humeur: "content",
+        regard: bouton ? centre(bouton) : null,
       }
     }
 
@@ -657,8 +625,8 @@ export function Objet3D() {
         N.saut = -16 // petit bond a l'arrivee dans une nouvelle scene
       }
       cible = (SCENES[id] ?? hero)(c)
-      // Jamais sous l'en-tete fixe (sauf en vol vers le bouton, qui est plus bas).
-      if (!cible.pose) cible.y = Math.max(cible.y, c.haut + 113 * cible.ech)
+      // Jamais sous l'en-tete fixe.
+      cible.y = Math.max(cible.y, c.haut + 113 * cible.ech)
 
       // Les marques posees sur la page par les scenes qui ne sont plus actives disparaissent.
       const gardes = new Set(ATTRS_PAR_SCENE[id] ?? [])
@@ -684,15 +652,13 @@ export function Objet3D() {
 
     const peindre = (c: Ctx, dt: number, snap: boolean) => {
       const k = snap || reduit ? 1 : 1 - Math.exp(-dt / 130)
-      // Pose sur le bouton : il doit coller a l'emplacement, sans le moindre retard.
-      const kPos = (cible.pose ?? 0) > 0.98 ? 1 : k
       if (N.init) {
         N.x = cible.x; N.y = cible.y; N.ech = cible.ech
         N.init = false
       }
-      N.x = mix(N.x, cible.x, kPos)
-      N.y = mix(N.y, cible.y, kPos)
-      N.ech = mix(N.ech, cible.ech, kPos)
+      N.x = mix(N.x, cible.x, k)
+      N.y = mix(N.y, cible.y, k)
+      N.ech = mix(N.ech, cible.ech, k)
       N.op = mix(N.op, cible.op ?? 0.95, k)
       // Il s'incline dans le sens du defilement : on sent la vitesse de lecture.
       const penche = reduit ? 0 : borne(N.dy * 0.7, -7, 7)
@@ -701,7 +667,7 @@ export function Objet3D() {
 
       // Le regard : la direction du point regarde, plafonnee a l'amplitude de la visiere.
       // Un element interactif survole prend le regard : c'est ce que le visiteur va faire.
-      const surv = mem.survol && document.contains(mem.survol) && !cible.pose ? mem.survol : null
+      const surv = mem.survol && document.contains(mem.survol) ? mem.survol : null
       const g = regardVers({ x: N.x, y: N.y }, surv ? centre(surv.getBoundingClientRect()) : cible.regard, c.now)
       N.gx = mix(N.gx, g.x * 9, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
       N.gy = mix(N.gy, g.y * 6, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
@@ -723,21 +689,6 @@ export function Objet3D() {
       if (el.dataset.devant !== devant) el.dataset.devant = devant
       const humeur = surv && (cible.humeur ?? "neutre") === "neutre" ? "curieux" : (cible.humeur ?? "neutre")
       if (el.dataset.humeur !== humeur) el.dataset.humeur = humeur
-
-      // Pose sur le bouton.
-      const pose = cible.pose ?? 0
-      const pil = cible.pil ?? 0
-      el.style.setProperty("--pose", pose.toFixed(4))
-      el.style.setProperty("--pilule", pil.toFixed(4))
-      if (cible.pl) el.style.setProperty("--pl", `${cible.pl.toFixed(1)}px`)
-      if (cible.ph) el.style.setProperty("--ph", `${cible.ph.toFixed(1)}px`)
-      const enPilule = pil > 0.05
-      if (enPilule !== mem.dernierePilule) {
-        mem.dernierePilule = enPilule
-        setPilule(enPilule)
-        // L'emplacement ne s'efface que lorsque le robot se pose reellement.
-        html.dataset.robotPose = enPilule ? "1" : "0"
-      }
 
       // Le fantome : la seconde recherche.
       const f = cible.fantome
@@ -763,7 +714,7 @@ export function Objet3D() {
       // La bulle : un calque a part, au-dessus du contenu, posee dans la marge.
       const b = cible.bulle
       const largeur = b?.largeur ?? borne(c.marge - 24, 0, 200)
-      const utile = !!b && largeur >= 110 && pose < 0.2
+      const utile = !!b && largeur >= 110
       const cle = utile && b ? `${b.titre ?? ""}|${b.texte}` : ""
       if (cle !== mem.bulleCle) {
         mem.bulleCle = cle
@@ -877,7 +828,6 @@ export function Objet3D() {
       document.removeEventListener("click", surClic)
       TOUS_ATTRS.forEach((a) => marquer(a, []))
       delete html.dataset.robotActif
-      delete html.dataset.robotPose
       delete html.dataset.robotScene
       delete (window as unknown as { __robot?: unknown }).__robot
     }
@@ -885,7 +835,7 @@ export function Objet3D() {
 
   return (
     <>
-      <div ref={racine} className={`obj ${pilule ? "obj--pose" : ""}`} data-humeur="neutre">
+      <div ref={racine} className="obj" data-humeur="neutre">
         <div className="obj__halo" aria-hidden="true" />
         <div className="obj__scene" aria-hidden="true">
           <div className="obj__cube">
@@ -906,11 +856,6 @@ export function Objet3D() {
           </div>
           <div className="obj__noyau" />
         </div>
-        {pilule ? (
-          <Link href="/contact" className="obj__pilule">
-            Me contacter
-          </Link>
-        ) : null}
       </div>
 
       {/* La seconde recherche, quand deux se font en parallele. */}
