@@ -142,6 +142,10 @@
               0 0 22px color-mix(in oklch, var(--accent) 65%, transparent); }
 .rail__pct { position: absolute; left: 26px; top: -3px; font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 10px; letter-spacing: .06em; color: var(--muted-foreground); white-space: nowrap; }
+.rail__etape { position: absolute; left: 26px; top: 11px; white-space: nowrap;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.rail__etape:empty { display: none; }
 @media (max-width: 1100px) { .rail { display: none; } }
 
 .rag { position: relative; }
@@ -627,6 +631,17 @@ main > section, main > div { position: relative; z-index: 1; }
    place dans la mise en page et donne la mesure a viser. Il ne s'efface que
    lorsque le robot se pose reellement — sinon une panne du robot (ecran
    etroit, JS en echec) laisserait la page sans bouton de contact. */
+/* Sa scene finale : un espace libre, ouvert seulement quand le robot est en service. */
+[data-scene-robot] { display: none; }
+[data-robot-actif="1"] [data-scene-robot] { display: block; position: relative; width: 100%; height: 300px; margin-bottom: 1rem; }
+/* Le quai : l'empreinte que le robot laisse en partant devenir le bouton. */
+[data-scene-robot]::before { content: ""; position: absolute; left: 50%; bottom: 46px; width: 230px; height: 58px;
+  margin-left: -115px; border-radius: 50%; border: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
+  transform: rotateX(72deg) scale(1.6, 1.6); opacity: .55; }
+[data-scene-robot]::after { content: "Disponible · avril 2027"; position: absolute; left: 0; right: 0; bottom: 4px;
+  text-align: center; font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted-foreground); }
+
 [data-robot-actif="1"] [data-cible-robot],
 [data-robot-pose="1"] [data-cible-robot] { visibility: hidden; }
 
