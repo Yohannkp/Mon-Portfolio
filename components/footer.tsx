@@ -1,10 +1,11 @@
 import Link from "next/link"
 import { Github, Linkedin, Mail } from "lucide-react"
+import { EMAIL } from "@/lib/contact"
 
 const socialLinks = [
   { name: "GitHub", href: "https://github.com/Yohannkp", icon: Github },
   { name: "LinkedIn", href: "https://www.linkedin.com/in/yohannkp/", icon: Linkedin },
-  { name: "Email", href: "mailto:yendiyohann@gmail.com", icon: Mail },
+  { name: "Email", href: `mailto:${EMAIL}`, icon: Mail },
 ]
 
 export function Footer() {

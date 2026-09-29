@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { ContactForm } from "@/components/contact-form"
 import { Github, Linkedin, Mail, MapPin } from "lucide-react"
+import { EMAIL } from "@/lib/contact"
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -11,8 +12,8 @@ const contactInfo = [
   {
     icon: Mail,
     label: "Email",
-    value: "yendiyohann@gmail.com",
-    href: "mailto:yendiyohann@gmail.com",
+    value: EMAIL,
+    href: `mailto:${EMAIL}`,
   },
   {
     icon: Linkedin,
@@ -50,7 +51,7 @@ export default function ContactPage() {
         <div>
           <h2 className="text-xl font-semibold">Envoyez-moi un message</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Remplissez le formulaire ci-dessous et je vous répondrai dans les plus brefs délais.
+            Écrivez votre message ici : il s&apos;ouvre dans votre application e-mail, prêt à envoyer.
           </p>
           <ContactForm />
         </div>
@@ -97,8 +98,8 @@ export default function ContactPage() {
               <span className="font-medium">Disponible pour opportunités</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
-              Je suis actuellement à la recherche d&apos;un stage, d&apos;une alternance ou 
-              d&apos;un premier poste. Ouvert aux propositions en région parisienne ou en remote.
+              Je cherche un stage de 4 à 6 mois à partir d&apos;avril 2027, en MLOps ou en data
+              engineering. Ouvert aux propositions en région parisienne ou en remote.
             </p>
           </div>
         </div>

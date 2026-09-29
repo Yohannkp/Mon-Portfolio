@@ -9,15 +9,15 @@ const skillCategories = [
     skills: ["Python", "SQL", "Go", "TypeScript", "Java"],
   },
   {
-    name: "ML & modeles",
+    name: "ML & modèles",
     skills: ["PyTorch", "Scikit-learn", "XGBoost", "SHAP", "Fine-tuning LoRA / QLoRA"],
   },
   {
     name: "Mise en production",
-    skills: ["Docker", "CI/CD", "FastAPI", "Git", "Tests automatises"],
+    skills: ["Docker", "CI/CD", "FastAPI", "Git", "Tests automatisés"],
   },
   {
-    name: "Donnees",
+    name: "Données",
     skills: ["PostgreSQL", "Neo4j", "ETL", "Power BI"],
   },
 ]

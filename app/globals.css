@@ -234,37 +234,6 @@
   font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground);
   margin-top: .75rem; }
 
-/* ---------- stations projets ---------- */
-.stations { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 2.5rem; }
-.station { display: grid; grid-template-columns: 150px 1fr auto; gap: 1.9rem; align-items: start;
-  border: 1px solid var(--bord-doux); border-radius: var(--r-carte); padding: 1.75rem 1.9rem; background: var(--card);
-  will-change: transform, opacity; transition: border-color .35s ease; }
-.station:hover { border-color: color-mix(in oklch, var(--accent) 45%, var(--border)); }
-.station__id { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px;
-  line-height: 1.9; letter-spacing: .1em; color: var(--muted-foreground); }
-.station__id b { display: block; color: var(--accent); font-weight: 500; }
-.station__corps h3 { font-size: 1.2rem; font-weight: 600; letter-spacing: -.015em; }
-.station__corps p { color: var(--muted-foreground); font-size: .92rem; margin-top: .6rem; max-width: 62ch; }
-.station__pile { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1rem; }
-.station__pile span { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px;
-  line-height: 1; color: var(--muted-foreground); border: 1px solid var(--border); border-radius: 6px;
-  padding: .4rem .55rem; }
-.station__lien { display: inline-block; margin-top: 1rem; font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 12px; color: var(--accent); text-decoration: none;
-  border-bottom: 1px solid color-mix(in oklch, var(--accent) 40%, transparent); padding-bottom: 2px; }
-.station__lien { transition: border-color .25s ease, color .25s ease, letter-spacing .25s ease; }
-.station__lien:hover { border-bottom-color: var(--accent); letter-spacing: .02em; }
-.station__n { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 1.9rem; line-height: 1;
-  font-weight: 600; color: var(--border); letter-spacing: -.02em; }
-
-@media (max-width: 820px) {
-  .station { grid-template-columns: 1fr; gap: .9rem; }
-  .station__n { display: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .station, .station__pile span { opacity: 1 !important; transform: none !important; }
-}
-
 /* ---------- demonstrations de projet ---------- */
 .demo { border: 1px solid var(--bord-doux); border-radius: var(--r-carte); background: var(--card); overflow: hidden; margin-top: 1.5rem; }
 .demo__bar { display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem;
@@ -371,14 +340,13 @@ main > section, main > div { position: relative; z-index: 1; }
   transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--ech, 1));
 }
 .obj { opacity: var(--op, .62); transition: opacity .4s ease; }
-.obj--pose { z-index: 40; opacity: 1; }
 /* Dans le guide d'une demonstration : devant le panneau, halo discret pour ne pas voiler le texte voisin. */
 .obj[data-devant="1"] { z-index: 2; }
 .obj[data-devant="1"] .obj__halo { opacity: .28; }
 
 .obj__halo { position: absolute; inset: -18%; border-radius: 50%;
   background: radial-gradient(circle, color-mix(in oklch, var(--accent) 13%, transparent), transparent 62%);
-  opacity: calc((1 - var(--mut, 0) * 0.4) * (1 - var(--pilule, 0))); }
+  opacity: calc(1 - var(--mut, 0) * 0.4); }
 .obj__scene { position: absolute; inset: 0; transform-style: preserve-3d; perspective: 1000px;
   transform: rotateX(-20deg) rotateY(var(--ry, 0deg)); }
 
@@ -412,7 +380,7 @@ main > section, main > div { position: relative; z-index: 1; }
    L'inverse de (rotateX a * rotateY b) est (rotateY -b * rotateX -a). */
 .obj__bot { position: absolute; left: 50%; top: 50%;
   width: 186px; height: 164px; margin: -82px 0 0 -93px;
-  opacity: calc(var(--mut, 0) * (1 - var(--pilule, 0)));
+  opacity: var(--mut, 0);
   transform-style: preserve-3d; rotate: var(--incl, 0deg);
   transform: rotateY(calc(var(--ry, 0deg) * -1)) rotateX(20deg)
              translateY(var(--bob, 0px)) scale(calc(0.6 + var(--mut, 0) * 0.4)); }
@@ -458,7 +426,7 @@ main > section, main > div { position: relative; z-index: 1; }
   transform: rotateX(72deg) rotateZ(calc(var(--ry, 0deg) * 0.6)); }
 
 /* ---------- le fantome : la seconde recherche, en parallele ------------- */
-.obj-fantome { --mut: 1; --pilule: 0; --ry: 0deg; opacity: var(--fo, 0); }
+.obj-fantome { --mut: 1; --ry: 0deg; opacity: var(--fo, 0); }
 .obj-fantome .obj__bot { opacity: 1; }
 
 /* ---------- la bulle : dans un calque a part, au-dessus du contenu ------- */
@@ -480,15 +448,10 @@ main > section, main > div { position: relative; z-index: 1; }
 @media (max-width: 1280px) { .obj, .obj-fantome, .obj-bulle { display: none; } }
 @media (prefers-reduced-motion: reduce) { .obj__oeil { animation: none; } }
 
-/* ---------- le robot DEVIENT le bouton ---------------------------------- */
-/* L'element de la section contact n'est qu'un emplacement : il reserve la
-   place dans la mise en page et donne la mesure a viser. Il ne s'efface que
-   lorsque le robot se pose reellement — sinon une panne du robot (ecran
-   etroit, JS en echec) laisserait la page sans bouton de contact. */
-/* Sa scene finale : un espace libre, ouvert seulement quand le robot est en service. */
+/* Son cercle, en fin de page : l'emplacement ou le robot reste, au-dessus du titre de contact.
+   Ouvert seulement quand le robot est en service ; sinon la page se lit sans ce vide. */
 [data-scene-robot] { display: none; }
 [data-robot-actif="1"] [data-scene-robot] { display: block; position: relative; width: 100%; height: 300px; margin-bottom: 1rem; }
-/* Le quai : l'empreinte que le robot laisse en partant devenir le bouton. */
 [data-scene-robot]::before { content: ""; position: absolute; left: 50%; bottom: 46px; width: 230px; height: 58px;
   margin-left: -115px; border-radius: 50%; border: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
   transform: rotateX(72deg) scale(1.6, 1.6); opacity: .55; }
@@ -496,23 +459,6 @@ main > section, main > div { position: relative; z-index: 1; }
   text-align: center; font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted-foreground); }
 
-[data-robot-actif="1"] [data-cible-robot],
-[data-robot-pose="1"] [data-cible-robot] { visibility: hidden; }
-
-/* Son opacite vient d'une variable, jamais d'une animation : une animation
-   figee sur sa premiere image laisserait un bouton invisible. */
-.obj__pilule { position: absolute; left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  width: var(--pl, 145px); height: var(--ph, 40px);
-  display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 999px; white-space: nowrap;
-  background: var(--accent); color: var(--background);
-  font-size: .9rem; font-weight: 600; letter-spacing: -.01em; text-decoration: none;
-  opacity: var(--pilule, 0); pointer-events: auto;
-  box-shadow: 0 18px 44px -18px color-mix(in oklch, var(--accent) 85%, transparent);
-  transition: filter .2s ease; }
-.obj__pilule:hover { filter: brightness(1.08); }
-.obj__pilule:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
 /* ==========================================================================
    Ce que le robot fait DANS la page : chaque effet est declenche par une scene
@@ -533,8 +479,6 @@ main > section, main > div { position: relative; z-index: 1; }
 .compteur { transition: box-shadow .35s ease; }
 .compteur[data-robot-vise="1"] { box-shadow: inset 0 -2px 0 var(--accent); }
 
-/* Projets — le lien que le robot attire l'oeil vers, une fois la carte lue. */
-.station__lien[data-robot-vise="1"] { border-bottom-color: var(--accent); color: var(--foreground); }
 
 /* Demonstrations — les onglets que le robot invite a essayer. */
 .onglet[data-robot-invite="1"] { animation: obj-invite 1.7s ease-in-out infinite;

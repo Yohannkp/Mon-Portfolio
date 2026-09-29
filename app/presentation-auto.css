@@ -1,0 +1,60 @@
+/* ==========================================================================
+   La presentation automatique : un rond avec une icone play / stop, en bas au centre.
+   Au repos, rien d'autre. En lecture, la phrase du guide s'affiche au-dessus.
+   Au survol, « Recommencer » apparait a gauche et la legende a droite.
+   ========================================================================== */
+
+.pa { position: fixed; left: 50%; bottom: 22px; z-index: 45; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: .8rem; pointer-events: none; }
+
+.pa__carte { max-width: min(560px, calc(100vw - 32px)); padding: .8rem 1.15rem; text-align: center;
+  border: 1px solid var(--bord-doux); border-radius: var(--r-carte);
+  background: color-mix(in oklch, var(--card) 92%, transparent); backdrop-filter: blur(14px);
+  box-shadow: var(--ombre-carte); opacity: 0; transform: translateY(8px);
+  transition: opacity .4s ease, transform .4s cubic-bezier(.2, .7, .2, 1); pointer-events: none; }
+.pa__carte[data-on="1"] { opacity: 1; transform: none; }
+.pa__etape { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.pa__phrase { margin-top: .3rem; font-size: .9rem; line-height: 1.55; color: var(--foreground); }
+
+.pa__rang { position: relative; display: flex; align-items: center; pointer-events: auto; }
+/* Un pont invisible entre le bouton et « Recommencer » : le survol ne se perd pas en chemin. */
+.pa__rang::before { content: ""; position: absolute; right: 100%; top: 0; width: 64px; height: 100%; }
+
+.pa__btn { position: relative; display: grid; place-items: center; width: 56px; height: 56px; padding: 0; cursor: pointer;
+  border: 1px solid var(--bord-doux); border-radius: 50%; color: var(--accent);
+  background: color-mix(in oklch, var(--card) 92%, transparent); backdrop-filter: blur(12px); box-shadow: var(--ombre-carte);
+  transition: transform .2s cubic-bezier(.2, .7, .2, 1), background .25s ease, color .25s ease, box-shadow .25s ease; }
+.pa__btn:hover { transform: scale(1.06);
+  box-shadow: 0 0 0 5px color-mix(in oklch, var(--accent) 14%, transparent), 0 0 26px -6px var(--accent); }
+.pa__btn:active { transform: scale(.95); }
+.pa__btn:focus-visible, .pa__recom:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.pa__btn[data-etat="lecture"] { color: var(--background); background: var(--accent); border-color: var(--accent); }
+
+.pa__anneau { position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px); pointer-events: none; }
+.pa__piste { fill: none; stroke: transparent; }
+.pa__progres { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset .35s linear; }
+.pa__btn[data-etat="lecture"] .pa__progres { stroke: var(--background); }
+
+.pa__recom { position: absolute; right: calc(100% + 10px); display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  cursor: pointer; border: 1px solid var(--bord-doux); border-radius: 50%; color: var(--muted-foreground);
+  background: color-mix(in oklch, var(--card) 92%, transparent); backdrop-filter: blur(12px);
+  opacity: 0; transform: translateX(14px) scale(.8); pointer-events: none;
+  transition: opacity .25s ease, transform .3s cubic-bezier(.2, .7, .2, 1), color .2s, border-color .2s; }
+.pa__rang:hover .pa__recom, .pa__rang:focus-within .pa__recom { opacity: 1; transform: none; pointer-events: auto; }
+.pa__recom:hover { color: var(--foreground); border-color: var(--muted-foreground); }
+
+.pa__label { position: absolute; left: calc(100% + 12px); white-space: nowrap; padding: .4rem .7rem; pointer-events: none;
+  border: 1px solid var(--bord-doux); border-radius: 999px; font-size: .78rem; color: var(--muted-foreground);
+  background: color-mix(in oklch, var(--card) 92%, transparent); backdrop-filter: blur(12px);
+  opacity: 0; transform: translateX(-6px); transition: opacity .25s ease, transform .25s ease; }
+.pa__rang:hover .pa__label, .pa__btn:focus-visible ~ .pa__label { opacity: 1; transform: none; }
+
+@media (max-width: 720px) {
+  .pa { bottom: 16px; }
+  .pa__label { display: none; }
+  .pa__recom { opacity: 1; transform: none; pointer-events: auto; width: 36px; height: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pa__carte, .pa__btn, .pa__recom, .pa__label, .pa__progres { transition: none; }
+}

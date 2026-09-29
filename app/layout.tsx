@@ -7,13 +7,17 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Tilt3D } from '@/components/tilt-3d'
 import { PageTransition } from '@/components/page-transition'
+import { SITE_URL } from '@/lib/site'
 import './globals.css'
 import './demo-guide.css'
+import './projets.css'
+import './presentation-auto.css'
 
 const _inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const _geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Yendi Yohann | MLOps & Machine Learning Engineering',
     template: '%s | Yendi Yohann',
@@ -25,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://v0-junior-developer-portfolio-bay.vercel.app',
+    url: SITE_URL,
     title: 'Yendi Yohann | MLOps & Machine Learning Engineering',
     description: "Élève ingénieur Big Data & IA à l'ECE Paris. J'affine des modèles et je les mets en production : pipelines de données, APIs, conteneurisation, déploiement continu.",
     siteName: 'Yendi Yohann — Portfolio',

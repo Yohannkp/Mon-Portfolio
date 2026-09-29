@@ -3,6 +3,7 @@ import { RagPipeline } from "@/components/sections/rag-pipeline"
 import { Demos } from "@/components/sections/demos"
 import { ReadingRail } from "@/components/reading-rail"
 import { Objet3D } from "@/components/objet-3d"
+import { PresentationAuto } from "@/components/presentation-auto"
 import { Counters } from "@/components/sections/counters"
 import { Stations } from "@/components/sections/stations"
 import { AboutPreview } from "@/components/sections/about-preview"
@@ -26,6 +27,8 @@ export default function HomePage() {
       <CurrentlyLearning />
       <ContactCTA />
       <Objet3D />
+      {/* La visite automatique n'existe que sur l'accueil. */}
+      <PresentationAuto />
     </>
   )
 }

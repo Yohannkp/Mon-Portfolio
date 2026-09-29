@@ -1,33 +1,33 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Search, Palette, Code, TestTube, Repeat } from "lucide-react"
+import { Search, Database, Code, TestTube, Repeat } from "lucide-react"
 
 const steps = [
   {
     icon: Search,
-    title: "Discovery & Strategy",
-    description: "Aligner les besoins business avec la faisabilité technique. Définition claire des KPIs et scope.",
+    title: "Cadrer",
+    description: "Définir ce qu'on mesure avant de construire : la métrique, le jeu de test, ce qui compterait comme un échec.",
   },
   {
-    icon: Palette,
-    title: "System Design",
-    description: "Architecture scalable et résiliente. Choix des technos adaptés (SQL vs NoSQL, Microservices).",
+    icon: Database,
+    title: "Préparer la donnée",
+    description: "La difficulté est souvent la donnée : la constituer, la nettoyer, la valider. Pour Mina, 360 paires construites à la main.",
   },
   {
     icon: Code,
-    title: "Clean Code",
-    description: "Développement modulaire, typé (TypeScript/Python) et auto-documenté. Focus sur la maintenabilité.",
+    title: "Construire",
+    description: "Un projet en modules, reproductible, pas un notebook : agent, entraînement, évaluation et démonstration séparés.",
   },
   {
     icon: TestTube,
-    title: "Quality Assurance",
-    description: "Tests unitaires et d'intégration systématiques. Pipeline CI/CD pour des déploiements sans stress.",
+    title: "Prouver",
+    description: "Évaluer avec la bonne méthode : magasin contrôle, test statistique, suite RAGAS. Un résultat non mesuré n'existe pas.",
   },
   {
     icon: Repeat,
-    title: "Feedback Loop",
-    description: "Monitoring en production, analyse des logs et itérations rapides basées sur la donnée réelle.",
+    title: "Déployer",
+    description: "Conteneuriser, servir derrière une API, intégration continue. Puis observer ce qui tourne réellement.",
   },
 ]
 
