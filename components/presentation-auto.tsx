@@ -25,6 +25,8 @@ type Arret = {
   cle: string
   titre: string | (() => string)
   phrase: string | (() => string)
+  /** Numero du projet presente (0..5) : les autres cartes s'estompent pendant cet arret. */
+  carte?: number
   /** Un arret dont l'element n'existe pas est saute. */
   ok?: () => boolean
   y0: () => number
@@ -56,6 +58,7 @@ const CARTES = PHARES.map((d, i): Arret => ({
   cle: `projet-${d.slug}`,
   titre: `Projet ${i + 1} sur ${PHARES.length} · ${d.nom}`,
   phrase: `${d.phare!.question} ${d.chiffre ? `Preuve : ${d.chiffre.valeur} ${d.chiffre.unite}.` : ""}`.trim(),
+  carte: i,
   ok: () => qa("#sec-stations .cas").length > i,
   // La ligne de lecture du robot est a 52 % de la hauteur : la carte s'y centre.
   y0: () => centreY(qa("#sec-stations .cas")[i]) - 0.52 * H(),
@@ -150,6 +153,22 @@ const ARRETS: Arret[] = [
   },
 ]
 
+/**
+ * Met en valeur le projet presente : les autres cartes s'estompent (le style est dans projets.css).
+ * `null` remet tout en place — a chaque fin d'arret sur un projet, a l'arret de la visite, au demontage.
+ */
+function focaliser(i: number | null) {
+  const liste = q("#sec-stations .cas-liste")
+  const cartes = qa("#sec-stations .cas")
+  if (i === null) {
+    liste?.removeAttribute("data-focus")
+    cartes.forEach((c) => c.removeAttribute("data-focus"))
+    return
+  }
+  liste?.setAttribute("data-focus", "1")
+  cartes.forEach((c, k) => c.setAttribute("data-focus", k === i ? "1" : "0"))
+}
+
 const texte = (v: string | (() => string)) => (typeof v === "function" ? v() : v)
 const borne = (v: number, a: number, b: number) => Math.min(Math.max(v, a), b)
 const facile = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2)
@@ -212,6 +231,7 @@ export function PresentationAuto() {
     const a0 = a.y0()
     const a1 = a.y1 ? a.y1() : a0
     document.documentElement.dataset.visiteEtape = String(i)
+    focaliser(a.carte ?? null)
     setNarration({ n: i + 1, total: s.liste.length, titre: texte(a.titre), phrase: texte(a.phrase) })
 
     const dedans = !!a.y1 && depuisY >= Math.min(a0, a1) - 30 && depuisY <= Math.max(a0, a1) + 30
@@ -323,6 +343,8 @@ export function PresentationAuto() {
     const s = m.current
     cancelAnimationFrame(s.raf)
     ecouter(false)
+    // Le visiteur reprend la main : les cartes reviennent toutes a leur place.
+    focaliser(null)
     if (etatRef.current === "lecture") changerEtat("pause")
   }
 
@@ -331,6 +353,7 @@ export function PresentationAuto() {
     cancelAnimationFrame(s.raf)
     ecouter(false)
     s.termine = true
+    focaliser(null)
     changerEtat("repos")
     setAvancement(1)
     setNarration({ n: s.liste.length, total: s.liste.length, titre: "Fin de la visite", phrase: "Merci de votre attention. Vous pouvez la relancer à tout moment." })
@@ -394,6 +417,7 @@ export function PresentationAuto() {
       cancelAnimationFrame(s.raf)
       ecouter(false)
       window.clearTimeout(cacheFin.current)
+      focaliser(null)
       const html = document.documentElement
       delete html.dataset.visite
       delete html.dataset.visiteEtape

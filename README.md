@@ -91,7 +91,7 @@ Un bouton rond, en bas au centre de la page d'accueil, lance une **visite guidé
 - **Rappuyer reprend là où l'on est**, pas au début, et continue jusqu'à la fin. Après la fin, ▶ repart du début.
 - **Au survol**, « Recommencer » apparaît : la page remonte tout en haut, la démonstration repart de sa première étape, et la visite reprend à zéro.
 
-Les 17 arrêts suivent le fil de la page : accueil, schéma RAG (balayé lentement, car il est piloté par le défilement), chiffres, les six projets un par un avec sa question et sa preuve, les démonstrations (la visite guidée de la démo se joue jusqu'au bout avant de continuer), à propos, compétences, méthode, veille, contact.
+Les 17 arrêts suivent le fil de la page : accueil, schéma RAG (balayé lentement, car il est piloté par le défilement), chiffres, les six projets un par un avec sa question et sa preuve (les cinq autres s'estompent pendant qu'un projet est présenté), les démonstrations (la visite guidée de la démo se joue jusqu'au bout avant de continuer), à propos, compétences, méthode, veille, contact.
 
 Rien n'est « joué » à part : la visite ne fait que **faire défiler la page**, donc les animations et le robot se comportent exactement comme si l'on défilait à la main. Le moteur est dans `components/presentation-auto.tsx` ; ajouter un arrêt, c'est ajouter une entrée à la liste `ARRETS`. Avec `prefers-reduced-motion`, les trajets entre deux arrêts sont instantanés.
 
