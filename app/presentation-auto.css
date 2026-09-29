@@ -19,13 +19,16 @@
   letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
 .pa__phrase { margin-top: .3rem; font-size: .9rem; line-height: 1.55; color: var(--foreground); }
 
-.pa__rang { position: relative; display: flex; align-items: center; pointer-events: auto; }
+.pa__rang { position: relative; display: flex; align-items: center; pointer-events: auto;
+  transition: opacity .3s ease, transform .3s ease; }
+/* Pendant un defilement manuel, le bouton s'efface : il ne passe jamais sur le texte. */
+.pa[data-defile="1"] .pa__rang { opacity: 0; transform: translateY(10px); pointer-events: none; }
 /* Un pont invisible entre le bouton et « Recommencer » : le survol ne se perd pas en chemin. */
 .pa__rang::before { content: ""; position: absolute; left: 100%; top: 0; width: 64px; height: 100%; }
 
 .pa__btn { position: relative; display: grid; place-items: center; width: 56px; height: 56px; padding: 0; cursor: pointer;
   border: 1px solid var(--bord-doux); border-radius: 50%; color: var(--accent);
-  background: color-mix(in oklch, var(--card) 92%, transparent); backdrop-filter: blur(12px); box-shadow: var(--ombre-carte);
+  background: var(--card); box-shadow: var(--ombre-carte);
   transition: transform .2s cubic-bezier(.2, .7, .2, 1), background .25s ease, color .25s ease, box-shadow .25s ease; }
 .pa__btn:hover { transform: scale(1.06);
   box-shadow: 0 0 0 5px color-mix(in oklch, var(--accent) 14%, transparent), 0 0 26px -6px var(--accent); }

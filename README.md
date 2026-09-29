@@ -84,7 +84,7 @@ Une liste de technologies ne dit pas pourquoi un projet compte. Chaque projet es
 
 ## La présentation automatique (accueil uniquement)
 
-Un bouton rond, en bas à gauche de la page d'accueil, lance une **visite guidée qui défile toute seule** : le visiteur n'a rien à faire, la page va d'un arrêt à l'autre, et les animations et le robot suivent.
+Un bouton rond, en bas à gauche de la page d'accueil (il s'efface pendant que vous faites défiler la page, pour ne jamais gêner la lecture), lance une **visite guidée qui défile toute seule** : le visiteur n'a rien à faire, la page va d'un arrêt à l'autre, et les animations et le robot suivent.
 
 - **▶ / ■** lance ou arrête la visite. Au repos, le bouton n'est qu'une icône ; en lecture, la phrase du guide s'affiche au-dessus (« Étape 5 / 17 · Projet 2 sur 6 · Mina-Translator »), et un anneau autour du bouton indique l'avancement.
 - **Défiler arrête aussitôt** : molette, tactile, clavier (flèches, espace, Page haut/bas, Échap) ou glissement de la barre de défilement.
