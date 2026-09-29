@@ -1,244 +1,163 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { foc, GuideShell, useSerie, useTyping, type Etape } from "@/components/sections/demo-guide"
+
+/**
+ * Une page scannee (une image, donc zero texte) devient interrogeable :
+ * le modèle de vision repère les lignes, les transcrit, puis une question retrouve le passage.
+ */
 
 const QUESTION = "Quelle est la durée du préavis de résiliation ?"
-const REPONSE =
-  "Le préavis de résiliation est de trois mois, à compter de la réception de la lettre recommandée. "
+const REPONSE = "Le préavis de résiliation est de trois mois, à compter de la réception de la lettre recommandée."
 
-const LIGNES: { t: string; cle?: boolean; surligne?: string }[] = [
-  { t: "ARTICLE 7 — RÉSILIATION", cle: true },
+const ETAPES: Etape[] = [
+  {
+    titre: "Une page scannée",
+    texte: "C'est une photo de page : pour l'ordinateur, il n'y a aucun texte à chercher ni à copier.",
+    humeur: "neutre",
+  },
+  {
+    titre: "Le modèle de vision lit",
+    texte: "Un modèle de vision local balaie la page et repère chaque ligne de texte.",
+    humeur: "concentre",
+    attente: 900,
+  },
+  {
+    titre: "Transcrire",
+    texte: "Chaque ligne repérée est transcrite. Le texte apparaît à droite, ligne après ligne.",
+    humeur: "concentre",
+    attente: 1800,
+  },
+  {
+    titre: "Une page cherchable",
+    texte: "412 caractères de texte : la page entre dans l'index, comme n'importe quel document.",
+    humeur: "content",
+  },
+  {
+    titre: "La question",
+    texte: "Je demande : « Quelle est la durée du préavis de résiliation ? »",
+    humeur: "concentre",
+  },
+  {
+    titre: "Retrouver le passage",
+    texte: "La recherche retrouve le passage de la page qui parle de préavis, et le marque.",
+    humeur: "curieux",
+    attente: 600,
+  },
+  {
+    titre: "Répondre en citant",
+    texte: "La réponse est rédigée à partir de ce passage, pas de mémoire, avec un renvoi [1] vers la page.",
+    humeur: "concentre",
+    attente: 1200,
+  },
+  {
+    titre: "Vérifiable",
+    texte: "Le [1] pointe la ligne exacte : on peut vérifier au lieu de faire confiance.",
+    humeur: "content",
+  },
+]
+
+const LIGNES: { t: string; cle?: boolean; pre?: string }[] = [
+  { t: "ARTICLE 7 — RÉSILIATION" },
   { t: "Chacune des parties peut résilier le présent contrat" },
   { t: "par lettre recommandée avec accusé de réception," },
-  { t: "sous réserve de respecter un préavis de" },
-  { t: " à compter de la réception.", cle: true, surligne: "trois (3) mois" },
+  { t: "sous réserve de respecter un préavis de", cle: true },
+  { t: " à compter de la réception.", cle: true, pre: "trois (3) mois" },
   { t: "Toute résiliation intervenant sans ce préavis" },
   { t: "ouvre droit à une indemnité compensatrice." },
 ]
+const N = LIGNES.length
+const CLE = 4 // la ligne que le renvoi [1] designe
 
-const BANDES = [
-  { c: "titre" }, { c: "" }, { c: "moyen" }, { c: "" }, { c: "court" },
-  { c: "cle", w: "88%", mt: true }, { c: "cle", w: "64%" },
-  { c: "", mt: true }, { c: "moyen" }, { c: "court" }, { c: "" }, { c: "moyen" },
-]
+function Scene({ etape }: { etape: number }) {
+  const k1 = useSerie(etape === 1, N, 300)
+  const k2 = useSerie(etape === 2, N, 520)
+  const question = useTyping(QUESTION, etape >= 4, 34).affiche
+  const reponse = useTyping(REPONSE, etape >= 6, 38)
 
-export function DemoScan({ nu = false }: { nu?: boolean } = {}) {
-  const racine = useRef<HTMLDivElement>(null)
-  const lib = useRef<typeof import("animejs") | null>(null)
-  const tl = useRef<{ pause: () => void } | null>(null)
-  const [pret, setPret] = useState(false)
-  const [enCours, setEnCours] = useState(false)
+  const boite = (i: number) => etape > 1 || (etape === 1 && i < k1)
+  const ecrite = (i: number) => etape > 2 || (etape === 2 && i < k2)
+  const chars = etape > 2 ? 412 : etape === 2 ? Math.round((412 * k2) / N) : 0
 
-  const reinitialiser = useCallback((A?: typeof import("animejs") | null) => {
-    const anime = A ?? lib.current
-    const el = racine.current
-    if (!anime || !el) return
-    tl.current?.pause()
-    tl.current = null
-    const q = el.querySelector<HTMLElement>("[data-q]")
-    const rep = el.querySelector<HTMLElement>("[data-rep]")
-    const avant = el.querySelector<HTMLElement>("[data-avant]")
-    if (q) q.textContent = ""
-    if (rep) rep.innerHTML = ""
-    if (avant) avant.innerHTML = 'texte extractible : <b>aucun</b>'
-    anime.utils.set(el.querySelectorAll(".scan__l, [data-rep], [data-curseur], [data-j]"), { opacity: 0 })
-    anime.utils.set(el.querySelectorAll("[data-scan]"), { opacity: 0, top: -60 })
-    setEnCours(false)
-  }, [])
-
-  useEffect(() => {
-    let annule = false
-    import("animejs")
-      .then((A) => {
-        if (annule) return
-        lib.current = A
-        setPret(true)
-        reinitialiser(A)
-      })
-      .catch(() => setPret(false))
-    return () => {
-      annule = true
-      tl.current?.pause()
-    }
-  }, [reinitialiser])
-
-  const jouer = useCallback(() => {
-    const anime = lib.current
-    const el = racine.current
-    if (!anime || !el) return
-    reinitialiser(anime)
-    setEnCours(true)
-
-    const t = anime.createTimeline({ defaults: { ease: "out(3)" } })
-    tl.current = t as unknown as { pause: () => void }
-
-    const page = el.querySelector<HTMLElement>(".page")!
-    const scan = el.querySelector<HTMLElement>("[data-scan]")!
-    const lignes = el.querySelectorAll<HTMLElement>(".scan__l")
-    const avant = el.querySelector<HTMLElement>("[data-avant]")!
-    const q = el.querySelector<HTMLElement>("[data-q]")!
-    const curseur = el.querySelector<HTMLElement>("[data-curseur]")!
-    const rep = el.querySelector<HTMLElement>("[data-rep]")!
-    const journal = el.querySelectorAll<HTMLElement>("[data-j]")
-    const h = page.offsetHeight
-
-    const ecrire = (cible: HTMLElement, texte: string, debut: number, duree: number) => {
-      const e = { n: 0 }
-      t.add(
-        e,
-        { n: texte.length, duration: duree, ease: "linear", onUpdate: () => (cible.textContent = texte.slice(0, Math.round(e.n))) },
-        debut,
-      )
-    }
-
-    t.add(scan, { opacity: [0, 1], duration: 200 }, 0)
-    t.add(scan, { top: [-60, h], duration: 1800, ease: "inOut(2)" }, 150)
-    t.add(scan, { opacity: 0, duration: 250 }, 1900)
-    t.add(lignes, { opacity: [0, 1], x: [-8, 0], duration: 340, delay: anime.stagger(190) }, 700)
-    t.add(
-      { v: 0 },
-      {
-        v: 1,
-        duration: 10,
-        onComplete: () => {
-          avant.innerHTML = 'transcrit par le modèle : <b class="violet">412 caractères</b>'
-        },
-      },
-      2100,
-    )
-    t.add(curseur, { opacity: [0, 1], duration: 120 }, 2500)
-    ecrire(q, QUESTION, 2600, 1000)
-    t.add(curseur, { opacity: 0, duration: 200 }, 3700)
-    t.add(rep, { opacity: [0, 1], duration: 260 }, 3900)
-    ecrire(rep, REPONSE, 4000, 1300)
-    t.add(
-      { v: 0 },
-      {
-        v: 1,
-        duration: 10,
-        onComplete: () => {
-          rep.textContent = REPONSE
-          const b = document.createElement("span")
-          b.className = "demo__cit"
-          b.textContent = "1"
-          rep.appendChild(b)
-          anime.animate(b, { opacity: [0, 1], scale: [0.6, 1], duration: 380, ease: "out(4)" })
-        },
-      },
-      5350,
-    )
-    t.add(journal, { opacity: [0, 1], x: [-8, 0], duration: 340, delay: anime.stagger(150) }, 5600)
-    t.add({ v: 0 }, { v: 1, duration: 10, onComplete: () => setEnCours(false) }, 6400)
-  }, [reinitialiser])
-
-  // Lancement automatique a l'entree dans le champ de vision : un recruteur ne
-  // doit jamais tomber sur un panneau vide en attendant de cliquer. Une seule
-  // fois, puis l'observateur se debranche ; le bouton reste pour rejouer.
-  useEffect(() => {
-    const el = racine.current
-    if (!pret || !el || typeof IntersectionObserver === "undefined") return
-    let lance = false
-    const io = new IntersectionObserver(
-      (entrees) => {
-        for (const e of entrees) {
-          if (e.isIntersecting && !lance) {
-            lance = true
-            io.disconnect()
-            jouer()
-          }
-        }
-      },
-      { threshold: 0.3 },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [pret, jouer])
-
-  const carte = (
-    <div className="demo" ref={racine}>
-      <div className="demo__bar">
-        <span className="demo__titre">Démonstration</span>
-        <span className="demo__sim">Simulation — aucun modèle n&apos;est exécuté</span>
-      </div>
-      <div className="demo__corps">
-        <div className="colonnes">
-          <div>
-            <p className="demo__etiq">Page 4 du PDF</p>
-            <div className="page">
-              {BANDES.map((b, i) => (
-                <div
-                  className={`page__bande ${b.c}`}
-                  key={i}
-                  style={{ width: b.w, marginTop: b.mt ? "0.85rem" : undefined }}
-                />
-              ))}
-              <div className="page__grain" />
-              <div className="page__scan" data-scan />
-              <div className="page__etiq">image · 0 caractère</div>
+  return (
+    <div className="sc">
+      <div className="sc__page-zone">
+        <p className="sc__legende">
+          <span>page1.jpg</span> <em>image · 0 caractère de texte</em>
+        </p>
+        <div className="sc__page" {...foc(etape <= 1)}>
+          <div className="sc__faisceau" key={etape === 1 ? "on" : "off"} data-on={etape === 1 ? "1" : "0"} />
+          {LIGNES.map((l, i) => (
+            <div
+              key={i}
+              className="sc__l"
+              data-boite={boite(i) ? "1" : "0"}
+              data-cours={etape === 2 && i === k2 - 1 ? "1" : "0"}
+              data-marque={etape >= 5 && l.cle ? "1" : "0"}
+              {...foc((etape === 2 && i === k2 - 1) || (etape === 5 && i === CLE))}
+            >
+              {l.pre ? <mark>{l.pre}</mark> : null}
+              {l.t}
+              {i === CLE ? (
+                <span className="sc__renvoi" data-on={etape >= 6 ? "1" : "0"} data-fort={etape === 7 ? "1" : "0"} {...foc(etape === 7)}>
+                  1
+                </span>
+              ) : null}
             </div>
-            <p className="avant" data-avant>
-              texte extractible : <b>aucun</b>
+          ))}
+          {/* Une signature et un cachet : de l'image, pas du texte. Le modele les voit, ils ne donnent aucun caractere. */}
+          <div className="sc__pied" aria-hidden="true">
+            <svg viewBox="0 0 120 44" className="sc__signature">
+              <path d="M4 32 C 14 6, 22 6, 24 24 S 34 40, 44 16 S 58 6, 62 22 S 78 36, 94 14 L 116 20" />
+            </svg>
+            <div className="sc__cachet">
+              <span>CACHET</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="sc__droite">
+        <div className="sc__vol">
+          <div className="sc__tete">
+            <span>Texte transcrit</span>
+            <b data-ok={etape >= 3 ? "1" : "0"} {...foc(etape === 3)}>
+              {etape < 2 ? "texte extractible : aucun" : `${chars} caractères`}
+            </b>
+          </div>
+          <div className="sc__texte">
+            {LIGNES.map((l, i) => (
+              <div key={i} className="sc__t" data-on={ecrite(i) ? "1" : "0"}>
+                {(l.pre ? l.pre : "") + l.t}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="sc__qr">
+          <div className="sc__champ" data-on={etape >= 4 ? "1" : "0"} {...foc(etape === 4)}>
+            <span>{question}</span>
+            <i data-ecrit={question.length >= QUESTION.length ? "1" : "0"} />
+          </div>
+          <div className="sc__rep" data-on={etape >= 6 ? "1" : "0"} {...foc(etape === 6)}>
+            <p>
+              {reponse.affiche}
+              {reponse.fini ? <sup className="sc__cit">1</sup> : null}
             </p>
           </div>
-
-          <div>
-            <p className="demo__etiq">Transcription par le modèle de vision</p>
-            <div className="zone">
-              {LIGNES.map((l, i) => (
-                <div className={`scan__l ${l.cle ? "cle" : ""}`} key={i}>
-                  {l.surligne ? <span className="demo__surligne">{l.surligne}</span> : null}
-                  {l.t}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <p className="demo__etiq">Question posée ensuite</p>
-        <div className="demo__champ">
-          <span data-q />
-          <span className="demo__curseur" data-curseur />
-        </div>
-
-        <p className="demo__etiq">Réponse</p>
-        <div className="demo__reponse" data-rep />
-
-        <div className="demo__journal">
-          <div data-j>
-            <b>modèle de vision</b> qwen3-vl:4b · <i>local</i>
-          </div>
-          <div data-j>
-            <b>page source</b> <em className="violet">cliquable — ouvre la page 4 du PDF d&apos;origine</em>
-          </div>
-          <div data-j>
-            <b>requêtes réseau sortantes</b> <i>0</i>
-          </div>
-        </div>
-
-        <div className="demo__actions">
-          <button className="demo__bouton" onClick={jouer} disabled={!pret || enCours}>
-            Tester
-          </button>
-          <button className="demo__bouton demo__bouton--fantome" onClick={() => reinitialiser()} disabled={!pret}>
-            Réinitialiser
-          </button>
         </div>
       </div>
     </div>
   )
+}
 
-  if (nu) return carte
-
+export function DemoScan(_props: { nu?: boolean } = {}) {
   return (
-    <section className="border-t border-border/40">
-      <div className="mx-auto max-w-6xl px-6 py-24">
-        <p className="rag__kicker">Démonstration</p>
-        <h2 className="rag__h2">Un document scanné devient cherchable</h2>
-        <p className="rag__lede mb-8">
-          Une page scannée est une image : aucun texte à extraire, invisible pour une recherche classique.
-        </p>
-        {carte}
-      </div>
-    </section>
+    <GuideShell
+      nom="Scan cherchable"
+      sim="Simulation — aucun modèle n'est exécuté"
+      etapes={ETAPES}
+      scene={({ etape }) => <Scene etape={etape} />}
+    />
   )
 }

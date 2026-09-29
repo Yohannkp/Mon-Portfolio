@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { lireDemo, RESULTAT, scenarioDemo, type PhaseDemo } from "@/lib/robot-demos"
 
 /**
  * L'objet : un cube filaire qui devient un robot, puis accompagne la lecture.
@@ -49,6 +48,8 @@ type Sortie = {
   incl?: number
   bulle?: Bulle | null
   fantome?: { x: number; y: number; regard?: Point | null; force: number; ech: number } | null
+  /** Passe devant le contenu : pour se poser dans un emplacement reserve (le guide d'une demonstration). */
+  devant?: boolean
   /** 0..1 : le robot rejoint l'emplacement du bouton. */
   pose?: number
   /** 0..1 : la pilule cliquable remplace le robot. */
@@ -195,7 +196,7 @@ export function Objet3D() {
       scene: "",
       carte: -1,
       carteT: 0,
-      demo: { btn: null as Element | null, dispo: false, vu: false, fin: false },
+      etapeDemo: "",
       clic: null as (Point & { t: number }) | null,
       souris: { x: -1, y: -1, t: -1e9 },
       lu: 0,
@@ -207,7 +208,6 @@ export function Objet3D() {
       bulleMin: 0,
       dernierePilule: false,
       survol: null as Element | null,
-      dem: null as (PhaseDemo & { t: number }) | null,
     }
 
     // --- Etat lisse (ce qui est effectivement a l'ecran) --------------------
@@ -380,86 +380,53 @@ export function Objet3D() {
       }
     }
 
-    /** Un moment marquant interrompt vite ; un moment ordinaire attend son temps de lecture. */
-    const peutRemplacer = (actuel: PhaseDemo & { t: number }, suivant: PhaseDemo, now: number) => {
-      const lu = now - actuel.t
-      if (suivant.marquant) return lu > 350
-      return lu > (actuel.marquant ? 1700 : 1100)
-    }
-
     /**
-     * DEMOS — il commente l'execution, pas le decor.
-     * La simulation ecrit dans la page ; lireDemo() dit ou elle en est (ligne du
-     * terminal, barre d'indexation, boite allumee…) et le robot en tire le
-     * commentaire, le regard et l'humeur. Un commentaire reste au moins 1,1 s :
-     * une etape qui ne dure que quelques images ne doit pas faire clignoter la bulle.
+     * DEMOS — il guide la visite.
+     * Chaque simulation est une visite en etapes que le robot explique (voir
+     * components/sections/demo-guide.tsx). Il se pose dans la colonne du guide, devant
+     * le panneau, regarde ce que l'etape montre (data-guide-focus) et prend l'humeur
+     * de l'etape. Le texte, lui, est dans la page : lisible, selectionnable, accessible.
+     * S'il n'y a pas de place pour lui dans le panneau (defilement, ecran etroit),
+     * il retourne dans la marge et se tait.
      */
     const demos = (c: Ctx): Sortie => {
       const panneau = rect("#sec-demos .demo")
-      const rangee = rect("#sec-demos .onglets")
-      const btn = q("#sec-demos .demo__bouton")
-      const d = mem.demo
-      if (btn !== d.btn) {
-        d.btn = btn
-        d.dispo = false
-        d.vu = false
-        d.fin = false
-        mem.dem = null
-      }
-      // Le bouton est desactive tant que la simulation tourne (et avant que
-      // anime.js soit charge) : on ne conclut « en cours » qu'apres l'avoir vu actif.
-      const off = (btn as HTMLButtonElement | null)?.disabled ?? true
-      if (!off) d.dispo = true
-      const enCours = off && d.dispo
-      if (enCours) {
-        d.vu = true
-        d.fin = false
-      }
-      if (!off && d.vu) d.fin = true
-
-      const onglets = qa("#sec-demos .onglet")
-      const inactifs = onglets.filter((o) => !o.classList.contains("onglet--actif"))
-      const invite = d.fin && !enCours
-      const zone = q("#sec-demos .demo")
-      const scenario = scenarioDemo(zone)
-
+      const zone = q<HTMLElement>("#sec-demos .demo[data-guide]")
+      const fin = zone?.dataset.fin === "1"
+      const inactifs = qa("#sec-demos .onglet").filter((o) => !o.classList.contains("onglet--actif"))
+      // Une visite terminee : les autres scenarios s'allument.
+      marquer("data-robot-invite", fin ? inactifs : [])
       // Un clic sur un onglet attire son regard un instant.
       const clic = mem.clic && c.now - mem.clic.t < 800 ? mem.clic : null
 
-      if (invite && rangee) {
-        marquer("data-robot-invite", inactifs)
+      const slot = rect("#sec-demos [data-guide-slot]")
+      if (zone && slot && slot.height > 0 && slot.top >= c.haut - 10 && slot.bottom <= c.H + 10) {
+        const etape = `${zone.dataset.etape ?? ""}|${zone.querySelector(".gd__titre")?.textContent ?? ""}`
+        if (etape !== mem.etapeDemo) {
+          mem.etapeDemo = etape
+          N.saut = -14 // un petit bond : on passe a l'etape suivante
+        }
+        const foyer = zone.querySelector("[data-guide-focus]")
+        const s0 = centre(slot)
         const cible1 = inactifs[0]?.getBoundingClientRect()
         return {
-          x: c.xM,
-          y: borne(centre(rangee).y, c.H * 0.2, c.H * 0.8),
-          ech: c.echM,
-          op: 0.95,
-          regard: clic ?? (cible1 ? centre(cible1) : null),
-          humeur: "content",
-          // Le resultat de CETTE simulation, puis l'invitation.
-          bulle: { titre: scenario ? RESULTAT[scenario] : "Terminé", texte: "Essaie un autre scénario" },
+          x: s0.x,
+          y: s0.y + 6,
+          ech: borne(slot.height / 190, 0.4, 0.8),
+          op: 1,
+          devant: true,
+          regard: clic ?? (fin && cible1 ? centre(cible1) : foyer ? centre(foyer.getBoundingClientRect()) : null),
+          humeur: fin ? "content" : ((zone.dataset.humeur as Humeur | undefined) ?? "neutre"),
         }
       }
-      marquer("data-robot-invite", [])
-
-      // Le commentaire suit la simulation, avec un temps de lecture minimal.
-      const vivante = enCours ? lireDemo(zone) : null
-      if (!enCours) mem.dem = null
-      else if (vivante && vivante.cle !== mem.dem?.cle && (!mem.dem || c.snap || peutRemplacer(mem.dem, vivante, c.now))) {
-        mem.dem = { ...vivante, t: c.now }
-        N.saut = -12 // un petit bond : quelque chose vient de se passer
-      }
-      const affiche = enCours ? mem.dem : null
-
+      mem.etapeDemo = ""
       const y = panneau
         ? borne((Math.max(panneau.top, 0) + Math.min(panneau.bottom, c.H)) / 2, c.H * 0.3, c.H * 0.7)
         : c.H * 0.5
-      const foyer = vivante?.focus ? centre(vivante.focus.getBoundingClientRect()) : null
       return {
         x: c.xM, y, ech: c.echM, op: 0.95,
-        regard: clic ?? foyer ?? (panneau ? { x: panneau.left + panneau.width * 0.45, y } : null),
-        humeur: affiche?.humeur ?? (enCours ? "concentre" : "neutre"),
-        bulle: affiche ? { titre: affiche.titre, texte: affiche.texte } : enCours ? { titre: "Simulation", texte: "Le scénario démarre" } : null,
+        regard: clic ?? (panneau ? { x: panneau.left + panneau.width * 0.45, y } : null),
+        humeur: fin ? "content" : "neutre",
       }
     }
 
@@ -747,6 +714,9 @@ export function Objet3D() {
       el.style.setProperty("--gx", `${N.gx.toFixed(2)}px`)
       el.style.setProperty("--gy", `${N.gy.toFixed(2)}px`)
       el.style.setProperty("--incl", `${N.incl.toFixed(2)}deg`)
+      // Dans le guide d'une demonstration, il passe devant le panneau (qui a un fond).
+      const devant = cible.devant ? "1" : "0"
+      if (el.dataset.devant !== devant) el.dataset.devant = devant
       const humeur = surv && (cible.humeur ?? "neutre") === "neutre" ? "curieux" : (cible.humeur ?? "neutre")
       if (el.dataset.humeur !== humeur) el.dataset.humeur = humeur
 
