@@ -16,6 +16,8 @@ export function ContactCTA() {
           transition={{ duration: 0.5 }}
           className="flex flex-col items-center text-center"
         >
+          {/* Reserve pour le robot, seulement quand il est en service (voir globals.css). */}
+          <div data-scene-robot aria-hidden="true" />
           <h2 className="sec__h2">
             Travaillons ensemble
           </h2>

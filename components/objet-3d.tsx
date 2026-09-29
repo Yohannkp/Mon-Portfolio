@@ -19,7 +19,13 @@ import { useEffect, useRef, useState } from "react"
  *   competences   il s'arrete sous chaque carte sur le badge dont il a la preuve
  *   methode       il parcourt les etapes et les allume derriere lui
  *   veille        il lit les trois chantiers
- *   contact       il se pose sur l'emplacement du bouton et devient le bouton
+ *   contact       il grossit dans sa scene, puis se replie sur l'emplacement
+ *                 du bouton et devient le bouton
+ *
+ * Fil conducteur : la page suit le trajet d'un modele, de la donnee brute au
+ * deploiement. Le robot publie l'etape en cours (data-robot-scene sur <html>),
+ * que le rail de lecture affiche. Son echelle raconte la meme chose : grand
+ * quand il presente (hero, finale), petit quand il travaille sur le contenu.
  *
  * Regle commune : jamais sur le texte. Il vit dans la marge droite, dans les
  * bandes vides entre deux blocs, ou sur le diagramme lui-meme.
@@ -199,6 +205,7 @@ export function Objet3D() {
       bulleCle: "",
       bulleMin: 0,
       dernierePilule: false,
+      survol: null as Element | null,
     }
 
     // --- Etat lisse (ce qui est effectivement a l'ecran) --------------------
@@ -208,7 +215,7 @@ export function Objet3D() {
       gx: 0, gy: 0, incl: 0, mut: 0,
       fx: 0, fy: 0, fech: 0.5, fo: 0, fgx: 0, fgy: 0,
       saut: 0,
-      angle: 0, vitesse: 0, brut: 0, dernierY: window.scrollY,
+      angle: 0, vitesse: 0, brut: 0, dy: 0, dyBrut: 0, dernierY: window.scrollY,
     }
     let cible: Sortie = { x: 0, y: 0, ech: 1 }
     let dernierTemps = performance.now()
@@ -234,7 +241,12 @@ export function Objet3D() {
     const marge = (c: Ctx, y: number): Sortie => ({ x: c.xM, y, ech: c.echM, op: 0.95 })
 
     /** HERO — le cube, grand, du cote droit. Il attend qu'on descende. */
-    const hero = (c: Ctx): Sortie => ({ x: c.W * 0.93 - 170, y: c.H * 0.5, ech: 1, op: 0.95, humeur: "neutre" })
+    const hero = (c: Ctx): Sortie => {
+      // Le plus grand qu'il sera : la donnee brute, seule, avant tout traitement.
+      // Il rentre dans la colonne libre a droite du titre, jamais dessus.
+      const ech = borne((c.W - c.gauche - 700) / 300, 0.8, 1.2)
+      return { x: c.W * 0.93 - 170 * ech, y: c.H * 0.5, ech, op: 0.95, humeur: "neutre" }
+    }
 
     /** SCHEMA — il porte la requete le long du pipeline. */
     const schema = (c: Ctx): Sortie => {
@@ -542,7 +554,7 @@ export function Objet3D() {
       }
     }
 
-    /** CONTACT — il se pose sur l'emplacement du bouton et devient le bouton. */
+    /** CONTACT — il grossit dans sa scene, puis se replie et devient le bouton. */
     const contact = (c: Ctx): Sortie => {
       const cib = q("[data-cible-robot]")
       const r = cib?.getBoundingClientRect()
@@ -554,12 +566,31 @@ export function Objet3D() {
       const reste = html.scrollHeight - c.Y - c.H
       const parLaFin = borne(1 - reste / (c.H * 0.5), 0, 1)
       const pose = Math.max(parPosition, parLaFin)
-      const pil = lisse(rampe(pose, 0.45, 1))
+      const pil = lisse(rampe(pose, 0.8, 1))
       const p = centre(r)
       const d = lisse(pose)
+
+      // Sa scene : un emplacement reserve au-dessus du titre. C'est le seul
+      // endroit de la page ou il est grand, et il est seul : rien ne le recouvre.
+      const scene = rect("[data-scene-robot]")
+      let x0 = c.xM
+      let y0 = c.H * 0.5
+      let e0 = c.echM
+      let regard: Point | null = null
+      if (scene && scene.height > 0) {
+        const s0 = centre(scene)
+        e0 = borne((scene.height - 44) / 190, 0.5, 1.05)
+        x0 = s0.x
+        y0 = s0.y + 10
+        // Il regarde le titre qui suit, puis le bouton quand il s'en approche.
+        regard = { x: p.x, y: mix(scene.bottom + 60, p.y, d) }
+      }
+      // Le titre et le texte sont entre la scene et le bouton : il les contourne
+      // par la droite au lieu de les traverser.
+      const detour = Math.sin(Math.PI * rampe(d, 0, 0.85)) * Math.min(460, Math.max(c.W - p.x - 110, 0))
       return {
-        x: mix(c.xM, p.x, d), y: mix(c.H * 0.5, p.y, d),
-        ech: mix(c.echM, 1, pil), op: 1, humeur: "content",
+        x: mix(x0, p.x, d) + detour, y: mix(y0, p.y, d),
+        ech: mix(mix(e0, 0.7, d), 1, pil), op: 1, humeur: "content", regard,
         pose, pil, pl: r.width, ph: r.height,
       }
     }
@@ -621,6 +652,7 @@ export function Objet3D() {
       const id = sousLaLigne(H * 0.55)
       if (id !== mem.scene) {
         mem.scene = id
+        html.dataset.robotScene = id
         N.saut = -16 // petit bond a l'arrivee dans une nouvelle scene
       }
       cible = (SCENES[id] ?? hero)(c)
@@ -661,11 +693,15 @@ export function Objet3D() {
       N.y = mix(N.y, cible.y, kPos)
       N.ech = mix(N.ech, cible.ech, kPos)
       N.op = mix(N.op, cible.op ?? 0.95, k)
-      N.incl = mix(N.incl, cible.incl ?? 0, k)
+      // Il s'incline dans le sens du defilement : on sent la vitesse de lecture.
+      const penche = reduit ? 0 : borne(N.dy * 0.7, -7, 7)
+      N.incl = mix(N.incl, (cible.incl ?? 0) + penche, k)
       N.saut *= snap ? 0 : Math.exp(-dt / 220)
 
       // Le regard : la direction du point regarde, plafonnee a l'amplitude de la visiere.
-      const g = regardVers({ x: N.x, y: N.y }, cible.regard, c.now)
+      // Un element interactif survole prend le regard : c'est ce que le visiteur va faire.
+      const surv = mem.survol && document.contains(mem.survol) && !cible.pose ? mem.survol : null
+      const g = regardVers({ x: N.x, y: N.y }, surv ? centre(surv.getBoundingClientRect()) : cible.regard, c.now)
       N.gx = mix(N.gx, g.x * 9, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
       N.gy = mix(N.gy, g.y * 6, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
 
@@ -681,7 +717,7 @@ export function Objet3D() {
       el.style.setProperty("--gx", `${N.gx.toFixed(2)}px`)
       el.style.setProperty("--gy", `${N.gy.toFixed(2)}px`)
       el.style.setProperty("--incl", `${N.incl.toFixed(2)}deg`)
-      const humeur = cible.humeur ?? "neutre"
+      const humeur = surv && (cible.humeur ?? "neutre") === "neutre" ? "curieux" : (cible.humeur ?? "neutre")
       if (el.dataset.humeur !== humeur) el.dataset.humeur = humeur
 
       // Pose sur le bouton.
@@ -766,6 +802,8 @@ export function Objet3D() {
       if (!actif()) return
       N.vitesse = N.vitesse * 0.9 + N.brut * 0.01
       N.brut = 0
+      N.dy = N.dy * 0.85 + N.dyBrut * 0.15
+      N.dyBrut = 0
       N.angle += (dt / 16.7) * (0.12 + N.vitesse)
       const c = calculer(now)
       peindre(c, dt, false)
@@ -777,6 +815,7 @@ export function Objet3D() {
 
     const surDefilement = () => {
       const y = window.scrollY
+      N.dyBrut += borne(y - N.dernierY, -90, 90)
       N.brut += Math.min(Math.abs(y - N.dernierY), 90) // plafonne : un saut d'ancre ne doit pas faire exploser l'objet
       N.dernierY = y
       if (!actif()) return
@@ -796,6 +835,8 @@ export function Objet3D() {
     }
     const surSouris = (e: PointerEvent) => {
       mem.souris = { x: e.clientX, y: e.clientY, t: performance.now() }
+      const cible1 = (e.target as Element | null)?.closest?.("a, button, [role=tab]") ?? null
+      mem.survol = cible1 && !cible1.closest(".obj") ? cible1 : null
     }
     const surClic = (e: MouseEvent) => {
       const tab = (e.target as Element | null)?.closest?.(".onglet")
@@ -833,6 +874,7 @@ export function Objet3D() {
       TOUS_ATTRS.forEach((a) => marquer(a, []))
       delete html.dataset.robotActif
       delete html.dataset.robotPose
+      delete html.dataset.robotScene
       delete (window as unknown as { __robot?: unknown }).__robot
     }
   }, [])
