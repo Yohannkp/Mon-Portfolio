@@ -42,13 +42,14 @@ De l'affinage du modèle à son déploiement.
             <div className="space-y-4 text-muted-foreground">
               <p className="leading-relaxed">
                 Un modèle qui reste dans un notebook ne sert à personne. Ce qui m'intéresse, c'est la partie
-                que la plupart des gens sautent : <strong>rendre un résultat reproductible</strong> et
-                <strong>savoir le mesurer</strong> — puis le servir derrière une API qui tient la charge.
+                que la plupart des gens sautent : <strong className="marque">rendre un résultat reproductible</strong> et
+                <strong className="marque">savoir le mesurer</strong> — puis le servir derrière une API qui tient la charge.
               </p>
               <p className="leading-relaxed">
                 Je viens du développement backend, et c'est ce qui fait la différence : je ne découvre pas
-                Docker, les tests et l'intégration continue au moment de déployer. Je cherche un stage de
-                4 à 6 mois à partir d'avril 2027, en MLOps ou en data engineering.
+                Docker, les tests et l'intégration continue au moment de déployer. Je cherche{" "}
+                <strong className="marque">un stage de 4 à 6 mois à partir d'avril 2027</strong>, en MLOps ou en data
+                engineering.
               </p>
             </div>
 

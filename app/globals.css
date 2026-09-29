@@ -170,7 +170,7 @@
   letter-spacing: .03em; fill: var(--muted-foreground); }
 .rag__token { fill: var(--accent); filter: drop-shadow(0 0 8px color-mix(in oklch, var(--accent) 90%, transparent)); }
 
-.rag__notebox { position: relative; width: 100%; max-width: 980px; height: 160px; margin-top: 1.6rem; padding: 0 1.5rem; }
+.rag__notebox { position: relative; width: 100%; max-width: 72rem; margin-inline: auto; height: 160px; margin-top: 1.6rem; padding: 0 1.5rem; }
 .rag-note { position: absolute; left: 1.5rem; top: 0; max-width: 46ch; background: var(--card);
   border: 1px solid var(--border); border-left: 2px solid var(--accent); padding: 1rem 1.15rem; border-radius: 6px;
   opacity: 0; will-change: transform, opacity; }
@@ -498,39 +498,35 @@
 
 
 /* ==========================================================================
-   L'objet : un cube filaire qui se change en robot, et qui suit la lecture.
-   Le JS n'ecrit que --prog (0 en haut de page, 1 en bas), --ry, --bx, --by.
-   Tout le reste est calcule en CSS : une seule couche composee par le GPU,
-   aucune dependance, ni canvas ni WebGL.
+   L'objet : un cube filaire qui se change en robot, puis accompagne la lecture.
+   Le JS ecrit des variables (position, echelle, regard, humeur) sur un seul
+   element ; le volume, la mutation et les expressions sont calcules ici, donc
+   composes par le GPU. Aucune dependance, ni canvas ni WebGL.
    ========================================================================== */
 
 /* Le robot passe DERRIERE le contenu : il ne doit jamais se poser sur le texte
-   qu'on est en train de lire. Les sections remontent au-dessus de lui, et comme
-   elles n'ont pas de fond, il reste visible dans les respirations de la page.
-   Une fois pose sur le bouton, il repasse devant — il faut pouvoir cliquer. */
+   qu'on est en train de lire. Les sections remontent au-dessus de lui ; elles
+   n'ont pas de fond, donc il reste visible dans les respirations de la page.
+   Pose sur le bouton, il repasse devant : il faut pouvoir cliquer. */
 main > section, main > div { position: relative; z-index: 1; }
 
-.obj {
-  position: fixed; z-index: 0; pointer-events: none;
-  /* --mut : 0 = cube, 1 = robot, ecrit par le JS. Le calcul est fait la-bas et
-     pas ici : un clamp() sur des nombres sans unite fait echouer le parseur de
-     Tailwind 4, qui abandonne silencieusement tout le bloc qui suit. */
-  /* --bx / --by : la trajectoire. Il ne reste pas dans un coin : il traverse
-     l'ecran, monte et descend au fil des sections. */
-  right: var(--bx, 7%);
-  top: var(--by, 50%);
-  width: 340px; height: 340px; margin: -170px 0 0 0;
-  display: flex; align-items: center; justify-content: center;
+.obj, .obj-fantome {
+  position: fixed; left: 0; top: 0; z-index: 0; pointer-events: none;
+  width: 340px; height: 340px; margin: -170px 0 0 -170px;
+  transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--ech, 1));
 }
+.obj { opacity: var(--op, .62); transition: opacity .4s ease; }
+.obj--pose { z-index: 40; opacity: 1; }
+
 .obj__halo { position: absolute; inset: -18%; border-radius: 50%;
   background: radial-gradient(circle, color-mix(in oklch, var(--accent) 13%, transparent), transparent 62%);
-  opacity: calc(1 - var(--mut) * 0.4); }
+  opacity: calc((1 - var(--mut, 0) * 0.4) * (1 - var(--pilule, 0))); }
 .obj__scene { position: absolute; inset: 0; transform-style: preserve-3d; perspective: 1000px;
   transform: rotateX(-20deg) rotateY(var(--ry, 0deg)); }
 
-/* ---------- etat cube ---------------------------------------------------- */
+/* ---------- etat cube --------------------------------------------------- */
 .obj__cube, .obj__coeur { position: absolute; inset: 0; transform-style: preserve-3d;
-  opacity: calc(1 - var(--mut)); }
+  opacity: calc(1 - var(--mut, 0)); }
 .obj__f { position: absolute; left: 50%; top: 50%; width: 176px; height: 176px;
   margin: -88px 0 0 -88px;
   border: 1px solid color-mix(in oklch, var(--accent) 42%, transparent);
@@ -550,17 +546,18 @@ main > section, main > div { position: relative; z-index: 1; }
 .obj__noyau { position: absolute; left: 50%; top: 50%; width: 11px; height: 11px;
   margin: -5.5px 0 0 -5.5px; border-radius: 50%; background: var(--accent);
   box-shadow: 0 0 32px 9px color-mix(in oklch, var(--accent) 55%, transparent);
-  opacity: calc(1 - var(--mut)); }
+  opacity: calc(1 - var(--mut, 0)); }
 
-/* ---------- etat robot --------------------------------------------------- */
+/* ---------- etat robot -------------------------------------------------- */
 /* On annule exactement la rotation de la scene : le cube tourne, le robot non.
    Un visage qui pivote en parallelogramme ne ressemble plus a rien.
    L'inverse de (rotateX a * rotateY b) est (rotateY -b * rotateX -a). */
 .obj__bot { position: absolute; left: 50%; top: 50%;
   width: 186px; height: 164px; margin: -82px 0 0 -93px;
-  opacity: var(--mut); transform-style: preserve-3d;
+  opacity: calc(var(--mut, 0) * (1 - var(--pilule, 0)));
+  transform-style: preserve-3d; rotate: var(--incl, 0deg);
   transform: rotateY(calc(var(--ry, 0deg) * -1)) rotateX(20deg)
-             translateY(var(--bob, 0px)) scale(calc(0.6 + var(--mut) * 0.4)); }
+             translateY(var(--bob, 0px)) scale(calc(0.6 + var(--mut, 0) * 0.4)); }
 .obj__tete { position: absolute; inset: 0; border-radius: 46% 46% 42% 42% / 52% 52% 48% 48%;
   background: linear-gradient(155deg,
     color-mix(in oklch, var(--accent) 28%, var(--card)),
@@ -571,13 +568,26 @@ main > section, main > div { position: relative; z-index: 1; }
 .obj__visiere { position: absolute; left: 12%; top: 26%; width: 76%; height: 40%;
   border-radius: 999px; background: oklch(0.14 0.01 255);
   border: 1px solid color-mix(in oklch, var(--accent) 30%, transparent); }
+
+/* Les yeux se deplacent DANS la visiere : c'est le regard. Le clignement reste
+   sur chaque oeil (transform) ; l'humeur passe par les proprietes individuelles
+   `scale` et par la forme, pour que les deux ne se marchent pas dessus. */
+.obj__yeux { position: absolute; inset: 0; transform: translate(var(--gx, 0px), var(--gy, 0px)); }
 .obj__oeil { position: absolute; top: 50%; width: 17px; height: 17px; margin-top: -8.5px;
   border-radius: 50%; background: var(--accent);
   box-shadow: 0 0 18px 4px color-mix(in oklch, var(--accent) 70%, transparent);
-  animation: obj-clin 6.5s infinite; }
+  animation: obj-clin 6.5s infinite; transition: scale .3s ease, height .3s ease, margin-top .3s ease; }
 .obj__oeil--g { left: 24%; }
 .obj__oeil--d { right: 24%; }
 @keyframes obj-clin { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+
+[data-humeur="concentre"] .obj__oeil { scale: 1 .55; }
+[data-humeur="curieux"] .obj__oeil { scale: 1.22; }
+[data-humeur="content"] .obj__oeil {
+  height: 9px; margin-top: -3px; background: transparent; box-shadow: none;
+  border-top: 5px solid var(--accent); border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  filter: drop-shadow(0 0 6px var(--accent)); }
+
 .obj__antenne { position: absolute; left: 50%; top: -22px; width: 2px; height: 22px;
   margin-left: -1px; background: color-mix(in oklch, var(--accent) 50%, transparent); }
 .obj__antenne::after { content: ""; position: absolute; left: -4px; top: -9px;
@@ -589,38 +599,38 @@ main > section, main > div { position: relative; z-index: 1; }
   border: 1px solid color-mix(in oklch, var(--accent) 60%, transparent);
   transform: rotateX(72deg) rotateZ(calc(var(--ry, 0deg) * 0.6)); }
 
-/* ---------- la bulle ----------------------------------------------------- */
-.obj__bulle { position: absolute; right: 100%; top: 30%; width: 250px;
-  opacity: 0; transform: translateX(12px);
-  transition: opacity .5s ease, transform .5s ease;
-  border: 1px solid var(--bord-doux); border-radius: var(--r-carte);
-  background: color-mix(in oklch, var(--card) 94%, transparent);
-  backdrop-filter: blur(10px); padding: .9rem 1.05rem; }
-.obj--parle .obj__bulle { opacity: 1; transform: none; }
-.obj__bulle b { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 9.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--accent); margin-bottom: .45rem; }
-.obj__bulle span { display: block; font-size: .82rem; line-height: 1.55; color: var(--muted-foreground); }
+/* ---------- le fantome : la seconde recherche, en parallele ------------- */
+.obj-fantome { --mut: 1; --pilule: 0; --ry: 0deg; opacity: var(--fo, 0); }
+.obj-fantome .obj__bot { opacity: 1; }
 
-@media (max-width: 1280px) { .obj { display: none; } }
+/* ---------- la bulle : dans un calque a part, au-dessus du contenu ------- */
+/* Le robot est derriere le texte ; sa bulle, elle, doit rester lisible. Elle
+   vit donc dans son propre calque, et n'est posee que dans une zone libre. */
+.obj-bulle { position: fixed; left: 0; top: 0; z-index: 35; pointer-events: none;
+  width: var(--bw, 180px); padding: .55rem .7rem;
+  transform: translate3d(var(--bx, 0px), var(--by, 0px), 0) translate(-50%, var(--bdy, -100%));
+  opacity: 0; transition: opacity .2s ease;
+  border: 1px solid var(--bord-doux); border-radius: var(--r-carte);
+  background: color-mix(in oklch, var(--card) 94%, transparent); backdrop-filter: blur(10px); }
+.obj-bulle[data-on="1"] { opacity: 1; }
+.obj-bulle b { display: block; font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 9.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: .3rem; }
+.obj-bulle b:empty { display: none; }
+.obj-bulle span { display: block; font-size: .78rem; line-height: 1.45; color: var(--muted-foreground); }
+
+@media (max-width: 1280px) { .obj, .obj-fantome, .obj-bulle { display: none; } }
 @media (prefers-reduced-motion: reduce) { .obj__oeil { animation: none; } }
 
 /* ---------- le robot DEVIENT le bouton ---------------------------------- */
 /* L'element de la section contact n'est qu'un emplacement : il reserve la
    place dans la mise en page et donne la mesure a viser. Il ne s'efface que
-   lorsque le robot commence reellement a se poser — sinon une panne du robot
-   (ecran etroit, JS en echec) laisserait la page sans bouton de contact. */
+   lorsque le robot se pose reellement — sinon une panne du robot (ecran
+   etroit, JS en echec) laisserait la page sans bouton de contact. */
 [data-robot-actif="1"] [data-cible-robot],
 [data-robot-pose="1"] [data-cible-robot] { visibility: hidden; }
 
-.obj { transform: scale(var(--ech, 1)); }
-.obj__bot { opacity: calc(var(--mut, 0) * (1 - var(--pilule, 0))); }
-.obj__halo { opacity: calc((1 - var(--mut, 0) * 0.4) * (1 - var(--pilule, 0))); }
-.obj__cube, .obj__coeur, .obj__noyau { opacity: calc(1 - var(--mut, 0)); }
-.obj--parle .obj__bulle { opacity: calc(1 - var(--pose, 0)); }
-
-/* La pilule prend exactement la taille de l'emplacement qu'elle remplace.
-   Son opacite vient d'une variable, jamais d'une animation : une animation
+/* Son opacite vient d'une variable, jamais d'une animation : une animation
    figee sur sa premiere image laisserait un bouton invisible. */
 .obj__pilule { position: absolute; left: 50%; top: 50%;
   transform: translate(-50%, -50%);
@@ -635,8 +645,45 @@ main > section, main > div { position: relative; z-index: 1; }
 .obj__pilule:hover { filter: brightness(1.08); }
 .obj__pilule:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
-/* Derriere le texte, un objet trop present gene la lecture meme sans le
-   recouvrir : on l'attenue, et on le rend franc a nouveau une fois pose. */
-.obj { opacity: .62; transition: opacity .4s ease; }
-.obj--pose { z-index: 40; opacity: 1; pointer-events: none; }
-.obj--pose .obj__pilule { pointer-events: auto; }
+/* ==========================================================================
+   Ce que le robot fait DANS la page : chaque effet est declenche par une scene
+   precise, sur un element reel, et disparait avec elle.
+   ========================================================================== */
+
+/* A propos — le surligneur. Les phrases qui portent le propos se soulignent
+   quand le robot les lit. Sans robot, elles restent du texte en gras. */
+.marque { color: var(--foreground); border-radius: 2px;
+  background: linear-gradient(color-mix(in oklch, var(--accent) 30%, transparent),
+                              color-mix(in oklch, var(--accent) 30%, transparent))
+    no-repeat 0 92% / 0% 44%;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  transition: background-size 1.1s cubic-bezier(.2, .7, .2, 1); }
+.marque[data-lu="1"] { background-size: 100% 44%; }
+
+/* En chiffres — la cellule que le robot designe. */
+.compteur { transition: box-shadow .35s ease; }
+.compteur[data-robot-vise="1"] { box-shadow: inset 0 -2px 0 var(--accent); }
+
+/* Projets — le lien que le robot attire l'oeil vers, une fois la carte lue. */
+.station__lien[data-robot-vise="1"] { border-bottom-color: var(--accent); color: var(--foreground); }
+
+/* Demonstrations — les onglets que le robot invite a essayer. */
+.onglet[data-robot-invite="1"] { animation: obj-invite 1.7s ease-in-out infinite;
+  color: var(--foreground); border-color: color-mix(in oklch, var(--accent) 55%, var(--border)); }
+@keyframes obj-invite {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50% { box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent) 22%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .onglet[data-robot-invite="1"] { animation: none; } }
+
+/* Competences — la preuve : le badge sur lequel le robot s'arrete. */
+#sec-competences [data-slot="badge"] { transition: box-shadow .4s ease, outline-color .4s ease, color .4s ease; }
+#sec-competences [data-preuve="1"] { outline: 1px solid var(--accent); color: var(--foreground);
+  box-shadow: 0 0 18px -2px color-mix(in oklch, var(--accent) 60%, transparent); }
+
+/* Methode — les etapes que le robot a deja parcourues. */
+#sec-methode div.rounded-full { transition: border-color .4s ease, box-shadow .4s ease; }
+#sec-methode [data-actif="1"] > div.rounded-full { border-color: var(--accent);
+  box-shadow: 0 0 0 5px color-mix(in oklch, var(--accent) 14%, transparent); }
+#sec-methode h3 { transition: color .4s ease; }
+#sec-methode [data-actif="1"] h3 { color: var(--accent); }

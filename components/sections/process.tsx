@@ -50,7 +50,7 @@ export function Process() {
           </h2>
         </motion.div>
 
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-24 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
           {steps.map((step, index) => (
             <motion.div
               key={step.title}
