@@ -204,6 +204,7 @@ export function PresentationAuto() {
   const etatRef = useRef<Etat>("repos")
   const reduit = useRef(false)
   const cacheFin = useRef(0)
+  const racine = useRef<HTMLDivElement>(null)
   const derniereMaj = useRef(0)
 
   const changerEtat = useCallback((e: Etat) => {
@@ -425,6 +426,24 @@ export function PresentationAuto() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Au repos, le bouton s'efface pendant que le visiteur fait defiler la page (il ne passe plus
+  // sur le texte) et revient des que le defilement s'arrete.
+  useEffect(() => {
+    let t = 0
+    const surScroll = () => {
+      const el = racine.current
+      if (!el || etatRef.current === "lecture") return
+      el.dataset.defile = "1"
+      window.clearTimeout(t)
+      t = window.setTimeout(() => delete el.dataset.defile, 1100)
+    }
+    window.addEventListener("scroll", surScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", surScroll)
+      window.clearTimeout(t)
+    }
+  }, [])
+
   const enCours = etat === "lecture"
   const entame = avancement > 0 && !fin
   const libelle = enCours ? "Arrêter la présentation" : entame ? "Reprendre la présentation" : "Présentation automatique"
@@ -432,7 +451,7 @@ export function PresentationAuto() {
   const C = 2 * Math.PI * R
 
   return (
-    <div className="pa" data-etat={etat} data-fin={fin ? "1" : "0"}>
+    <div className="pa" ref={racine} data-etat={etat} data-fin={fin ? "1" : "0"}>
       <div className="pa__carte" data-on={narration && (enCours || fin) ? "1" : "0"} role="status" aria-live="polite">
         {narration ? (
           <>
