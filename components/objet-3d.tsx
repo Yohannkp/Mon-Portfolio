@@ -188,6 +188,7 @@ export function Objet3D() {
       carte: -1,
       carteT: 0,
       etapeDemo: "",
+      visite: "",
       clic: null as (Point & { t: number }) | null,
       souris: { x: -1, y: -1, t: -1e9 },
       lu: 0,
@@ -617,6 +618,12 @@ export function Objet3D() {
         echM: borne((m - 34) / 215, 0.34, 0.62),
         haut: (entete?.getBoundingClientRect().bottom ?? 64) + 6,
         snap,
+      }
+      // Presentation automatique : un petit bond a chaque arret, comme s'il presentait la suite.
+      const visite = html.dataset.visiteEtape ?? ""
+      if (visite !== mem.visite) {
+        mem.visite = visite
+        if (visite && html.dataset.visite === "1") N.saut = -16
       }
       const id = sousLaLigne(H * 0.55)
       if (id !== mem.scene) {
