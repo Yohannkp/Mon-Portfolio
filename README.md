@@ -11,8 +11,8 @@ Le site cherche un stage de 4 à 6 mois à partir d'avril 2027.
 | Page | Contenu |
 | --- | --- |
 | `/` | Page d'accueil : l'essentiel du parcours, dans l'ordre décrit ci-dessous |
-| `/projects` et `/projects/[slug]` | Projets de développement, avec une fiche détaillée par projet |
-| `/data-projects` | Projets data / ML (RAG, fine-tuning, RL, scoring, tests A/B…) |
+| `/projects` | Les 17 projets, classés par ce qu'ils démontrent (voir ci-dessous). `/data-projects` y redirige |
+| `/projects/[slug]` | Étude de cas détaillée des applications (problème, solution, défis, apprentissages) |
 | `/about` | Parcours, formation, expériences |
 | `/contact` | Formulaire de contact |
 
@@ -21,7 +21,7 @@ Le site cherche un stage de 4 à 6 mois à partir d'avril 2027.
 1. **Hero** — le titre, la disponibilité et les deux appels à l'action.
 2. **Schéma RAG** — un pipeline animé (requête → recherche hybride vectorielle + BM25 → fusion RRF → reranking → réponse citée), épinglé pendant le défilement.
 3. **En chiffres** — le bandeau de compteurs.
-4. **Projets** — les projets phares, une carte par projet.
+4. **Projets** — six études de cas : la question qu'un recruteur se pose, la preuve chiffrée en grand, un schéma de l'idée, et la méthode qui se déplie en un clic.
 5. **Démonstrations** — quatre visites guidées, chacune menée par le robot (RAG-Local sur des fichiers, un scan rendu cherchable, SELF_DEV_AGENT, Mina-Translator). Ce sont des simulations, et la page le dit.
 6. **À propos**, **Compétences**, **Méthode**, **Veille** — le profil, les technologies regroupées par famille avec une preuve pour chacune, la démarche de travail et ce qui est en cours d'apprentissage.
 7. **Contact** — l'appel final.
@@ -35,7 +35,7 @@ Un cube filaire, à droite du hero, se transforme en petit robot dès qu'on desc
 | Hero | Cube fermé et grand : la donnée brute, avant que quoi que ce soit ne tourne |
 | Schéma RAG | Il porte la requête le long du pipeline et se dédouble pendant la recherche parallèle |
 | En chiffres | Il passe sous le bandeau et désigne chaque compteur |
-| Projets | Il suit la carte lue, puis attire l'œil vers son lien |
+| Projets | Il suit l'étude de cas lue et dit ce qu'elle démontre, puis attire l'œil vers son dépôt |
 | Démonstrations | Il guide la visite, étape par étape (voir ci-dessous), puis invite à essayer un autre scénario |
 | À propos | Il souligne les phrases qui portent le propos |
 | Compétences | Il s'arrête sous chaque famille, sur le badge dont le site contient la preuve |
@@ -72,6 +72,14 @@ Règles de conception :
 - Avec `prefers-reduced-motion`, il se positionne sans lissage ni oscillation.
 
 Le code est dans `components/objet-3d.tsx` (les scènes) et dans la fin de `app/globals.css` (le volume, les expressions et les effets posés sur la page).
+
+## Les projets : présentés par ce qu'ils prouvent
+
+Une liste de technologies ne dit pas pourquoi un projet compte. Chaque projet est donc décrit par un **dossier** (`lib/dossiers.ts`) : le problème posé, ce qui a été fait, ce que cela démontre, et **une preuve chiffrée quand elle existe**.
+
+- **Aucun chiffre inventé.** Chaque valeur vient d'un projet documenté (360 paires, AUC 0,88, 85 % de précision, +15 % de rotation des stocks, 0 requête sortante…). Un projet sans chiffre n'en reçoit pas : il a un enjeu et un résultat.
+- **Sur l'accueil**, six projets phares sont des études de cas. Chacun répond à une question de recruteur (« Peut-il livrer un système d'IA sans exposer les données ? »), avec un schéma qui illustre l'idée (`components/glyphes.tsx`). Le schéma est une illustration, jamais une mesure.
+- **Sur `/projects`**, un bandeau réunit les huit preuves chiffrées, puis les 17 projets sont classés en quatre axes : mettre des modèles en production, affiner et entraîner, mesurer et prouver, construire des applications. Un sommaire collant suit l'axe lu. Il remplace l'ancien mur de filtres techniques.
 
 ## Transitions et interactions
 
@@ -115,12 +123,12 @@ components/
   reading-rail.tsx      le rail de lecture
   page-transition.tsx   la transition entre les pages
 lib/
-  projects.ts           projets de développement
-  data-projects.ts      projets data / ML
+  dossiers.ts           les projets : enjeu, résultat, preuve chiffrée, axe (source unique de l'accueil et de /projects)
+  projects.ts           le détail des études de cas des applications (/projects/[slug])
 public/                 images et icônes
 ```
 
-Pour ajouter un projet, il suffit d'ajouter une entrée dans `lib/projects.ts` ou `lib/data-projects.ts` : la liste et la fiche détaillée sont générées à partir de ces fichiers.
+Pour ajouter un projet, on ajoute un dossier dans `lib/dossiers.ts` : il apparaît dans son axe sur `/projects`, et sur l'accueil s'il porte un `phare`. Une étude de cas détaillée s'ajoute en plus dans `lib/projects.ts`, et se relie par le champ `fiche`.
 
 ## Licence
 

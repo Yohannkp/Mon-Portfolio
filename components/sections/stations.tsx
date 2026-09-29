@@ -1,166 +1,124 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, ChevronDown } from "lucide-react"
+import { Chiffre } from "@/components/chiffre"
+import { Glyphe } from "@/components/glyphes"
+import { useVu } from "@/components/use-vu"
+import { AXES, DOSSIERS, PHARES, dossiersParAxe, type Dossier } from "@/lib/dossiers"
 
-type Station = {
-  cle: string
-  code: string
-  role: string
-  titre: string
-  texte: string
-  pile: string[]
-  depot?: string
+/**
+ * Les six projets phares, presentes comme des etudes de cas : la question qu'un
+ * recruteur se pose, la preuve chiffree en grand, le schema de l'idee, et la
+ * methode a un clic. Les donnees viennent de lib/dossiers.ts.
+ *
+ * Le robot lit cette section (voir objet-3d.tsx) : .cas, .cas__code b, .cas__lien.
+ */
+
+function Cas({ d, i, total }: { d: Dossier; i: number; total: number }) {
+  const [ref, vu] = useVu<HTMLElement>(0.2)
+  const [ouvert, setOuvert] = useState(false)
+  const ph = d.phare!
+  const long = (d.chiffre?.valeur.length ?? 0) > 7
+
+  return (
+    <article className="cas" ref={ref} data-vu={vu ? "1" : "0"}>
+      <div className="cas__gauche">
+        <span className="cas__n">
+          {String(i + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+        </span>
+        {d.chiffre ? (
+          <>
+            <b className="cas__chiffre" data-long={long ? "1" : "0"}>
+              <Chiffre valeur={d.chiffre.valeur} actif={vu} />
+            </b>
+            <span className="cas__unite">{d.chiffre.unite}</span>
+          </>
+        ) : null}
+      </div>
+
+      <div className="cas__corps">
+        <p className="cas__code">
+          <b>{d.nom}</b> · {d.role}
+        </p>
+        <p className="cas__question">{ph.question}</p>
+        <h3>{ph.titre}</h3>
+        <p className="cas__enjeu">{d.enjeu}</p>
+
+        <button className="cas__comment" aria-expanded={ouvert} onClick={() => setOuvert((o) => !o)}>
+          Comment j&apos;ai fait <ChevronDown size={14} />
+        </button>
+        <div className="cas__resultat" data-ouvert={ouvert ? "1" : "0"}>
+          <div>
+            <p>{d.resultat}</p>
+          </div>
+        </div>
+
+        <div className="cas__pied">
+          <ul className="cas__prouve" aria-label="Ce que ce projet démontre">
+            {d.prouve.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+          <p className="cas__stack">{d.stack.join(" · ")}</p>
+        </div>
+
+        <div className="cas__liens">
+          {d.depot ? (
+            <a className="cas__lien" href={d.depot} target="_blank" rel="noreferrer noopener">
+              Voir le dépôt
+            </a>
+          ) : null}
+          {d.fiche ? (
+            <Link className="cas__lien" href={d.fiche}>
+              Étude de cas
+            </Link>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="cas__visuel">
+        {d.glyphe ? (
+          <Glyphe id={d.glyphe} />
+        ) : d.image ? (
+          <Image src={d.image} alt={`Résultat du projet ${d.nom}`} width={320} height={200} data-ajuste={d.ajuste ?? "cover"} />
+        ) : null}
+      </div>
+    </article>
+  )
 }
 
-const STATIONS: Station[] = [
-  {
-    cle: "rag-local",
-    code: "RAG-LOCAL",
-    role: "assistant documentaire",
-    titre: "Aucune donnée ne quitte la machine",
-    texte:
-      "Recherche hybride, reranking cross-encoder, réponses citées à la page près. Les images des PDF sont décrites par un modèle de vision local et deviennent cherchables comme du texte.",
-    pile: ["FastAPI", "Chroma", "Ollama", "Next.js", "Docker Compose", "RAGAS"],
-    depot: "https://github.com/Yohannkp/RAG-Local",
-  },
-  {
-    cle: "mina-translator",
-    code: "MINA-TRANSLATOR",
-    role: "traduction FR ↔ mina",
-    titre: "Une langue sans corpus",
-    texte:
-      "Le mina n'a aucun corpus parallèle public. J'en ai constitué un — 360 paires sur sept domaines — pour affiner Qwen2-0.5B en QLoRA 4 bits, et une application de collecte participative pour l'étendre et le fiabiliser.",
-    pile: ["QLoRA", "Whisper", "FastAPI", "Streamlit"],
-    depot: "https://github.com/Yohannkp/mina-translator",
-  },
-  {
-    cle: "self-dev-agent",
-    code: "SELF_DEV_AGENT",
-    role: "agent de développement",
-    titre: "Un agent qui vérifie son propre travail",
-    texte:
-      "Un modèle de 7 milliards de paramètres n'est pas fiable. Alors l'agent n'écrit pas du code en espérant : il explore, modifie, exécute les tests, et se corrige.",
-    pile: ["Ollama", "Tool calling", "AST", "Python"],
-    depot: "https://github.com/Yohannkp/Claude-local",
-  },
-  {
-    cle: "leboncoin-mern",
-    code: "LE BON COIN",
-    role: "plateforme d'annonces",
-    titre: "Changer de base sans tout casser",
-    texte:
-      "Backend Express structuré, authentification par jeton, autorisation par propriétaire. Puis migration de MongoDB vers SQLite : modèles et contrôleurs entièrement réécrits.",
-    pile: ["Node.js", "Express", "JWT", "Sequelize", "React"],
-    depot: "https://github.com/Yohannkp/React-MERN-Project",
-  },
-  {
-    cle: "snake-rl",
-    code: "SNAKE RL",
-    role: "apprentissage par renforcement",
-    titre: "Un environnement écrit à la main",
-    texte:
-      "Environnement Gymnasium sur mesure, DQN en PyTorch avec réseau cible et mémoire de rejeu. Entraînement sur GPU, modules séparés.",
-    pile: ["PyTorch", "Gymnasium", "DQN"],
-    depot: "https://github.com/Yohannkp/Apprentissage-par-renforcement-Snake-Game",
-  },
-  {
-    cle: "optimisation-ventes",
-    code: "OPTIMISATION",
-    role: "impact d'un agencement",
-    titre: "Mesurer sans pouvoir randomiser",
-    texte:
-      "Chaque magasin test est apparié à un magasin contrôle choisi par corrélation avant l'intervention. C'est ce qui rend la mesure défendable.",
-    pile: ["pandas", "Inférence causale", "Tests statistiques"],
-    depot: "https://github.com/Yohannkp/Optimisation-des-ventes",
-  },
-]
-
 export function Stations() {
-  const racine = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const el = racine.current
-    if (!el) return
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-
-    let annule = false
-    const observateurs: IntersectionObserver[] = []
-
-    import("animejs")
-      .then(({ animate, stagger, utils }) => {
-        if (annule || !racine.current) return
-        el.querySelectorAll<HTMLElement>(".station").forEach((carte) => {
-          const io = new IntersectionObserver(
-            (entrees) => {
-              entrees.forEach((e) => {
-                if (!e.isIntersecting) return
-                io.disconnect()
-                animate(carte, { opacity: [0, 1], y: [34, 0], duration: 820, ease: "out(3)" })
-                animate(carte.querySelectorAll(".station__pile span"), {
-                  opacity: [0, 1],
-                  y: [8, 0],
-                  duration: 520,
-                  ease: "out(3)",
-                  delay: stagger(34, { start: 180 }),
-                })
-              })
-            },
-            { threshold: 0.18, rootMargin: "0px 0px -8% 0px" },
-          )
-          io.observe(carte)
-          observateurs.push(io)
-          utils.set(carte, { opacity: 0 })
-        })
-      })
-      .catch(() => {
-        /* les cartes restent visibles */
-      })
-
-    return () => {
-      annule = true
-      observateurs.forEach((o) => o.disconnect())
-    }
-  }, [])
-
   return (
     <section id="sec-stations" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
-        <p className="rag__kicker">Stations</p>
-        <h2 className="rag__h2">Six projets, menés jusqu&apos;au déploiement</h2>
+        <p className="rag__kicker">Projets</p>
+        <h2 className="rag__h2">Six projets, six preuves</h2>
         <p className="rag__lede mb-12">
-          Chacun résout un problème que je me suis posé, pas un exercice de cours.
+          Chacun répond à une question qu&apos;un recruteur se pose. Le chiffre est ce que j&apos;ai pu établir ; la méthode
+          se déplie en un clic, et le reste est dans le dépôt.
         </p>
 
-        <div className="stations" ref={racine}>
-          {STATIONS.map((s, i) => (
-            <article className="station" key={s.cle}>
-              <div className="station__id">
-                <b>{s.code}</b>
-                {s.role}
-              </div>
-              <div className="station__corps">
-                <h3>{s.titre}</h3>
-                <p>{s.texte}</p>
-                <div className="station__pile">
-                  {s.pile.map((t) => (
-                    <span key={t}>{t}</span>
-                  ))}
-                </div>
-                {s.depot ? (
-                  <a className="station__lien" href={s.depot} target="_blank" rel="noreferrer noopener">
-                    Voir le dépôt
-                  </a>
-                ) : null}
-              </div>
-              <div className="station__n">{String(i + 1).padStart(2, "0")}</div>
-            </article>
+        <div className="cas-liste">
+          {PHARES.map((d, i) => (
+            <Cas key={d.slug} d={d} i={i} total={PHARES.length} />
           ))}
         </div>
 
-        <div className="mt-12">
-          <Link href="/projects" className="station__lien inline-flex items-center gap-2">
+        <div className="cas-suite">
+          <p>
+            <b>Les {DOSSIERS.length} projets</b>, classés par ce qu&apos;ils démontrent :
+          </p>
+          <div>
+            {AXES.map((a) => (
+              <Link key={a.id} href={`/projects#${a.id}`} className="cas-suite__axe">
+                {a.titre} <span>{dossiersParAxe(a.id).length}</span>
+              </Link>
+            ))}
+          </div>
+          <Link href="/projects" className="cas__lien inline-flex items-center gap-2">
             Tous les projets
             <ArrowRight className="h-4 w-4" />
           </Link>

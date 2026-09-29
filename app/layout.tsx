@@ -9,6 +9,7 @@ import { Tilt3D } from '@/components/tilt-3d'
 import { PageTransition } from '@/components/page-transition'
 import './globals.css'
 import './demo-guide.css'
+import './projets.css'
 
 const _inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const _geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })

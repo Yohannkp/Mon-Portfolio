@@ -6,6 +6,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // L'ancienne page « Projets Data » est fusionnee dans /projects, classee par axe.
+  async redirects() {
+    return [{ source: '/data-projects', destination: '/projects', permanent: true }]
+  },
  
 }
 

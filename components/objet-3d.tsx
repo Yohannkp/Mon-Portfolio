@@ -347,7 +347,7 @@ export function Objet3D() {
 
     /** PROJETS — il suit la carte qu'on lit, puis attire l'oeil vers son lien. */
     const projets = (c: Ctx): Sortie => {
-      const cartes = qa(".station")
+      const cartes = qa("#sec-stations .cas")
       if (!cartes.length) return marge(c, c.H * 0.5)
       let idx = 0
       let dmin = Infinity
@@ -364,11 +364,15 @@ export function Objet3D() {
       }
       const r = cartes[idx].getBoundingClientRect()
       const depuis = c.now - mem.carteT
-      const lien = cartes[idx].querySelector<HTMLElement>(".station__lien")
+      const lien = cartes[idx].querySelector<HTMLElement>(".cas__lien")
       // Une fois la carte lue, le regard va au lien : c'est la que se decide la visite du depot.
       const versLien = depuis > 2200 && lien
       marquer("data-robot-vise", versLien && lien ? [lien] : [])
-      const code = cartes[idx].querySelector("b")?.textContent ?? ""
+      // Ce que le projet demontre : c'est la, pas dans la techno, que se joue sa pertinence.
+      const code = cartes[idx].querySelector(".cas__code b")?.textContent ?? ""
+      const prouve = Array.from(cartes[idx].querySelectorAll(".cas__prouve li"))
+        .map((li) => li.textContent)
+        .join(" · ")
       return {
         x: c.xM,
         y: borne(centre(r).y, c.H * 0.28, c.H * 0.72),
@@ -376,7 +380,7 @@ export function Objet3D() {
         op: 0.95,
         regard: versLien && lien ? centre(lien.getBoundingClientRect()) : { x: r.left + r.width * 0.32, y: r.top + r.height * 0.4 },
         humeur: depuis < 900 ? "content" : "neutre",
-        bulle: { titre: `${String(idx + 1).padStart(2, "0")} / ${String(cartes.length).padStart(2, "0")}`, texte: code },
+        bulle: { titre: code, texte: prouve ? `Démontre : ${prouve}` : "" },
       }
     }
 
