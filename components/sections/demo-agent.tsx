@@ -8,7 +8,7 @@ const LIGNES: Ligne[] = [
   { classe: "inv", texte: "selfdev> corrige le bug dans la fonction divide" },
   { classe: "", vide: true },
   { classe: "out", outil: "grep", arg: "divide" },
-  { classe: "out fic", texte: "   calc.py:42   def divide(a, b):" },
+  { classe: "out fichier", texte: "   calc.py:42   def divide(a, b):" },
   { classe: "", vide: true },
   { classe: "out", outil: "read_file", arg: "calc.py — lignes 38 à 48" },
   { classe: "out", texte: "   42  def divide(a, b):" },

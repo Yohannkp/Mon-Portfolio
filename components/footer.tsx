@@ -26,7 +26,7 @@ export function Footer() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-secondary hover:text-foreground active:scale-90"
               >
                 <link.icon className="h-5 w-5" />
                 <span className="sr-only">{link.name}</span>

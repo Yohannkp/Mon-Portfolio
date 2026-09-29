@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Tilt3D } from '@/components/tilt-3d'
+import { PageTransition } from '@/components/page-transition'
 import './globals.css'
 
 const _inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -74,6 +75,7 @@ export default function RootLayout({
             <Footer />
           </div>
           <Tilt3D />
+          <PageTransition />
         </ThemeProvider>
         <Analytics />
       </body>

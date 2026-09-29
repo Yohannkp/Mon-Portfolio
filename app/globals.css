@@ -252,7 +252,8 @@
 .station__lien { display: inline-block; margin-top: 1rem; font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 12px; color: var(--accent); text-decoration: none;
   border-bottom: 1px solid color-mix(in oklch, var(--accent) 40%, transparent); padding-bottom: 2px; }
-.station__lien:hover { border-bottom-color: var(--accent); }
+.station__lien { transition: border-color .25s ease, color .25s ease, letter-spacing .25s ease; }
+.station__lien:hover { border-bottom-color: var(--accent); letter-spacing: .02em; }
 .station__n { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 1.9rem; line-height: 1;
   font-weight: 600; color: var(--border); letter-spacing: -.02em; }
 
@@ -321,8 +322,11 @@
 
 .demo__actions { margin-top: 1.4rem; display: flex; gap: .6rem; }
 .demo__bouton { font-size: .82rem; font-weight: 500; color: var(--background); background: var(--accent);
-  border: 0; border-radius: var(--r-puce); padding: .7rem 1.1rem; cursor: pointer; transition: filter .2s; }
-.demo__bouton:hover:not(:disabled) { filter: brightness(1.1); }
+  border: 0; border-radius: var(--r-puce); padding: .7rem 1.1rem; cursor: pointer;
+  transition: filter .2s, transform .18s cubic-bezier(.2, .7, .2, 1), box-shadow .25s ease, background .2s, color .2s; }
+.demo__bouton:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px);
+  box-shadow: 0 8px 22px -10px color-mix(in oklch, var(--accent) 70%, transparent); }
+.demo__bouton:active:not(:disabled) { transform: scale(.96); box-shadow: none; }
 .demo__bouton:disabled { opacity: .45; cursor: default; }
 .demo__bouton--fantome { background: transparent; color: var(--muted-foreground); border: 1px solid var(--input); }
 
@@ -340,7 +344,7 @@
 .term .out { color: var(--muted-foreground); padding-left: 1rem; }
 .term .ok { color: oklch(0.78 0.15 160); }
 .term .ko { color: oklch(0.68 0.19 25); }
-.term .fic { color: var(--foreground); }
+.term .fichier { color: var(--foreground); }
 .term .moins { color: oklch(0.68 0.19 25); }
 .term .plus { color: oklch(0.78 0.15 160); }
 .term__outil { display: inline-block; font-size: 10.5px; letter-spacing: .06em; color: var(--background);
@@ -368,8 +372,9 @@
 .onglet { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11.5px;
   letter-spacing: .06em; color: var(--muted-foreground); background: transparent;
   border: 1px solid var(--border); border-radius: var(--r-puce); padding: .5rem .8rem; cursor: pointer;
-  transition: color .2s, border-color .2s, background .2s; }
-.onglet:hover { color: var(--foreground); border-color: var(--input); }
+  transition: color .2s, border-color .2s, background .2s, transform .18s cubic-bezier(.2, .7, .2, 1); }
+.onglet:hover { color: var(--foreground); border-color: var(--input); transform: translateY(-1px); }
+.onglet:active { transform: scale(.96); }
 .onglet--actif { color: var(--background); background: var(--accent); border-color: var(--accent); }
 .onglets__entete { margin: 1.6rem 0 0; }
 .onglets__entete h3 { font-size: 1.15rem; font-weight: 600; letter-spacing: -.015em; }
@@ -702,3 +707,56 @@ main > section, main > div { position: relative; z-index: 1; }
   box-shadow: 0 0 0 5px color-mix(in oklch, var(--accent) 14%, transparent); }
 #sec-methode h3 { transition: color .4s ease; }
 #sec-methode [data-actif="1"] h3 { color: var(--accent); }
+
+
+/* ==========================================================================
+   Transitions de page et retour des boutons.
+   Le JS (components/page-transition.tsx) ne pose que deux attributs sur <html> ;
+   tout le mouvement est ici, compose par le GPU.
+   ========================================================================== */
+
+/* Sortie : la page se retire, une fine barre montre qu'on charge. */
+main { transition: opacity .22s ease; }
+html[data-leaving] main { opacity: 0; }
+html[data-leaving] { cursor: progress; }
+html[data-leaving] a, html[data-leaving] button { pointer-events: none; }
+
+html::before { content: ""; position: fixed; left: 0; top: 0; z-index: 100; width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  box-shadow: 0 0 12px color-mix(in oklch, var(--accent) 70%, transparent);
+  transform-origin: left; transform: scaleX(1); opacity: 0; transition: opacity .35s ease .05s;
+  pointer-events: none; }
+html[data-leaving]::before { opacity: 1; transition: none; animation: nav-barre 1.4s cubic-bezier(.1, .6, .2, 1) forwards; }
+/* Une fois la page arrivee, la barre finit sa course puis s'efface. */
+@keyframes nav-barre { from { transform: scaleX(0); } to { transform: scaleX(.85); } }
+
+/* Entree : les sections arrivent l'une apres l'autre.
+   Jamais sur un parent de tout le contenu : un transform sur un ancetre deviendrait
+   le repere des elements fixes (robot, rail). Et `backwards`, pas `both` : a la fin,
+   plus aucun transform ne reste sur la section. */
+@keyframes page-in-a { from { opacity: 0; translate: 0 22px; } }
+@keyframes page-in-b { from { opacity: 0; translate: 0 22px; } }
+html[data-nav="a"] main > :where(section, div, article):not(.obj, .obj-fantome, .obj-bulle, .rail) {
+  animation: page-in-a .7s cubic-bezier(.2, .7, .2, 1) backwards; }
+html[data-nav="b"] main > :where(section, div, article):not(.obj, .obj-fantome, .obj-bulle, .rail) {
+  animation: page-in-b .7s cubic-bezier(.2, .7, .2, 1) backwards; }
+html[data-nav] main > :nth-child(2) { animation-delay: .06s !important; }
+html[data-nav] main > :nth-child(3) { animation-delay: .12s !important; }
+html[data-nav] main > :nth-child(4) { animation-delay: .18s !important; }
+html[data-nav] main > :nth-child(n+5) { animation-delay: .24s !important; }
+
+/* Tous les boutons : ils repondent au survol et au clic. */
+[data-slot="button"] { transition-property: color, background-color, border-color, box-shadow, transform, filter;
+  transition-duration: .2s; transition-timing-function: cubic-bezier(.2, .7, .2, 1); }
+[data-slot="button"]:not(:disabled):active { transform: scale(.96); }
+/* La fleche d'un bouton avance vers ce qu'il promet. */
+[data-slot="button"] > svg:last-child { transition: transform .25s cubic-bezier(.2, .7, .2, 1); }
+[data-slot="button"]:hover > svg:last-child { transform: translateX(4px); }
+
+@media (prefers-reduced-motion: reduce) {
+  main { transition: none; }
+  html[data-nav] main > * { animation: none !important; }
+  [data-slot="button"], [data-slot="button"] > svg { transition: none; }
+  [data-slot="button"]:not(:disabled):active { transform: none; }
+  .demo__bouton:hover:not(:disabled), .demo__bouton:active:not(:disabled), .onglet:hover, .onglet:active { transform: none; }
+}

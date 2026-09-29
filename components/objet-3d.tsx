@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
+import { lireDemo, RESULTAT, scenarioDemo, type PhaseDemo } from "@/lib/robot-demos"
 
 /**
  * L'objet : un cube filaire qui devient un robot, puis accompagne la lecture.
@@ -206,6 +207,7 @@ export function Objet3D() {
       bulleMin: 0,
       dernierePilule: false,
       survol: null as Element | null,
+      dem: null as (PhaseDemo & { t: number }) | null,
     }
 
     // --- Etat lisse (ce qui est effectivement a l'ecran) --------------------
@@ -378,7 +380,20 @@ export function Objet3D() {
       }
     }
 
-    /** DEMOS — il regarde la simulation, puis invite a essayer un autre onglet. */
+    /** Un moment marquant interrompt vite ; un moment ordinaire attend son temps de lecture. */
+    const peutRemplacer = (actuel: PhaseDemo & { t: number }, suivant: PhaseDemo, now: number) => {
+      const lu = now - actuel.t
+      if (suivant.marquant) return lu > 350
+      return lu > (actuel.marquant ? 1700 : 1100)
+    }
+
+    /**
+     * DEMOS — il commente l'execution, pas le decor.
+     * La simulation ecrit dans la page ; lireDemo() dit ou elle en est (ligne du
+     * terminal, barre d'indexation, boite allumee…) et le robot en tire le
+     * commentaire, le regard et l'humeur. Un commentaire reste au moins 1,1 s :
+     * une etape qui ne dure que quelques images ne doit pas faire clignoter la bulle.
+     */
     const demos = (c: Ctx): Sortie => {
       const panneau = rect("#sec-demos .demo")
       const rangee = rect("#sec-demos .onglets")
@@ -389,6 +404,7 @@ export function Objet3D() {
         d.dispo = false
         d.vu = false
         d.fin = false
+        mem.dem = null
       }
       // Le bouton est desactive tant que la simulation tourne (et avant que
       // anime.js soit charge) : on ne conclut « en cours » qu'apres l'avoir vu actif.
@@ -404,6 +420,8 @@ export function Objet3D() {
       const onglets = qa("#sec-demos .onglet")
       const inactifs = onglets.filter((o) => !o.classList.contains("onglet--actif"))
       const invite = d.fin && !enCours
+      const zone = q("#sec-demos .demo")
+      const scenario = scenarioDemo(zone)
 
       // Un clic sur un onglet attire son regard un instant.
       const clic = mem.clic && c.now - mem.clic.t < 800 ? mem.clic : null
@@ -418,18 +436,30 @@ export function Objet3D() {
           op: 0.95,
           regard: clic ?? (cible1 ? centre(cible1) : null),
           humeur: "content",
-          bulle: { titre: "Terminé", texte: "Essaie un autre scénario" },
+          // Le resultat de CETTE simulation, puis l'invitation.
+          bulle: { titre: scenario ? RESULTAT[scenario] : "Terminé", texte: "Essaie un autre scénario" },
         }
       }
       marquer("data-robot-invite", [])
+
+      // Le commentaire suit la simulation, avec un temps de lecture minimal.
+      const vivante = enCours ? lireDemo(zone) : null
+      if (!enCours) mem.dem = null
+      else if (vivante && vivante.cle !== mem.dem?.cle && (!mem.dem || c.snap || peutRemplacer(mem.dem, vivante, c.now))) {
+        mem.dem = { ...vivante, t: c.now }
+        N.saut = -12 // un petit bond : quelque chose vient de se passer
+      }
+      const affiche = enCours ? mem.dem : null
+
       const y = panneau
         ? borne((Math.max(panneau.top, 0) + Math.min(panneau.bottom, c.H)) / 2, c.H * 0.3, c.H * 0.7)
         : c.H * 0.5
+      const foyer = vivante?.focus ? centre(vivante.focus.getBoundingClientRect()) : null
       return {
         x: c.xM, y, ech: c.echM, op: 0.95,
-        regard: clic ?? (panneau ? { x: panneau.left + panneau.width * 0.45, y } : null),
-        humeur: enCours ? "concentre" : "neutre",
-        bulle: enCours ? { titre: "Simulation", texte: "Je regarde le scénario se dérouler" } : null,
+        regard: clic ?? foyer ?? (panneau ? { x: panneau.left + panneau.width * 0.45, y } : null),
+        humeur: affiche?.humeur ?? (enCours ? "concentre" : "neutre"),
+        bulle: affiche ? { titre: affiche.titre, texte: affiche.texte } : enCours ? { titre: "Simulation", texte: "Le scénario démarre" } : null,
       }
     }
 

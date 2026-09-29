@@ -36,7 +36,7 @@ Un cube filaire, à droite du hero, se transforme en petit robot dès qu'on desc
 | Schéma RAG | Il porte la requête le long du pipeline et se dédouble pendant la recherche parallèle |
 | En chiffres | Il passe sous le bandeau et désigne chaque compteur |
 | Projets | Il suit la carte lue, puis attire l'œil vers son lien |
-| Démonstrations | Il regarde la simulation, puis invite à essayer un autre scénario |
+| Démonstrations | Il commente l'exécution réelle de la simulation (voir ci-dessous), puis invite à essayer un autre scénario |
 | À propos | Il souligne les phrases qui portent le propos |
 | Compétences | Il s'arrête sous chaque famille, sur le badge dont le site contient la preuve |
 | Méthode | Il parcourt les étapes et les allume derrière lui |
@@ -44,6 +44,8 @@ Un cube filaire, à droite du hero, se transforme en petit robot dès qu'on desc
 | Contact | Il grossit, puis rétrécit et devient le bouton « Me contacter » |
 
 Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se pose sur ce qu'on survole, il s'incline avec la vitesse de défilement, et un clic sur un onglet attire son attention.
+
+**Commentaires pendant les démonstrations.** Les simulations écrivent dans la page (lignes du terminal, barre d'indexation, boîtes qui s'allument). Le robot lit cet état avec `lib/robot-demos.ts` et commente ce qui se passe à l'instant : « Test rouge — ZeroDivisionError : le bug est reproduit », puis « Test vert — 4 tests sur 4 passent » pour l'agent, l'étape de la chaîne pour Mina, « Sans texte : on cherche leur description » pour les photos. Son regard suit l'élément qui vient de changer. À la fin, il rappelle le résultat de ce scénario-là avant d'inviter à en essayer un autre.
 
 Règles de conception :
 
@@ -53,6 +55,13 @@ Règles de conception :
 - Avec `prefers-reduced-motion`, il se positionne sans lissage ni oscillation.
 
 Le code est dans `components/objet-3d.tsx` (les scènes) et dans la fin de `app/globals.css` (le volume, les expressions et les effets posés sur la page).
+
+## Transitions et interactions
+
+- **Entre les pages :** la page sort en fondu pendant qu'une fine barre indique le chargement, puis la suivante entre en cascade (`components/page-transition.tsx`, styles en fin de `app/globals.css`). Un Ctrl/Cmd+clic, une ancre ou le bouton retour du navigateur gardent leur comportement normal.
+- **Boutons :** tous réagissent au survol (léger relief) et au clic (léger enfoncement). Une flèche de bouton avance vers ce qu'il promet.
+- **Menu :** la pastille du menu glisse d'un lien à l'autre.
+- **Mouvement réduit :** avec `prefers-reduced-motion`, la navigation est immédiate et les effets de survol sont coupés.
 
 ## Stack
 
@@ -87,9 +96,11 @@ components/
   ui/                   composants shadcn/ui
   objet-3d.tsx          le robot
   reading-rail.tsx      le rail de lecture
+  page-transition.tsx   la transition entre les pages
 lib/
   projects.ts           projets de développement
   data-projects.ts      projets data / ML
+  robot-demos.ts        lecture de l'état des simulations, pour les commentaires du robot
 public/                 images et icônes
 ```
 
