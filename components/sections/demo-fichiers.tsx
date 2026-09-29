@@ -1,273 +1,310 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { foc, GuideShell, useSerie, useTween, useTyping, type Etape } from "@/components/sections/demo-guide"
+
+/**
+ * RAG-Local sur un dossier : indexer (texte et images), puis retrouver par le sens.
+ * La carte de droite est une projection illustrative de l'espace d'embeddings :
+ * les positions sont fixees a la main pour la lisibilite, pas calculees.
+ */
 
 const QUESTION = "Où sont mes photos prises à la plage ?"
 
-const FICHIERS = [
+const ETAPES: Etape[] = [
+  {
+    titre: "Un dossier à explorer",
+    texte: "1 247 fichiers : des documents, des tableurs, des PDF… et des photos, qui ne contiennent aucun texte.",
+    humeur: "neutre",
+  },
+  {
+    titre: "Lire les textes",
+    texte: "L'indexation lit les fichiers un par un et en extrait le texte.",
+    humeur: "concentre",
+    attente: 1500,
+  },
+  {
+    titre: "Décrire les images",
+    texte: "Pour une photo, un modèle de vision local écrit une description. C'est cette description qui sera cherchée.",
+    humeur: "curieux",
+    attente: 1500,
+  },
+  {
+    titre: "Ne pas refaire",
+    texte: "Un fichier inchangé n'est pas réanalysé : archives/2019.pdf est ignoré. L'indexation est incrémentale.",
+    humeur: "content",
+  },
+  {
+    titre: "Des points sur une carte",
+    texte: "Chaque texte devient un point dans un espace : deux contenus proches par le sens sont proches sur la carte.",
+    humeur: "curieux",
+    attente: 800,
+  },
+  {
+    titre: "La question",
+    texte: "Je demande : « Où sont mes photos prises à la plage ? » Elle devient un point à son tour.",
+    humeur: "concentre",
+    attente: 800,
+  },
+  {
+    titre: "Les plus proches voisins",
+    texte: "On ne compare pas des mots : on cherche les points les plus proches de la question, avec un score de similarité.",
+    humeur: "concentre",
+    attente: 800,
+  },
+  {
+    titre: "Le résultat",
+    texte: "Trois photos sont retrouvées. Aucune ne contient de texte : c'est leur description qui a été cherchée.",
+    humeur: "content",
+  },
+  {
+    titre: "100 % local",
+    texte: "Modèle de vision, embeddings, index : tout tourne sur la machine. Requêtes réseau sortantes : 0.",
+    humeur: "content",
+  },
+]
+
+type Tuile = { nom: string; ext: string; img?: [string, string]; ignore?: boolean }
+const TUILES: Tuile[] = [
+  { nom: "notes_reunion.md", ext: "MD" },
+  { nom: "contrat_prestation.pdf", ext: "PDF" },
+  { nom: "IMG_2831.jpg", ext: "JPG", img: ["#e8a87c", "#3b7ea1"] },
+  { nom: "budget_2026.xlsx", ext: "XLS" },
+  { nom: "DSC_0147.png", ext: "PNG", img: ["#6fb3d2", "#d9c18a"] },
+  { nom: "rapport_annuel.docx", ext: "DOC" },
+  { nom: "capture_ecran_plage.webp", ext: "WEBP", img: ["#7fc4a0", "#3f6f5e"] },
+  { nom: "archives/2019.pdf", ext: "PDF", ignore: true },
+]
+const ORDRE_TEXTES = [0, 1, 3, 5]
+const ORDRE_IMAGES = [2, 4, 6]
+
+const RESULTATS = [
   {
     nom: "IMG_2831.jpg",
     chemin: "~/Documents/Photos/Vacances 2025/",
-    date: "12 août 2025",
     desc: "Une plage au coucher du soleil, deux transats sous un parasol rayé, la mer calme en arrière-plan.",
     score: "0,91",
-    c1: "#e8a87c",
-    c2: "#3b7ea1",
-    ext: "JPG",
+    c: ["#e8a87c", "#3b7ea1"],
   },
   {
     nom: "DSC_0147.png",
     chemin: "~/Documents/Photos/Lomé/",
-    date: "3 janv. 2026",
     desc: "Vue sur le sable et les vagues, des pirogues colorées tirées sur le rivage, ciel dégagé.",
     score: "0,87",
-    c1: "#6fb3d2",
-    c2: "#d9c18a",
-    ext: "PNG",
+    c: ["#6fb3d2", "#d9c18a"],
   },
   {
     nom: "capture_ecran_plage.webp",
     chemin: "~/Documents/Inspirations/",
-    date: "28 mai 2025",
     desc: "Photographie de bord de mer avec palmiers et cabane en bois au premier plan.",
     score: "0,79",
-    c1: "#7fc4a0",
-    c2: "#3f6f5e",
-    ext: "WEBP",
+    c: ["#7fc4a0", "#3f6f5e"],
   },
 ]
 
-const ETAPES = [
-  "Lecture de notes_reunion.md",
-  "Lecture de contrat_prestation.pdf",
-  "Description de l'image IMG_2831.jpg",
-  "Lecture de budget_2026.xlsx",
-  "Description de l'image DSC_0147.png",
-  "Lecture de rapport_annuel.docx",
-  "Description de l'image capture_ecran_plage.webp",
-  "Fichier inchangé — ignoré : archives/2019.pdf",
-  "Indexation terminée",
+/* --- La carte : quatre nuages, et la question au milieu des photos de plage --- */
+const hasard = (graine: number) => () => {
+  graine = (graine + 0x6d2b79f5) | 0
+  let t = Math.imul(graine ^ (graine >>> 15), 1 | graine)
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+}
+const NUAGES = [
+  { g: "doc", x: 105, y: 92, r: 36, n: 15, nom: "documents" },
+  { g: "xls", x: 320, y: 78, r: 30, n: 11, nom: "tableurs" },
+  { g: "autres", x: 98, y: 252, r: 36, n: 12, nom: "autres photos" },
+]
+const rnd = hasard(11)
+const POINTS: { g: string; x: number; y: number }[] = []
+NUAGES.forEach((n) => {
+  for (let i = 0; i < n.n; i++) {
+    const a = rnd() * Math.PI * 2
+    const d = Math.sqrt(rnd()) * n.r
+    POINTS.push({ g: n.g, x: Math.round((n.x + Math.cos(a) * d) * 10) / 10, y: Math.round((n.y + Math.sin(a) * d * 0.85) * 10) / 10 })
+  }
+})
+const Q = { x: 296, y: 232 }
+// Les trois plus proches (les resultats), puis le reste des photos de plage, plus loin.
+const VOISINS = [
+  { x: 283, y: 226, score: "0,91" },
+  { x: 312, y: 246, score: "0,87" },
+  { x: 326, y: 224, score: "0,79" },
+]
+const PLAGE_AUTRES = [
+  { x: 262, y: 214 },
+  { x: 268, y: 262 },
+  { x: 342, y: 258 },
+  { x: 306, y: 194 },
+  { x: 250, y: 240 },
 ]
 
-const JOURNAL = [
-  { cle: "modèle de vision", val: "qwen3-vl:4b", note: "local" },
-  { cle: "embeddings", val: "nomic-embed-text", note: "local" },
-  { cle: "indexation", val: "incrémentale — un fichier inchangé n'est pas réanalysé", note: "" },
-  { cle: "requêtes réseau sortantes", val: "", note: "0" },
-]
+function Tuiles({ etape }: { etape: number }) {
+  const k = useSerie(etape === 1 || etape === 2, etape === 1 ? ORDRE_TEXTES.length : ORDRE_IMAGES.length, 620)
+  const n = Math.round(useTween(etape === 0 ? 0 : etape === 1 ? 480 : etape === 2 ? 1020 : 1247, 1800))
+  const legende = useTyping(RESULTATS[0].desc, etape >= 2, 52).affiche
 
-export function DemoFichiers({ nu = false }: { nu?: boolean } = {}) {
-  const racine = useRef<HTMLDivElement>(null)
-  const lib = useRef<typeof import("animejs") | null>(null)
-  const tl = useRef<{ pause: () => void } | null>(null)
-  const [pret, setPret] = useState(false)
-  const [enCours, setEnCours] = useState(false)
+  const etatTuile = (t: Tuile, i: number) => {
+    if (t.ignore) return etape >= 3 ? "ignore" : "attente"
+    const liste = t.img ? ORDRE_IMAGES : ORDRE_TEXTES
+    const seuil = t.img ? 2 : 1
+    const rang = liste.indexOf(i)
+    if (etape > seuil) return t.img ? "vision" : "lu"
+    if (etape === seuil) return rang < k ? (t.img ? "vision" : "lu") : rang === k ? "cours" : "attente"
+    return "attente"
+  }
+  const LIBELLE: Record<string, string> = {
+    attente: "—",
+    cours: "lecture…",
+    lu: "texte extrait",
+    vision: "décrit par le modèle",
+    ignore: "inchangé — ignoré",
+  }
 
-  const reinitialiser = useCallback((A?: typeof import("animejs") | null) => {
-    const anime = A ?? lib.current
-    const el = racine.current
-    if (!anime || !el) return
-    tl.current?.pause()
-    tl.current = null
-    const q = el.querySelector<HTMLElement>("[data-q]")
-    const ligne = el.querySelector<HTMLElement>("[data-ligne-idx]")
-    const cpt = el.querySelector<HTMLElement>("[data-cpt]")
-    const barre = el.querySelector<HTMLElement>("[data-barre]")
-    if (q) q.textContent = ""
-    if (ligne) ligne.textContent = "en attente"
-    if (cpt) cpt.textContent = "0 / 1 247 fichiers"
-    if (barre) barre.style.width = "0%"
-    anime.utils.set(el.querySelectorAll("[data-curseur], .fic, .note-vision, [data-j]"), { opacity: 0 })
-    setEnCours(false)
-  }, [])
-
-  useEffect(() => {
-    let annule = false
-    import("animejs")
-      .then((A) => {
-        if (annule) return
-        lib.current = A
-        setPret(true)
-        reinitialiser(A)
-      })
-      .catch(() => setPret(false))
-    return () => {
-      annule = true
-      tl.current?.pause()
-    }
-  }, [reinitialiser])
-
-  const jouer = useCallback(() => {
-    const anime = lib.current
-    const el = racine.current
-    if (!anime || !el) return
-    reinitialiser(anime)
-    setEnCours(true)
-
-    const t = anime.createTimeline({ defaults: { ease: "out(3)" } })
-    tl.current = t as unknown as { pause: () => void }
-
-    const q = el.querySelector<HTMLElement>("[data-q]")!
-    const curseur = el.querySelector<HTMLElement>("[data-curseur]")!
-    const ligne = el.querySelector<HTMLElement>("[data-ligne-idx]")!
-    const cpt = el.querySelector<HTMLElement>("[data-cpt]")!
-    const barre = el.querySelector<HTMLElement>("[data-barre]")!
-    const fics = el.querySelectorAll<HTMLElement>(".fic")
-    const note = el.querySelector<HTMLElement>(".note-vision")!
-    const journal = el.querySelectorAll<HTMLElement>("[data-j]")
-
-    const etat = { p: 0 }
-    t.add(
-      etat,
-      {
-        p: 100,
-        duration: 2600,
-        ease: "inOut(2)",
-        onUpdate: () => {
-          barre.style.width = `${etat.p}%`
-          cpt.textContent = `${Math.round(etat.p * 12.47)} / 1 247 fichiers`
-        },
-      },
-      0,
-    )
-    ETAPES.forEach((texte, i) => {
-      t.add({ v: 0 }, { v: 1, duration: 10, onComplete: () => (ligne.textContent = texte) }, 60 + i * 290)
-    })
-
-    t.add(curseur, { opacity: [0, 1], duration: 120 }, 2750)
-    const e = { n: 0 }
-    t.add(
-      e,
-      {
-        n: QUESTION.length,
-        duration: 1000,
-        ease: "linear",
-        onUpdate: () => (q.textContent = QUESTION.slice(0, Math.round(e.n))),
-      },
-      2850,
-    )
-    t.add(curseur, { opacity: 0, duration: 200 }, 3950)
-    t.add(fics, { opacity: [0, 1], y: [14, 0], duration: 520, delay: anime.stagger(180) }, 4150)
-    t.add(note, { opacity: [0, 1], y: [10, 0], duration: 480 }, 5100)
-    t.add(journal, { opacity: [0, 1], x: [-8, 0], duration: 340, delay: anime.stagger(150) }, 5500)
-    t.add({ v: 0 }, { v: 1, duration: 10, onComplete: () => setEnCours(false) }, 6400)
-  }, [reinitialiser])
-
-  // Lancement automatique a l'entree dans le champ de vision : un recruteur ne
-  // doit jamais tomber sur un panneau vide en attendant de cliquer. Une seule
-  // fois, puis l'observateur se debranche ; le bouton reste pour rejouer.
-  useEffect(() => {
-    const el = racine.current
-    if (!pret || !el || typeof IntersectionObserver === "undefined") return
-    let lance = false
-    const io = new IntersectionObserver(
-      (entrees) => {
-        for (const e of entrees) {
-          if (e.isIntersecting && !lance) {
-            lance = true
-            io.disconnect()
-            jouer()
-          }
-        }
-      },
-      { threshold: 0.3 },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [pret, jouer])
-
-  const carte = (
-    <div className="demo" ref={racine}>
-      <div className="demo__bar">
-        <span className="demo__titre">Démonstration</span>
-        <span className="demo__sim">Simulation — aucun modèle n&apos;est exécuté</span>
+  return (
+    <div className="fi__gauche">
+      <div className="fi__tete">
+        <span>~/Documents</span>
+        <b>{n.toLocaleString("fr-FR")} / 1 247</b>
       </div>
-      <div className="demo__corps">
-        <p className="demo__etiq">Indexation du dossier</p>
-        <div className="idx">
-          <div className="idx__tete">
-            <span>~/Documents</span>
-            <b data-cpt>0 / 1 247 fichiers</b>
-          </div>
-          <div className="idx__barre">
-            <i data-barre />
-          </div>
-          <div className="idx__ligne" data-ligne-idx>
-            en attente
-          </div>
-        </div>
-
-        <p className="demo__etiq">Question</p>
-        <div className="demo__champ">
-          <span data-q />
-          <span className="demo__curseur" data-curseur />
-        </div>
-
-        <p className="demo__etiq">Fichiers retrouvés</p>
-        <div className="res">
-          {FICHIERS.map((f) => (
-            <div className="fic" key={f.nom}>
-              <div className="vign" style={{ background: `linear-gradient(135deg, ${f.c1}, ${f.c2})` }}>
-                <span>{f.ext}</span>
-              </div>
-              <div>
-                <div className="fic__nom">{f.nom}</div>
-                <div className="fic__chemin">
-                  {f.chemin} · {f.date}
-                </div>
-                <div className="fic__desc">
-                  <b>description générée en local :</b> {f.desc}
-                </div>
-              </div>
-              <div className="fic__score">
-                pertinence<b>{f.score}</b>
-              </div>
+      <div className="fi__barre">
+        <i style={{ width: `${(n / 1247) * 100}%` }} />
+      </div>
+      <div className="fi__tuiles" {...foc(etape <= 1)}>
+        {TUILES.map((t, i) => {
+          const e = etatTuile(t, i)
+          return (
+            <div key={t.nom} className="fi__tuile" data-etat={e} {...foc((etape === 1 || etape === 2) && e === "cours")} {...(etape === 3 && t.ignore ? foc(true) : {})}>
+              <span
+                className="fi__vign"
+                style={t.img ? { background: `linear-gradient(135deg, ${t.img[0]}, ${t.img[1]})` } : undefined}
+              >
+                {t.ext}
+              </span>
+              <span className="fi__nom">{t.nom}</span>
+              <span className="fi__etat">{LIBELLE[e]}</span>
             </div>
-          ))}
-        </div>
+          )
+        })}
+      </div>
+      <div className="fi__legende" data-on={etape >= 2 ? "1" : "0"}>
+        <p>Description écrite localement · IMG_2831.jpg</p>
+        <span>{legende}</span>
+      </div>
+    </div>
+  )
+}
 
-        <div className="note-vision">
-          <b>Ce qui vient de se passer</b>
-          <span>
-            Ces trois fichiers sont des <strong>images</strong>. Elles ne contiennent aucun texte, aucun nom parlant,
-            aucune métadonnée exploitable. Elles ont été décrites par un modèle de vision exécuté sur la machine, et ce
-            sont ces descriptions qui ont été indexées — puis retrouvées par la question.
-          </span>
-        </div>
-
-        <div className="demo__journal">
-          {JOURNAL.map((j) => (
-            <div data-j key={j.cle}>
-              <b>{j.cle}</b> {j.val} {j.note ? <i>{j.note}</i> : null}
+function Resultats({ etape }: { etape: number }) {
+  return (
+    <div className="fi__gauche fi__gauche--res" key="res">
+      <div className="fi__tete">
+        <span>Fichiers retrouvés</span>
+        <b>3 sur 1 247</b>
+      </div>
+      <div className="fi__res">
+        {RESULTATS.map((r, i) => (
+          <div key={r.nom} className="fi__fic" style={{ animationDelay: `${i * 140}ms` }} {...foc(etape === 7 && i === 0)}>
+            <span className="fi__vign fi__vign--g" style={{ background: `linear-gradient(135deg, ${r.c[0]}, ${r.c[1]})` }} />
+            <div>
+              <b>{r.nom}</b>
+              <em>{r.chemin}</em>
+              <p>{r.desc}</p>
             </div>
-          ))}
+            <span className="fi__score">{r.score}</span>
+          </div>
+        ))}
+      </div>
+      <div className="fi__local" data-on={etape >= 8 ? "1" : "0"} {...foc(etape === 8)}>
+        <div>
+          <span>modèle de vision</span>
+          <b>qwen3-vl:4b · local</b>
         </div>
-
-        <div className="demo__actions">
-          <button className="demo__bouton" onClick={jouer} disabled={!pret || enCours}>
-            Tester
-          </button>
-          <button className="demo__bouton demo__bouton--fantome" onClick={() => reinitialiser()} disabled={!pret}>
-            Réinitialiser
-          </button>
+        <div>
+          <span>embeddings</span>
+          <b>nomic-embed-text · local</b>
+        </div>
+        <div>
+          <span>requêtes réseau sortantes</span>
+          <b className="fi__zero">0</b>
         </div>
       </div>
     </div>
   )
+}
 
-  if (nu) return carte
-
+function Carte({ etape }: { etape: number }) {
+  const question = useTyping(QUESTION, etape >= 5, 34).affiche
+  const apparu = etape >= 4
+  // La camera s'approche de la question : c'est la que se joue la recherche.
+  const zoom = etape === 6 || etape === 7
+  // La question est ramenee au centre de la carte, puis on grossit autour d'elle.
+  const camera = zoom ? `translate(210px, 160px) scale(1.75) translate(${-Q.x}px, ${-Q.y}px)` : "none"
   return (
-    <section className="border-t border-border/40">
-      <div className="mx-auto max-w-6xl px-6 py-24">
-        <p className="rag__kicker">Démonstration</p>
-        <h2 className="rag__h2">Question sur mon ordinateur</h2>
-        <p className="rag__lede mb-8">
-          RAG-Local ne se limite pas aux documents importés : il indexe un dossier de la machine et répond en langage
-          naturel — y compris sur des images, qui n&apos;ont pourtant aucun texte.
-        </p>
-        {carte}
+    <div className="fi__droite">
+      <div className="fi__tete">
+        <span>Espace de recherche</span>
+        <b>nomic-embed-text</b>
       </div>
-    </section>
+      <div className="fi__champ" data-on={etape >= 5 ? "1" : "0"} {...foc(etape === 5)}>
+        <span>{question}</span>
+        <i data-ecrit={question.length >= QUESTION.length ? "1" : "0"} />
+      </div>
+      <svg className="fi__svg" viewBox="0 0 420 320" role="img" aria-label="Carte des documents par similarité de sens" {...foc(etape === 4)}>
+        <g className="fi__cam" style={{ transform: camera }}>
+        {NUAGES.map((n) => (
+          <g key={n.g} className="fi__nuage" data-on={apparu ? "1" : "0"}>
+            <ellipse cx={n.x} cy={n.y} rx={n.r + 16} ry={(n.r + 16) * 0.8} />
+            <text x={n.x} y={n.y - n.r * 0.85 - 14}>{n.nom}</text>
+          </g>
+        ))}
+        <g className="fi__nuage fi__nuage--plage" data-on={apparu ? "1" : "0"}>
+          <ellipse cx={300} cy={236} rx={62} ry={50} />
+          <text x={300} y={168}>photos de plage</text>
+        </g>
+
+        {POINTS.map((p, i) => (
+          <circle key={i} className="fi__pt" data-g={p.g} data-on={apparu ? "1" : "0"} data-dim={etape >= 7 ? "1" : "0"} cx={p.x} cy={p.y} r={3.6} style={{ transitionDelay: `${i * 22}ms` }} />
+        ))}
+        {PLAGE_AUTRES.map((p, i) => (
+          <circle key={`pa${i}`} className="fi__pt" data-g="plage" data-on={apparu ? "1" : "0"} data-dim={etape >= 7 ? "1" : "0"} cx={p.x} cy={p.y} r={3.6} style={{ transitionDelay: `${(40 + i) * 22}ms` }} />
+        ))}
+        {VOISINS.map((p, i) => (
+          <circle key={`v${i}`} className="fi__pt fi__pt--voisin" data-g="plage" data-on={apparu ? "1" : "0"} data-choisi={etape >= 6 ? "1" : "0"} cx={p.x} cy={p.y} r={4.6} style={{ transitionDelay: `${(46 + i) * 22}ms` }} />
+        ))}
+
+        {VOISINS.map((p, i) => (
+          <g key={`r${i}`} className="fi__rayon" data-on={etape >= 6 ? "1" : "0"} style={{ transitionDelay: `${i * 180}ms` }}>
+            <line x1={Q.x} y1={Q.y} x2={p.x} y2={p.y} pathLength={1} />
+            <text x={p.x + (i === 0 ? -13 : 11)} y={p.y + (i === 1 ? 17 : -11)} textAnchor={i === 0 ? "end" : "start"}>{p.score}</text>
+          </g>
+        ))}
+
+        <g className="fi__question" data-on={etape >= 5 ? "1" : "0"} {...foc(etape === 6)}>
+          <circle className="fi__onde" cx={Q.x} cy={Q.y} r={9} />
+          <circle className="fi__onde fi__onde--2" cx={Q.x} cy={Q.y} r={9} />
+          <path d={`M ${Q.x} ${Q.y - 8} L ${Q.x + 8} ${Q.y} L ${Q.x} ${Q.y + 8} L ${Q.x - 8} ${Q.y} Z`} />
+        </g>
+        </g>
+      </svg>
+    </div>
+  )
+}
+
+function Scene({ etape }: { etape: number }) {
+  return (
+    <div className="fi">
+      {etape >= 7 ? <Resultats etape={etape} /> : <Tuiles etape={etape} />}
+      <Carte etape={etape} />
+    </div>
+  )
+}
+
+export function DemoFichiers(_props: { nu?: boolean } = {}) {
+  return (
+    <GuideShell
+      nom="RAG-Local"
+      sim="Simulation — aucun modèle n'est exécuté"
+      etapes={ETAPES}
+      scene={({ etape }) => <Scene etape={etape} />}
+    />
   )
 }

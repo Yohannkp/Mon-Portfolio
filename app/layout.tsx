@@ -6,7 +6,9 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Tilt3D } from '@/components/tilt-3d'
+import { PageTransition } from '@/components/page-transition'
 import './globals.css'
+import './demo-guide.css'
 
 const _inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const _geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
@@ -74,6 +76,7 @@ export default function RootLayout({
             <Footer />
           </div>
           <Tilt3D />
+          <PageTransition />
         </ThemeProvider>
         <Analytics />
       </body>

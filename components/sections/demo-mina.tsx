@@ -1,196 +1,147 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { foc, GuideShell, useTween, useTyping, type Etape } from "@/components/sections/demo-guide"
+
+/**
+ * Mina-Translator : un corpus fait main, un petit modele affine, et la chaine
+ * parole -> texte -> traduction. Les 360 points sont les 360 paires du corpus.
+ */
 
 const FRANCAIS = "Je suis allé à l'école aujourd'hui."
 const MINA = "Meyi suku egbea."
-const NB_BARRES = 56
 
-const BOITES = [
-  { titre: "Whisper", sous: "parole → texte" },
-  { titre: "Qwen2-0.5B + LoRA", sous: "QLoRA 4 bits" },
-  { titre: "Sortie", sous: "mina" },
+const ETAPES: Etape[] = [
+  {
+    titre: "Le mina : peu de données",
+    texte: "Le mina est parlé dans le sud du Togo. Il n'existe aucun corpus parallèle public : tout part de là.",
+    humeur: "neutre",
+  },
+  {
+    titre: "Un corpus fait main",
+    texte: "J'ai constitué 360 paires de phrases, sur 7 domaines, chacune validée par un locuteur.",
+    humeur: "concentre",
+    attente: 1800,
+  },
+  {
+    titre: "Affiner un petit modèle",
+    texte:
+      "Avec ces paires, j'affine Qwen2-0.5B en QLoRA 4 bits : le modèle reste petit, seule une couche d'adaptation est apprise.",
+    humeur: "curieux",
+    attente: 800,
+  },
+  {
+    titre: "Une phrase, à voix haute",
+    texte: "Voici la chaîne au travail. Quelqu'un dit une phrase en français : « Je suis allé à l'école aujourd'hui. »",
+    humeur: "concentre",
+    attente: 800,
+  },
+  {
+    titre: "Whisper écoute",
+    texte: "Whisper transforme la parole en texte : la voix devient une phrase écrite.",
+    humeur: "concentre",
+  },
+  {
+    titre: "Le modèle traduit",
+    texte: "Le modèle affiné reçoit ce texte et le traduit en mina.",
+    humeur: "concentre",
+    attente: 600,
+  },
+  {
+    titre: "La sortie",
+    texte: "La traduction sort en mina : « Meyi suku egbea. »",
+    humeur: "content",
+  },
+  {
+    titre: "Ce qui compte",
+    texte: "La chaîne fait parole, texte, traduction. Mais c'est le corpus de 360 paires qui rend la traduction possible.",
+    humeur: "content",
+  },
 ]
 
-export function DemoMina({ nu = false }: { nu?: boolean } = {}) {
-  const racine = useRef<HTMLDivElement>(null)
-  const lib = useRef<typeof import("animejs") | null>(null)
-  const tl = useRef<{ pause: () => void } | null>(null)
-  const [pret, setPret] = useState(false)
-  const [enCours, setEnCours] = useState(false)
+const BARRES = Array.from({ length: 30 }, (_, i) => 22 + Math.round(Math.abs(Math.sin(i * 0.62)) * 62 + ((i * 37) % 13)))
+const DOTS = Array.from({ length: 360 }, (_, i) => i)
 
-  const reinitialiser = useCallback((A?: typeof import("animejs") | null) => {
-    const anime = A ?? lib.current
-    const el = racine.current
-    if (!anime || !el) return
-    tl.current?.pause()
-    tl.current = null
-    const tr = el.querySelector<HTMLElement>("[data-tr]")
-    const tx = el.querySelector<HTMLElement>("[data-tx]")
-    if (tr) tr.textContent = ""
-    if (tx) tx.textContent = ""
-    anime.utils.set(el.querySelectorAll(".onde i"), { height: 6, background: "var(--input)" })
-    anime.utils.set(el.querySelectorAll(".chaine__boite"), { opacity: 0.38 })
-    anime.utils.set(el.querySelectorAll("[data-note]"), { opacity: 0 })
-    setEnCours(false)
-  }, [])
+/** Quelle boite de la chaine travaille a cette etape ; -1 : aucune, 9 : toutes. */
+const BOITE = [-1, -1, 2, 0, 1, 2, 3, 9]
 
-  useEffect(() => {
-    let annule = false
-    import("animejs")
-      .then((A) => {
-        if (annule) return
-        lib.current = A
-        setPret(true)
-        reinitialiser(A)
-      })
-      .catch(() => setPret(false))
-    return () => {
-      annule = true
-      tl.current?.pause()
-    }
-  }, [reinitialiser])
-
-  const jouer = useCallback(() => {
-    const anime = lib.current
-    const el = racine.current
-    if (!anime || !el) return
-    reinitialiser(anime)
-    setEnCours(true)
-
-    const t = anime.createTimeline({ defaults: { ease: "out(3)" } })
-    tl.current = t as unknown as { pause: () => void }
-
-    const barres = Array.from(el.querySelectorAll<HTMLElement>(".onde i"))
-    const boites = Array.from(el.querySelectorAll<HTMLElement>(".chaine__boite"))
-    const tr = el.querySelector<HTMLElement>("[data-tr]")!
-    const tx = el.querySelector<HTMLElement>("[data-tx]")!
-    const note = el.querySelector<HTMLElement>("[data-note]")!
-
-    const ecrire = (cible: HTMLElement, texte: string, debut: number, duree: number) => {
-      const etat = { n: 0 }
-      t.add(
-        etat,
-        {
-          n: texte.length,
-          duration: duree,
-          ease: "linear",
-          onUpdate: () => {
-            cible.textContent = texte.slice(0, Math.round(etat.n))
-          },
-        },
-        debut,
-      )
-    }
-
-    barres.forEach((b, i) => {
-      const h = 8 + Math.round(Math.abs(Math.sin(i * 0.55)) * 30) + Math.round(Math.random() * 8)
-      t.add(b, { height: [6, h], background: "var(--accent)", duration: 520, ease: "out(3)" }, 60 + i * 22)
-      t.add(b, { background: "oklch(0.5 0.1 250)", duration: 600, ease: "out(2)" }, 900 + i * 8)
-    })
-
-    t.add(boites[0], { opacity: 1, duration: 220 }, 300)
-    ecrire(tr, FRANCAIS, 700, 1000)
-    t.add(boites[1], { opacity: 1, duration: 220 }, 1900)
-    ecrire(tx, MINA, 2200, 900)
-    t.add(boites[2], { opacity: 1, duration: 220 }, 3150)
-    t.add(note, { opacity: [0, 1], y: [8, 0], duration: 420 }, 3350)
-    t.add({ v: 0 }, { v: 1, duration: 10, onComplete: () => setEnCours(false) }, 3900)
-  }, [reinitialiser])
-
-  // Lancement automatique a l'entree dans le champ de vision : un recruteur ne
-  // doit jamais tomber sur un panneau vide en attendant de cliquer. Une seule
-  // fois, puis l'observateur se debranche ; le bouton reste pour rejouer.
-  useEffect(() => {
-    const el = racine.current
-    if (!pret || !el || typeof IntersectionObserver === "undefined") return
-    let lance = false
-    const io = new IntersectionObserver(
-      (entrees) => {
-        for (const e of entrees) {
-          if (e.isIntersecting && !lance) {
-            lance = true
-            io.disconnect()
-            jouer()
-          }
-        }
-      },
-      { threshold: 0.3 },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [pret, jouer])
-
-  const carte = (
-    <div className="demo" ref={racine}>
-          <div className="demo__bar">
-            <span className="demo__titre">Démonstration</span>
-            <span className="demo__sim">Simulation — aucun modèle n&apos;est exécuté</span>
-          </div>
-          <div className="demo__corps">
-            <p className="demo__etiq">Entrée vocale</p>
-            <div className="onde">
-              {Array.from({ length: NB_BARRES }).map((_, i) => (
-                <i key={i} />
-              ))}
-            </div>
-
-            <p className="demo__etiq">Chaîne de traitement</p>
-            <div className="chaine">
-              {BOITES.map((b, i) => (
-                <div key={b.titre} style={{ display: "contents" }}>
-                  <div className="chaine__boite">
-                    <b>{b.titre}</b>
-                    <span>{b.sous}</span>
-                  </div>
-                  {i < BOITES.length - 1 ? <div className="chaine__fleche">→</div> : null}
-                </div>
-              ))}
-            </div>
-
-            <p className="demo__etiq">Transcription</p>
-            <div className="demo__champ">
-              <span data-tr />
-            </div>
-
-            <p className="demo__etiq">Traduction</p>
-            <div className="demo__champ demo__champ--sortie">
-              <span data-tx />
-            </div>
-
-            <div className="demo__journal">
-              <div data-note>
-                <b>corpus d&apos;entraînement</b> 360 paires · 7 domaines ·{" "}
-                <i>paire validée par un locuteur</i>
-              </div>
-            </div>
-
-            <div className="demo__actions">
-              <button className="demo__bouton" onClick={jouer} disabled={!pret || enCours}>
-                Tester
-              </button>
-              <button className="demo__bouton demo__bouton--fantome" onClick={() => reinitialiser()} disabled={!pret}>
-                Réinitialiser
-              </button>
-            </div>
-          </div>
-        </div>
-  )
-
-  if (nu) return carte
+function Scene({ etape }: { etape: number }) {
+  const paires = Math.round(useTween(etape >= 1 ? 360 : 0, 2600))
+  const fr = useTyping(FRANCAIS, etape >= 4, 30).affiche
+  const mina = useTyping(MINA, etape >= 6, 9)
+  const actif = BOITE[etape]
+  const on = (i: number) => (actif === 9 || actif === i ? "actif" : etape >= 3 ? "vu" : "attente")
+  const chaine = etape >= 2
 
   return (
-    <section className="border-t border-border/40">
-      <div className="mx-auto max-w-6xl px-6 py-24">
-        <p className="rag__kicker">Démonstration</p>
-        <h2 className="rag__h2">Du français au mina</h2>
-        <p className="rag__lede mb-8">
-          Le mina est parlé dans le sud du Togo. Aucun corpus parallèle public n&apos;existe pour cette langue : tout le
-          projet part de là.
-        </p>
-
-        {carte}
+    <div className="mi">
+      <div className="mi__corpus">
+        <div className="mi__points" aria-hidden="true" {...foc(etape === 0 || etape === 1)}>
+          {DOTS.map((i) => (
+            <i key={i} data-on={i < paires ? "1" : "0"} />
+          ))}
+        </div>
+        <div className="mi__stat" {...foc(etape === 7)}>
+          <b>{paires}</b>
+          <span>paires de phrases</span>
+          <em data-on={etape >= 1 ? "1" : "0"}>7 domaines · chacune validée par un locuteur</em>
+          <em data-on={etape === 0 ? "1" : "0"}>aucun corpus parallèle public</em>
+        </div>
       </div>
-    </section>
+
+      <div className="mi__chaine" data-vive={chaine ? "1" : "0"}>
+        <div className="mi__boite" data-etat={on(0)} {...foc(etape === 3)}>
+          <b>Voix</b>
+          <div className="mi__onde" data-on={etape === 3 ? "1" : "0"}>
+            {BARRES.map((h, i) => (
+              <i key={i} style={{ height: `${h}%`, animationDelay: `${(i % 9) * 70}ms` }} />
+            ))}
+          </div>
+        </div>
+        <span className="mi__fleche" data-on={etape === 4 ? "1" : "0"} />
+        <div className="mi__boite" data-etat={on(1)} {...foc(etape === 4)}>
+          <b>Whisper</b>
+          <span>parole → texte</span>
+        </div>
+        <span className="mi__fleche" data-on={etape === 5 ? "1" : "0"} />
+        <div className="mi__boite mi__boite--modele" data-etat={etape === 2 ? "actif" : on(2)} {...foc(etape === 2 || etape === 5)}>
+          <b>Qwen2-0.5B</b>
+          <span>QLoRA 4 bits</span>
+          <div className="mi__couches">
+            <i>modèle de base · 4 bits</i>
+            <i data-lora={etape === 2 ? "1" : "0"}>adaptateur LoRA</i>
+          </div>
+        </div>
+        <span className="mi__fleche" data-on={etape === 6 ? "1" : "0"} />
+        <div className="mi__boite" data-etat={on(3)} {...foc(etape === 6)}>
+          <b>Sortie</b>
+          <span>mina</span>
+        </div>
+      </div>
+
+      <div className="mi__textes">
+        <div className="mi__champ" data-on={etape >= 3 ? "1" : "0"}>
+          <small>Transcription (français)</small>
+          <p>{etape === 3 ? "écoute…" : fr}</p>
+        </div>
+        <div className="mi__champ mi__champ--sortie" data-on={etape >= 6 ? "1" : "0"} {...foc(etape === 6)}>
+          <small>Traduction (mina)</small>
+          <p>
+            {mina.affiche}
+            <i data-ecrit={mina.fini ? "1" : "0"} />
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function DemoMina(_props: { nu?: boolean } = {}) {
+  return (
+    <GuideShell
+      nom="Mina-Translator"
+      sim="Simulation — aucun modèle n'est exécuté"
+      etapes={ETAPES}
+      scene={({ etape }) => <Scene etape={etape} />}
+    />
   )
 }

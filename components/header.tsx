@@ -26,6 +26,12 @@ export function Header() {
     setMounted(true)
   }, [])
 
+  // Le menu mobile se ferme quand la page change : la transition de page
+  // intercepte le clic, donc le onClick du lien ne suffit plus.
+  React.useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [pathname])
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">

@@ -22,7 +22,7 @@ Le site cherche un stage de 4 à 6 mois à partir d'avril 2027.
 2. **Schéma RAG** — un pipeline animé (requête → recherche hybride vectorielle + BM25 → fusion RRF → reranking → réponse citée), épinglé pendant le défilement.
 3. **En chiffres** — le bandeau de compteurs.
 4. **Projets** — les projets phares, une carte par projet.
-5. **Démonstrations** — quatre scénarios simulés au clic (RAG-Local sur des fichiers, un scan rendu cherchable, SELF_DEV_AGENT, Mina-Translator). Ce sont des simulations, et la page le dit.
+5. **Démonstrations** — quatre visites guidées, chacune menée par le robot (RAG-Local sur des fichiers, un scan rendu cherchable, SELF_DEV_AGENT, Mina-Translator). Ce sont des simulations, et la page le dit.
 6. **À propos**, **Compétences**, **Méthode**, **Veille** — le profil, les technologies regroupées par famille avec une preuve pour chacune, la démarche de travail et ce qui est en cours d'apprentissage.
 7. **Contact** — l'appel final.
 
@@ -36,7 +36,7 @@ Un cube filaire, à droite du hero, se transforme en petit robot dès qu'on desc
 | Schéma RAG | Il porte la requête le long du pipeline et se dédouble pendant la recherche parallèle |
 | En chiffres | Il passe sous le bandeau et désigne chaque compteur |
 | Projets | Il suit la carte lue, puis attire l'œil vers son lien |
-| Démonstrations | Il regarde la simulation, puis invite à essayer un autre scénario |
+| Démonstrations | Il guide la visite, étape par étape (voir ci-dessous), puis invite à essayer un autre scénario |
 | À propos | Il souligne les phrases qui portent le propos |
 | Compétences | Il s'arrête sous chaque famille, sur le badge dont le site contient la preuve |
 | Méthode | Il parcourt les étapes et les allume derrière lui |
@@ -44,6 +44,25 @@ Un cube filaire, à droite du hero, se transforme en petit robot dès qu'on desc
 | Contact | Il grossit, puis rétrécit et devient le bouton « Me contacter » |
 
 Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se pose sur ce qu'on survole, il s'incline avec la vitesse de défilement, et un clic sur un onglet attire son attention.
+
+**Les démonstrations sont des visites guidées.** Le robot ne laisse plus une animation filer : il explique la simulation une étape à la fois, dans le panneau, à côté de la scène.
+
+- Chaque étape a un titre et une phrase que le robot écrit à une vitesse lisible, puis un temps de lecture proportionnel à la longueur du texte (de 5 à 9 secondes par étape). Une fine barre montre le temps avant la suite.
+- Le visiteur garde la main : pause, précédent, suivant, saut direct à une étape, flèches du clavier. La visite démarre quand on la voit et se met en pause quand on la quitte des yeux.
+- La scène est une fonction de l'étape courante : on peut reculer, sauter ou rejouer sans jamais obtenir un état incohérent.
+- Le robot se pose dans la colonne du guide, regarde ce que l'étape montre, et prend l'humeur de l'étape (concentré, curieux, content). À la fin, les autres scénarios s'allument pour l'inviter à continuer.
+- Sous 1281 px, le robot n'existe pas, mais la visite est complète : le guide et ses contrôles s'empilent au-dessus de la scène.
+
+Chaque scénario montre son mécanisme, pas un décor :
+
+| Scénario | Ce que la scène montre |
+| --- | --- |
+| SELF_DEV_AGENT | La boucle explorer → comprendre → tester → corriger, un éditeur avec le diff, les tests qui passent au rouge puis au vert |
+| RAG-Local | Les fichiers lus un par un, les images décrites par un modèle de vision, puis la carte de recherche : la question et ses plus proches voisins avec leur score |
+| Scan cherchable | Une page-image, le balayage, les lignes repérées, la transcription, le passage retrouvé, et la réponse dont le renvoi [1] pointe la ligne exacte |
+| Mina-Translator | Les 360 paires du corpus, le modèle de base et son adaptateur LoRA, puis la chaîne voix → Whisper → traduction |
+
+Le moteur commun est `components/sections/demo-guide.tsx` ; chaque scénario ne fournit que ses étapes et sa scène.
 
 Règles de conception :
 
@@ -53,6 +72,13 @@ Règles de conception :
 - Avec `prefers-reduced-motion`, il se positionne sans lissage ni oscillation.
 
 Le code est dans `components/objet-3d.tsx` (les scènes) et dans la fin de `app/globals.css` (le volume, les expressions et les effets posés sur la page).
+
+## Transitions et interactions
+
+- **Entre les pages :** la page sort en fondu pendant qu'une fine barre indique le chargement, puis la suivante entre en cascade (`components/page-transition.tsx`, styles en fin de `app/globals.css`). Un Ctrl/Cmd+clic, une ancre ou le bouton retour du navigateur gardent leur comportement normal.
+- **Boutons :** tous réagissent au survol (léger relief) et au clic (léger enfoncement). Une flèche de bouton avance vers ce qu'il promet.
+- **Menu :** la pastille du menu glisse d'un lien à l'autre.
+- **Mouvement réduit :** avec `prefers-reduced-motion`, la navigation est immédiate et les effets de survol sont coupés.
 
 ## Stack
 
@@ -83,10 +109,11 @@ Pour tester une version de production : `pnpm build` puis `pnpm start`.
 ```
 app/                    pages (App Router) et styles globaux
 components/
-  sections/             les sections de la page d'accueil et les démos
+  sections/             les sections de la page d'accueil ; demo-guide.tsx est le moteur des visites guidées
   ui/                   composants shadcn/ui
   objet-3d.tsx          le robot
   reading-rail.tsx      le rail de lecture
+  page-transition.tsx   la transition entre les pages
 lib/
   projects.ts           projets de développement
   data-projects.ts      projets data / ML
