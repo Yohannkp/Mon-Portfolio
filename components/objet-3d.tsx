@@ -364,14 +364,22 @@ export function Objet3D() {
       const prouve = Array.from(cartes[idx].querySelectorAll(".cas__prouve li"))
         .map((li) => li.textContent)
         .join(" · ")
+      // Pendant la visite, la carte presentee grandit et mord sur la marge : le robot se cale
+      // sur son bord reel (le rect suit l'animation), il glisse donc avec elle, sans jamais passer dessous.
+      const enFocus = cartes[idx].dataset.focus === "1"
+      const mC = enFocus ? Math.max(0, c.W - r.right) : c.marge
+      const xC = enFocus ? r.right + mC / 2 : c.xM
+      const eC = enFocus ? borne((mC - 34) / 215, 0.3, 0.62) : c.echM
+      const largeurBulle = borne(mC - 24, 0, 200)
       return {
-        x: c.xM,
+        x: xC,
         y: borne(centre(r).y, c.H * 0.28, c.H * 0.72),
-        ech: c.echM,
+        ech: eC,
         op: 0.95,
         regard: versLien && lien ? centre(lien.getBoundingClientRect()) : { x: r.left + r.width * 0.32, y: r.top + r.height * 0.4 },
         humeur: depuis < 900 ? "content" : "neutre",
-        bulle: { titre: code, texte: prouve ? `Démontre : ${prouve}` : "" },
+        // Trop etroit pour la bulle (ecran a peine plus large que 1281 px) : elle se tait, la visite a deja sa phrase.
+        bulle: { titre: code, texte: prouve ? `Démontre : ${prouve}` : "", largeur: largeurBulle },
       }
     }
 
