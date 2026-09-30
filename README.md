@@ -102,6 +102,10 @@ Ce site n'a pas de serveur de courrier. Le formulaire **ne prétend donc pas env
 
 Pour recevoir les messages directement dans une boîte, sans passer par l'application e-mail du visiteur, il faudrait un service d'envoi (Formspree, Web3Forms, Resend…) et sa clé : c'est une décision à part.
 
+## Mode clair
+
+Le mode clair n'est pas un blanc pur : fond gris-bleu doux (≈ `#ecedf1`), cartes un cran plus claires, texte bleu-gris plutôt que noir, bleu d'accent plus profond pour rester lisible, et un fond qui ne s'assombrit que légèrement quand le robot se met en avant. La couleur de la barre du navigateur (mobile) suit aussi le thème.
+
 ## Version mobile
 
 Le site est vérifié de 360 à 768 px de large : aucune page ne déborde à l'horizontale.
