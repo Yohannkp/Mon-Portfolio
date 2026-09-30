@@ -132,26 +132,96 @@ const IDS = [
 ]
 
 /** Un accessoire du visage, partage par le robot et par son fantome. */
-/** Les bras, qui ne servent qu'a la colere : deux bras a poings/doigts, ancres aux flancs de la tete (voir globals.css). */
+const EPAULE_X = 84
+const EPAULE_Y = 44
+const ARM = { L1: 70, L2: 72 }
+
+/**
+ * Dessine un bras : epaule fixe, main donnee, coude calcule (cinematique inverse a deux os, coude vers l'exterieur et le bas).
+ * `k` (0..1) fait « pousser » le bras ; `bd` (0..1) tend l'index (poing serre a 0).
+ */
+function dessinerBras(el: HTMLElement, cote: 1 | -1, h: { x: number; y: number }, k: number, bd: number) {
+  const g = el.querySelector(`.obj__bras-${cote === 1 ? "d" : "g"}`)
+  if (!g) return
+  const $ = (sel: string) => g.querySelector<SVGElement>(sel)!
+  const L1 = ARM.L1 * Math.max(k, 0.02)
+  const L2 = ARM.L2 * Math.max(k, 0.02)
+  const sx = EPAULE_X * cote
+  const sy = EPAULE_Y
+  let dx = h.x * cote - sx
+  let dy = h.y - sy
+  let d = Math.hypot(dx, dy) || 1
+  const dmax = L1 + L2 - 0.5
+  const dmin = Math.abs(L1 - L2) + 0.5
+  const dc = Math.min(dmax, Math.max(dmin, d))
+  const ux = dx / d
+  const uy = dy / d
+  dx = ux * dc
+  dy = uy * dc
+  d = dc
+  const a = (L1 * L1 - L2 * L2 + d * d) / (2 * d)
+  const hh = Math.sqrt(Math.max(0, L1 * L1 - a * a))
+  const c1 = { x: sx + ux * a - uy * hh, y: sy + uy * a + ux * hh }
+  const c2 = { x: sx + ux * a + uy * hh, y: sy + uy * a - ux * hh }
+  const note = (p: { x: number; y: number }) => p.x * cote + p.y * 0.6
+  const e = note(c1) > note(c2) ? c1 : c2
+  const hx = sx + dx
+  const hy = sy + dy
+  const set = (sel: string, attr: string, v: string) => $(sel).setAttribute(attr, v)
+  // Un membre effile : deux disques de rayons differents reunis par leurs tangentes.
+  const l = (x1: number, y1: number, r1: number, x2: number, y2: number, r2: number) => {
+    const vx = x2 - x1
+    const vy = y2 - y1
+    const n = Math.hypot(vx, vy) || 1
+    const nx = -vy / n
+    const ny = vx / n
+    const f = (v: number) => v.toFixed(1)
+    return `M${f(x1 + nx * r1)} ${f(y1 + ny * r1)} L${f(x2 + nx * r2)} ${f(y2 + ny * r2)} A${f(r2)} ${f(r2)} 0 0 0 ${f(x2 - nx * r2)} ${f(y2 - ny * r2)} L${f(x1 - nx * r1)} ${f(y1 - ny * r1)} A${f(r1)} ${f(r1)} 0 0 0 ${f(x1 + nx * r1)} ${f(y1 + ny * r1)}Z`
+  }
+  const kk = Math.max(k, 0.05)
+  set(".b-haut", "d", l(sx, sy, 10 * kk, e.x, e.y, 7.8 * kk))
+  set(".b-avant", "d", l(e.x, e.y, 7.8 * kk, hx, hy, 6 * kk))
+  set(".b-epaule", "cx", sx.toFixed(1))
+  set(".b-epaule", "cy", sy.toFixed(1))
+  set(".b-coude", "cx", e.x.toFixed(1))
+  set(".b-coude", "cy", e.y.toFixed(1))
+  // La main : direction de l'avant-bras ; paume ronde, index qui se deplie dans l'axe, pouce sur le cote.
+  let fx = hx - e.x
+  let fy = hy - e.y
+  const fn = Math.hypot(fx, fy) || 1
+  fx /= fn
+  fy /= fn
+  const pr = 12 + 2 * (1 - bd)
+  const px = hx + fx * 4
+  const py = hy + fy * 4
+  set(".b-paume", "cx", px.toFixed(1))
+  set(".b-paume", "cy", py.toFixed(1))
+  set(".b-paume", "r", (pr * Math.max(k, 0.05)).toFixed(1))
+  const il = 30 * bd * k
+  const ix = px + fx * (pr * 0.6)
+  const iy = py + fy * (pr * 0.6)
+  set(".b-index", "d", il > 1 ? l(ix, iy, 4.6, ix + fx * il, iy + fy * il, 3.8) : "")
+  set(".b-pouce", "cx", (px - fy * cote * 10 - fx * 1).toFixed(1))
+  set(".b-pouce", "cy", (py + fx * cote * 10 - fy * 1).toFixed(1))
+}
+
+/** Les bras, qui ne servent qu'a la colere. Les os, les articulations et la main sont dessines par le JS a chaque image (cinematique inverse). */
 function Bras() {
-  const bras = (cote: "g" | "d") => (
-    <g className={`obj__bras-${cote}`}>
-      <path className="obj__bras-os" d="M0 0 L7 44 L0 88" />
-      <circle className="obj__bras-art" cx="0" cy="0" r="9" />
-      <circle className="obj__bras-art" cx="7" cy="44" r="7.5" />
-      <g className="obj__main">
-        <rect className="obj__paume" x="-12" y="86" width="24" height="22" rx="9" />
-        <path className="obj__doigt obj__doigt--index" d="M-7 106 L-7 130" />
-        <path className="obj__doigt obj__doigt--autre" d="M-1 108 L-1 126" />
-        <path className="obj__doigt obj__doigt--autre" d="M5 108 L5 124" />
-        <path className="obj__doigt obj__doigt--autre" d="M10.5 106 L10.5 120" />
-      </g>
+  const cote = (c: "g" | "d") => (
+    <g className={`obj__bras-${c}`}>
+      <path className="b-os b-haut" />
+      <path className="b-os b-avant" />
+      <circle className="b-art b-epaule" r="11" />
+      <circle className="b-art b-coude" r="8.5" />
+      <path className="b-main b-index" />
+      <circle className="b-main b-paume" />
+      <circle className="b-main b-pouce" r="5.5" />
     </g>
   )
   return (
     <svg className="obj__bras" viewBox="-170 -170 340 340" aria-hidden="true">
-      {bras("g")}
-      {bras("d")}
+      {cote("g")}
+      {cote("d")}
     </svg>
   )
 }
@@ -243,7 +313,8 @@ export function Objet3D() {
     // Une fois par visite : le robot se fache, devient tout rouge, se balance, descend pour prendre de l'elan,
     // puis remonte en TIRANT la page avec lui jusqu'a la section des simulations. Fluide de bout en bout :
     // tout est une fonction du temps, la page et le robot partent du meme mouvement.
-    const R = { etat: "non" as "non" | "joue", t0: 0, y0: 0, yCible: 0, yFixe: false, dx: 0, dy: 0, rot: 0, rage: 0, sq: 0, fier: false, choc: false, offChoc: 0 }
+    const R = { etat: "non" as "non" | "joue", t0: 0, y0: 0, yCible: 0, yFixe: false, dx: 0, dy: 0, rot: 0, rage: 0, sq: 0, rk: 1, fier: false, choc: false, offChoc: 0, lock: false, glisse: false, montre: false, gx0: 0, gy0: 0, gk0: 1, spx: 0, spy: 0, spk: 1 }
+    const BR = { g: { x: 0, y: 0, vx: 0, vy: 0 }, d: { x: 0, y: 0, vx: 0, vy: 0 }, pdx: 0, pdy: 0, dirx: -0.6, diry: 0.8 }
     const choc = q(".obj-choc")
     const fuite = { dedans: false, entree: 0, prevMid: window.scrollY + window.innerHeight * 0.5 }
 
@@ -899,12 +970,15 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       verrou(false)
       delete html.dataset.robotRage
       delete el.dataset.rage
-      for (const v of ["--rx", "--rdy", "--rrot", "--rage", "--rsq", "--bk", "--bphi", "--bd"]) el.style.removeProperty(v)
+      for (const v of ["--rx", "--rdy", "--rrot", "--rage", "--rsq", "--rk", "--bk"]) el.style.removeProperty(v)
       delete q("#sec-demos")?.dataset.robotMontre
     }
     const lancerRage = (top: number) => {
       rageJouee = true
-      Object.assign(R, { etat: "joue", t0: performance.now(), y0: window.scrollY, yCible: Math.max(0, top - 110), yFixe: false, dx: 0, dy: 0, rot: 0, rage: 0, sq: 0, fier: false, choc: false, offChoc: 0 })
+      Object.assign(R, { montre: false, etat: "joue", t0: performance.now(), y0: window.scrollY, yCible: Math.max(0, top - 110), yFixe: false, dx: 0, dy: 0, rot: 0, rage: 0, sq: 0, rk: 1, fier: false, choc: false, offChoc: 0, lock: true, glisse: false })
+      BR.pdx = 0
+      BR.pdy = 0
+      for (const c of [BR.g, BR.d]) Object.assign(c, { x: EPAULE_X, y: EPAULE_Y, vx: 0, vy: 0 })
       html.dataset.robotRage = "1"
       el.dataset.rage = "1"
       verrou(true)
@@ -935,25 +1009,27 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
     }
     /**
      * La choregraphie (ms depuis le depart), pendant laquelle le defilement est verrouille :
-     *   0 - 950      fache : rouge, balancement qui s'eteint
-     *   950 - 1600   descend (prend de l'elan), un peu penche en arriere
-     *   1600 - 2500  s'elance vers le haut, en s'accelerant, la page tiree derriere lui... et COGNE le plafond de l'ecran
-     *   2500 - 3100  choc : ecrase, l'ecran tremble, il rebondit vers le bas ; la page finit d'arriver aux simulations
-     *   3100 - 4300  fier, se calme, le rouge s'efface, il regagne sa place — puis le defilement est rendu
+     *   0 - 950       fache : rouge, poings qui battent, balancement qui s'eteint
+     *   950 - 1600    descend (prend de l'elan), les bras en arriere
+     *   1600 - 2500   s'elance vers le haut en s'accelerant, la page tiree derriere lui, bras dresses... et COGNE le plafond
+     *   2500 - 3100   choc : ecrase, l'ecran tremble ; la page finit d'arriver aux simulations
+     *   3100 - 3900   se rend devant la section, plus grand, et tend les bras vers elle
+     *   3900 - 5600   la designe des deux mains (la section brille), en la montrant tour a tour
+     *   5600 - 6300   se calme, rabaisse les bras et regagne sa place habituelle
      */
     const jouerRage = (c: Ctx, dt: number) => {
       const tt = c.now - R.t0
-      const T1 = 950, T2 = 1600, TC = 2500, T3 = 3100, T4 = 4900
+      const T1 = 950, T2 = 1600, TC = 2500, T3 = 3100, TG = 3900, TH = 5600, T4 = 6300, TL = 5000
       if (tt >= T2 && !R.yFixe) {
         R.yFixe = true
         R.y0 = window.scrollY
       }
       const haut = 113 * N.ech // du centre du robot au sommet de son antenne
       const offPlafond = -(N.y - haut) - 8 // decalage qui amene le sommet du robot au plafond (et un peu dans l'en-tete)
+      const p2 = borne((tt - T1) / (T2 - T1), 0, 1)
+      const p3 = borne((tt - T2) / (TC - T2), 0, 1)
       if (tt < TC) {
         const env = Math.min(1, tt / 160) * (1 - borne((tt - 750) / 200, 0, 1))
-        const p2 = borne((tt - T1) / (T2 - T1), 0, 1)
-        const p3 = borne((tt - T2) / (TC - T2), 0, 1)
         R.dx = 9 * Math.sin(tt / 78) * env
         R.rot = 12 * Math.sin(tt / 78 + 0.6) * env - 6 * p2 * (1 - p3) - 7 * Math.sin(Math.PI * p3 * 0.9)
         // Il s'elance : le mouvement s'acccelere jusqu'au choc (courbe cubique), il ne ralentit pas avant de frapper.
@@ -988,31 +1064,119 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
         R.rot = mix(R.rot, 0, 1 - Math.exp(-dt / 120))
         R.rage = 1
       } else {
-        window.scrollTo({ top: R.yCible, behavior: "instant" as ScrollBehavior })
-        if (!R.fier) {
-          R.fier = true
-          mem.emo = { h: "fier", jusqua: c.now + 1700 }
+        if (R.lock) window.scrollTo({ top: R.yCible, behavior: "instant" as ScrollBehavior })
+        if (!R.glisse) {
+          // Il va se placer devant la section : a droite du titre, dans le vide, un peu plus grand, tourne vers la demonstration.
+          R.glisse = true
+          const sec = q("#sec-demos")
+          const demo = q("#sec-demos .demo")
+          const rs = sec?.getBoundingClientRect()
+          const rd = demo?.getBoundingClientRect()
+          const spotX = Math.min(window.innerWidth * 0.76, window.innerWidth - 190)
+          const spotY = borne((rs ? rs.top : 110) + 200, 210, window.innerHeight - 250)
+          R.gx0 = R.dx
+          R.gy0 = R.dy
+          R.gk0 = R.rk
+          R.spx = spotX - N.x
+          R.spy = spotY - N.y
+          R.spk = borne(0.8 / N.ech, 0.8, 2.4)
+          const vx = (rd ? rd.left + rd.width * 0.42 : spotX - 300) - spotX
+          const vy = (rd ? rd.top + rd.height * 0.3 : spotY + 300) - spotY
+          const n = Math.hypot(vx, vy) || 1
+          // Direction du geste : vers la demonstration, mais assez a l'horizontale pour que les bras se tendent et se lisent comme un « regardez ca ».
+          const dy0 = borne(vy / n, 0.2, 0.5)
+          BR.dirx = -Math.sqrt(1 - dy0 * dy0)
+          BR.diry = dy0
+          mem.emo = { h: "fier", jusqua: c.now + 1800 }
         }
         const k = 1 - Math.exp(-dt / 300)
-        R.dx = mix(R.dx, 0, k)
-        R.dy = mix(R.dy, 0, k)
-        R.rot = mix(R.rot, 0, k)
         R.sq = mix(R.sq, 0, 1 - Math.exp(-dt / 90))
         R.rage = 1 - ease(borne((tt - T3 - 200) / 1000, 0, 1))
+        if (tt >= TL && R.lock) {
+          R.lock = false
+          verrou(false)
+        }
+        if (tt < TH) {
+          const g = ease(borne((tt - T3) / (TG - T3), 0, 1))
+          R.dx = mix(R.gx0, R.spx, g)
+          R.dy = mix(R.gy0, R.spy, g)
+          R.rk = mix(R.gk0, R.spk, g)
+          R.rot = mix(R.rot, -7 * g, k)
+          if (tt >= TG && !R.montre) {
+            R.montre = true
+            mem.emo = { h: "fier", jusqua: c.now + (TH - TG) }
+          }
+        } else {
+          const g = ease(borne((tt - TH) / (T4 - TH), 0, 1))
+          R.dx = mix(R.spx, 0, g)
+          R.dy = mix(R.spy, 0, g)
+          R.rk = mix(R.spk, 1, g)
+          R.rot = mix(R.rot, 0, k)
+        }
         if (tt >= T4) return finRage()
       }
-      // Les bras : ils poussent sous la colere (poings serres), se balancent, puis se dressent avec lui.
-      // Au moment ou il s'elance, la section des simulations s'illumine ; les doigts la designent jusqu'au bout.
-      const pRise = borne((tt - T2) / (TC - T2), 0, 1)
-      const bk = ease(borne((tt - 250) / 500, 0, 1)) * (1 - ease(borne((tt - 4200) / 650, 0, 1)))
-      let phi = tt < T2 ? mix(52, 34, ease(borne((tt - T1) / (T2 - T1), 0, 1))) + 12 * Math.sin(tt / 78) * (1 - borne((tt - 750) / 200, 0, 1)) : mix(34, 166, ease(pRise))
-      if (tt > TC) phi += 4 * Math.sin((tt - TC) / 120) * Math.exp(-(tt - TC) / 1500)
-      const bd = ease(borne((tt - T2 - 250) / (TC - T2 - 250), 0, 1))
-      const secDemos = q("#sec-demos")
-      if (secDemos && tt >= T2 && secDemos.dataset.robotMontre !== "1") secDemos.dataset.robotMontre = "1"
+
+      // ---- Les bras ----------------------------------------------------------------------------------
+      // Chaque main est tiree vers une cible par un ressort (elle depasse, revient : c'est ce qui la rend vivante) ;
+      // le coude se place tout seul (cinematique inverse a deux os). Le mouvement du robot est un peu « en retard » sur les mains.
+      const sec = tt >= T2 ? q("#sec-demos") : null
+      if (sec && sec.dataset.robotMontre !== "1") sec.dataset.robotMontre = "1"
+      const bk = ease(borne((tt - 250) / 550, 0, 1)) * (1 - ease(borne((tt - (T4 - 500)) / 450, 0, 1)))
+      const bd = tt < TC ? ease(borne((tt - T2 - 200) / (TC - T2 - 200), 0, 1)) : 1 - ease(borne((tt - TH) / 500, 0, 1))
+      const s = Math.max(dt, 1) / 1000
+      const lagX = borne(-((R.dx - BR.pdx) / s) * 0.02, -40, 40)
+      const lagY = borne(-((R.dy - BR.pdy) / s) * 0.02, -45, 45)
+      BR.pdx = R.dx
+      BR.pdy = R.dy
+      for (const cote of [1, -1] as const) {
+        const h = cote === 1 ? BR.d : BR.g
+        const tl = tt - (cote === 1 ? 0 : 70) // la main gauche est un peu decalee : le geste n'est pas symetrique
+        let tx: number, ty: number
+        if (tl < T1) {
+          const w = tl / 78 + (cote === 1 ? 0 : 1.7)
+          tx = 132 + 12 * Math.sin(w)
+          ty = 58 + 30 * Math.sin(w + 1.3)
+        } else if (tl < T2) {
+          const e = ease(borne((tl - T1) / (T2 - T1), 0, 1))
+          tx = mix(132, 122, e)
+          ty = mix(60, 128, e)
+        } else if (tl < TC) {
+          const e = ease(borne((tl - T2) / (TC - T2), 0, 1))
+          tx = mix(122, 64, e)
+          ty = mix(128, -98, e)
+        } else if (tl < T3) {
+          tx = 66
+          ty = -96 + 44 * (1 - Math.exp(-(tl - TC) / 230))
+        } else if (tl < TH) {
+          // Les deux bras se tendent vers la section, puis la montrent tour a tour (petits coups vers l'avant).
+          const g = ease(borne((tl - T3) / (TG - T3), 0, 1))
+          const jab = tl > TG ? 0.07 * Math.sin((tl - TG) / 190 + (cote === 1 ? 0 : Math.PI)) : 0
+          const reach = ARM.L1 + ARM.L2 - 4
+          const px = EPAULE_X * cote + BR.dirx * reach * (1 + jab)
+          const py = EPAULE_Y + BR.diry * reach * (1 + jab)
+          tx = mix(66, px * cote, g)
+          ty = mix(-52, py, g)
+        } else {
+          const e = ease(borne((tl - TH) / (T4 - TH - 200), 0, 1))
+          const reach = ARM.L1 + ARM.L2 - 4
+          tx = mix((EPAULE_X * cote + BR.dirx * reach) * cote, 122, e)
+          ty = mix(EPAULE_Y + BR.diry * reach, 96, e)
+        }
+        tx += lagX * cote
+        ty += lagY
+        // Ressort amorti (integre par petits pas pour rester stable)
+        const raideur = 200, amort = 2 * 0.4 * Math.sqrt(raideur)
+        for (let i = 0, n = Math.max(1, Math.ceil(s / 0.008)); i < n; i++) {
+          const h8 = s / n
+          h.vx += ((tx - h.x) * raideur - amort * h.vx) * h8
+          h.vy += ((ty - h.y) * raideur - amort * h.vy) * h8
+          h.x += h.vx * h8
+          h.y += h.vy * h8
+        }
+        dessinerBras(el, cote, h, bk, bd)
+      }
       el.style.setProperty("--bk", bk.toFixed(3))
-      el.style.setProperty("--bphi", `${phi.toFixed(2)}deg`)
-      el.style.setProperty("--bd", bd.toFixed(3))
+      el.style.setProperty("--rk", R.rk.toFixed(3))
       el.style.setProperty("--rx", `${R.dx.toFixed(2)}px`)
       el.style.setProperty("--rdy", `${R.dy.toFixed(2)}px`)
       el.style.setProperty("--rrot", `${R.rot.toFixed(2)}deg`)
