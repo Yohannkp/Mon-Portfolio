@@ -219,7 +219,8 @@ export function Objet3D() {
     // Une fois par visite : le robot se fache, devient tout rouge, se balance, descend pour prendre de l'elan,
     // puis remonte en TIRANT la page avec lui jusqu'a la section des simulations. Fluide de bout en bout :
     // tout est une fonction du temps, la page et le robot partent du meme mouvement.
-    const R = { etat: "non" as "non" | "joue", t0: 0, y0: 0, yCible: 0, yFixe: false, coupe: false, dx: 0, dy: 0, rot: 0, rage: 0, fier: false }
+    const R = { etat: "non" as "non" | "joue", t0: 0, y0: 0, yCible: 0, yFixe: false, dx: 0, dy: 0, rot: 0, rage: 0, sq: 0, fier: false, choc: false, offChoc: 0 }
+    const choc = q(".obj-choc")
     const fuite = { dedans: false, entree: 0, prevMid: window.scrollY + window.innerHeight * 0.5 }
 
     // --- Etat lisse (ce qui est effectivement a l'ecran) --------------------
@@ -864,33 +865,26 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
 
     const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
     const easeOut = (x: number) => 1 - Math.pow(1 - x, 3)
-    const coupeRage = (e: Event) => {
-      if (R.etat !== "joue" || R.coupe) return
-      // Pendant qu'il se fache et prend son elan, le defilement du visiteur continue (l'inertie du trackpad dure ~1 s) : on l'ignore.
-      // Seule une action volontaire APRES ce moment, pendant qu'il tire la page, la lui reprend.
-      if (performance.now() - R.t0 < 1800) return
-      if (e.type === "keydown" && !["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Escape"].includes((e as KeyboardEvent).key)) return
-      R.coupe = true // le visiteur reprend la main : il ne tire plus la page, le robot se calme
-    }
-    const ecouterRage = (on: boolean) => {
-      const f = on ? window.addEventListener : window.removeEventListener
-      for (const t of ["wheel", "touchstart", "keydown", "mousedown"] as const) f.call(window, t, coupeRage, { capture: true, passive: true })
+    /** Le defilement est verrouille pendant tout le trajet (le robot ramene la page) : aucune main ne peut lutter avec lui. */
+    const verrou = (on: boolean) => {
+      if (on) html.dataset.scrollVerrou = "1"
+      else delete html.dataset.scrollVerrou
     }
     const finRage = () => {
       R.etat = "non"
-      ecouterRage(false)
+      verrou(false)
       delete html.dataset.robotRage
       delete el.dataset.rage
-      for (const v of ["--rx", "--rdy", "--rrot", "--rage"]) el.style.removeProperty(v)
+      for (const v of ["--rx", "--rdy", "--rrot", "--rage", "--rsq"]) el.style.removeProperty(v)
     }
     const lancerRage = (top: number) => {
       rageJouee = true
-      Object.assign(R, { etat: "joue", t0: performance.now(), y0: window.scrollY, yCible: Math.max(0, top - 110), yFixe: false, coupe: false, dx: 0, dy: 0, rot: 0, rage: 0, fier: false })
+      Object.assign(R, { etat: "joue", t0: performance.now(), y0: window.scrollY, yCible: Math.max(0, top - 110), yFixe: false, dx: 0, dy: 0, rot: 0, rage: 0, sq: 0, fier: false, choc: false, offChoc: 0 })
       html.dataset.robotRage = "1"
       el.dataset.rage = "1"
-      mem.emo = { h: "colere", jusqua: R.t0 + 3300 }
+      verrou(true)
+      mem.emo = { h: "colere", jusqua: R.t0 + 2500 }
       N.saut = -22
-      ecouterRage(true)
     }
     /** Le visiteur vient de traverser toute la section des simulations d'un trait : trop vite pour l'avoir vue. */
     const detecterFuite = () => {
@@ -915,36 +909,61 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       if (dwell < 1100 && demo && demo.dataset.etape === "0") lancerRage(top)
     }
     /**
-     * La choregraphie (ms depuis le depart) :
-     *   0 - 950     fache : rouge, balancement qui s'eteint
-     *   950 - 1600  descend (prend de l'elan), un peu penche en arriere
-     *   1600 - 3200 remonte d'un trait, la page tiree avec lui jusqu'aux simulations
-     *   3200 -      fier, se calme, le rouge s'efface, il regagne sa place
+     * La choregraphie (ms depuis le depart), pendant laquelle le defilement est verrouille :
+     *   0 - 950      fache : rouge, balancement qui s'eteint
+     *   950 - 1600   descend (prend de l'elan), un peu penche en arriere
+     *   1600 - 2500  s'elance vers le haut, en s'accelerant, la page tiree derriere lui... et COGNE le plafond de l'ecran
+     *   2500 - 3100  choc : ecrase, l'ecran tremble, il rebondit vers le bas ; la page finit d'arriver aux simulations
+     *   3100 - 4300  fier, se calme, le rouge s'efface, il regagne sa place — puis le defilement est rendu
      */
     const jouerRage = (c: Ctx, dt: number) => {
-      const t = c.now - R.t0
-      const T1 = 950, T2 = 1600, T3 = 3200, T4 = 4400
-      if (R.coupe && t < T3) R.t0 = c.now - T3 // il reprend la main : on saute a l'apaisement
       const tt = c.now - R.t0
+      const T1 = 950, T2 = 1600, TC = 2500, T3 = 3100, T4 = 4300
       if (tt >= T2 && !R.yFixe) {
         R.yFixe = true
-        R.y0 = window.scrollY // le visiteur a peut-etre continue de descendre : on part d'ou il est
+        R.y0 = window.scrollY
       }
-      if (tt < T3) {
+      const haut = 113 * N.ech // du centre du robot au sommet de son antenne
+      const offPlafond = -(N.y - haut) - 8 // decalage qui amene le sommet du robot au plafond (et un peu dans l'en-tete)
+      if (tt < TC) {
         const env = Math.min(1, tt / 160) * (1 - borne((tt - 750) / 200, 0, 1))
         const p2 = borne((tt - T1) / (T2 - T1), 0, 1)
-        const p3 = borne((tt - T2) / (T3 - T2), 0, 1)
-        const offHaut = c.haut + 110 - N.y
+        const p3 = borne((tt - T2) / (TC - T2), 0, 1)
         R.dx = 9 * Math.sin(tt / 78) * env
-        R.rot = 12 * Math.sin(tt / 78 + 0.6) * env - 6 * p2 - 9 * Math.sin(Math.PI * p3)
-        R.dy = tt < T2 ? 150 * easeOut(p2) : mix(150, offHaut, ease(p3))
+        R.rot = 12 * Math.sin(tt / 78 + 0.6) * env - 6 * p2 * (1 - p3) - 7 * Math.sin(Math.PI * p3 * 0.9)
+        // Il s'elance : le mouvement s'acccelere jusqu'au choc (courbe cubique), il ne ralentit pas avant de frapper.
+        R.dy = tt < T2 ? 150 * easeOut(p2) : mix(150, offPlafond, p3 * p3 * p3)
         R.rage = tt < 450 ? ease(tt / 450) : 1
-        if (tt >= T2 && !R.coupe) {
-          // La page suit le robot avec un leger retard : il la tire.
-          const pp = ease(borne((p3 - 0.06) / 0.94, 0, 1))
+        R.sq = 0
+        if (tt >= T2) {
+          const pp = ease(borne((tt - (T2 + 100)) / (T3 - T2 - 100), 0, 1))
           window.scrollTo({ top: mix(R.y0, R.yCible, pp), behavior: "instant" as ScrollBehavior })
         }
+      } else if (tt < T3) {
+        if (!R.choc) {
+          R.choc = true
+          R.offChoc = offPlafond
+          mem.emo = { h: "surpris", jusqua: c.now + 650 }
+          if (choc) {
+            choc.style.setProperty("--cx", `${N.x.toFixed(0)}px`)
+            choc.dataset.on = "1"
+            window.setTimeout(() => {
+              delete choc.dataset.on
+            }, 650)
+          }
+        }
+        const tau = tt - TC
+        const pp = ease(borne((tt - (T2 + 100)) / (T3 - T2 - 100), 0, 1))
+        // Le choc : la page tremble (secousses amorties), le robot s'ecrase puis rebondit vers le bas.
+        const tremble = 8 * Math.exp(-tau / 170) * Math.sin(tau / 11)
+        window.scrollTo({ top: mix(R.y0, R.yCible, pp) + tremble, behavior: "instant" as ScrollBehavior })
+        R.sq = Math.exp(-tau / 130)
+        R.dy = R.offChoc + 110 * easeOut(borne(tau / 520, 0, 1))
+        R.dx = 3 * Math.exp(-tau / 200) * Math.sin(tau / 40)
+        R.rot = mix(R.rot, 0, 1 - Math.exp(-dt / 120))
+        R.rage = 1
       } else {
+        window.scrollTo({ top: R.yCible, behavior: "instant" as ScrollBehavior })
         if (!R.fier) {
           R.fier = true
           mem.emo = { h: "fier", jusqua: c.now + 1700 }
@@ -953,6 +972,7 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
         R.dx = mix(R.dx, 0, k)
         R.dy = mix(R.dy, 0, k)
         R.rot = mix(R.rot, 0, k)
+        R.sq = mix(R.sq, 0, 1 - Math.exp(-dt / 90))
         R.rage = 1 - ease(borne((tt - T3 - 200) / 1000, 0, 1))
         if (tt >= T4) return finRage()
       }
@@ -960,6 +980,7 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       el.style.setProperty("--rdy", `${R.dy.toFixed(2)}px`)
       el.style.setProperty("--rrot", `${R.rot.toFixed(2)}deg`)
       el.style.setProperty("--rage", R.rage.toFixed(3))
+      el.style.setProperty("--rsq", R.sq.toFixed(3))
     }
 
     const surDefilement = () => {
@@ -1083,6 +1104,8 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
     <>
       {/* Le fond qui s'assombrit quand le robot se met en avant (voir globals.css). */}
       <div className="obj-ombre" aria-hidden="true" />
+      {/* L'impact du robot contre le plafond de l'ecran (colere devant les simulations). */}
+      <div className="obj-choc" aria-hidden="true" />
       <div ref={racine} className="obj" data-humeur="neutre">
         <div className="obj__halo" aria-hidden="true" />
         <div className="obj__scene" aria-hidden="true">

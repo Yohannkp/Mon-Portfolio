@@ -48,7 +48,9 @@ Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se po
 
 ### La colère du robot (une seule fois)
 
-Si le visiteur défile **à la main** et traverse la section des simulations d'un trait (moins d'une seconde et demie, sans y avoir joué), le robot se fâche : visage furieux, tout rouge (`hue-rotate` piloté par `--rage`), il se balance, **descend pour prendre de l'élan**, puis **remonte d'un trait en tirant la page avec lui** (la page suit avec un léger retard) jusqu'aux simulations. Toute la chorégraphie est une fonction du temps (fluide de bout en bout), il passe devant le contenu, puis se calme (fier), le rouge s'efface et il regagne sa place dans le guide. Une seule fois par visite de la page (rechargée, elle peut revenir) ; jamais pendant la présentation automatique, sur téléphone ou si les animations sont réduites ; une action volontaire du visiteur pendant qu'il tire la page lui rend la main.
+Si le visiteur défile **à la main** et traverse la section des simulations d'un trait (moins d'une seconde et demie, sans y avoir joué), le robot se fâche : visage furieux, tout rouge (`hue-rotate` piloté par `--rage`), il se balance, **descend pour prendre de l'élan**, puis **s'élance vers le haut en s'accélérant, la page tirée derrière lui, et cogne le plafond de l'écran** (anneau d'impact, l'écran tremble, il s'écrase puis rebondit). La page finit d'arriver aux simulations, il se calme (fier), le rouge s'efface et il regagne sa place dans le guide.
+
+**Le défilement est verrouillé pendant tout le trajet** (`html[data-scroll-verrou] { overflow: hidden }`, avec `scrollbar-gutter: stable` pour que la page ne saute pas quand la barre disparaît), puis rendu une fois le robot replacé. Toute la chorégraphie est une fonction du temps (fluide de bout en bout). Une seule fois par visite de la page (rechargée, elle peut revenir) ; jamais pendant la présentation automatique, sur téléphone ou si les animations sont réduites.
 
 ### Les émotions du robot
 
