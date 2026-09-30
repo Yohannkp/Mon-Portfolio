@@ -74,8 +74,8 @@ export function Hero() {
 
       </div>
 
-      <div className="mx-auto max-w-6xl px-6 py-24 md:py-32" style={{ position: "relative", zIndex: 1 }}>
-        <div className="flex flex-col items-start gap-8">
+      <div className="mx-auto max-w-6xl px-6 py-16 sm:py-24 md:py-32" style={{ position: "relative", zIndex: 1 }}>
+        <div className="flex flex-col items-start gap-6 sm:gap-8">
           <div data-apres>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-4 py-1.5 text-sm">
               <span className="relative flex h-2 w-2">
@@ -86,12 +86,12 @@ export function Hero() {
             </span>
           </div>
 
-          <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-balance md:text-5xl lg:text-6xl">
+          <h1 className="max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-balance sm:text-4xl md:text-5xl lg:text-6xl">
             <Mots texte={TITRE_1} />
-            <Mots texte={TITRE_2} className="mt-2 block font-semibold text-muted-foreground" />
+            <Mots texte={TITRE_2} className="mt-2 block text-2xl font-semibold text-muted-foreground sm:text-4xl md:text-5xl lg:text-6xl" />
           </h1>
 
-          <p data-apres className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+          <p data-apres className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl">
             Élève ingénieur Big Data &amp; IA à l&apos;ECE Paris. Ce qui m&apos;intéresse est la chaîne complète :
             affiner un modèle, le servir derrière une API, le conteneuriser et le déployer de façon reproductible. Deux
             stages en développement, dont un en Go sur un système déjà en production.

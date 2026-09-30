@@ -703,7 +703,13 @@ export function PresentationAuto() {
   // sur le texte) et revient des que le defilement s'arrete.
   useEffect(() => {
     let t = 0
+    // Encore sur l'accroche ? Sous 1280px, le bouton attend qu'on l'ait quittee (voir la feuille de style).
+    const majHaut = () => {
+      if (racine.current) racine.current.dataset.haut = window.scrollY < window.innerHeight * 0.6 ? "1" : "0"
+    }
+    majHaut()
     const surScroll = () => {
+      majHaut()
       const el = racine.current
       if (!el || etatRef.current === "lecture") return
       el.dataset.defile = "1"
@@ -718,8 +724,8 @@ export function PresentationAuto() {
   }, [])
 
   // L'invitation : quand le visiteur arrive de lui-meme sur les projets, un petit message doux lui propose
-  // de lancer la visite a partir de la. Jamais pendant une visite. Fermee d'un geste = plus jamais ;
-  // simplement quittee (il a defile plus loin) = elle peut revenir, trois fois au plus par session.
+  // de lancer la visite a partir de la. Jamais pendant une visite, une seule fois par session, et elle se
+  // retire seule au bout de 12 s : elle passe au-dessus des cartes, elle ne doit pas s'y installer.
   const lu = (cle: string) => {
     try {
       return sessionStorage.getItem(cle)
@@ -771,7 +777,7 @@ export function PresentationAuto() {
         }
         window.clearTimeout(departInvite.current)
         if (inviteVue.current || etatRef.current !== "repos" || m.current.termine) return
-        if (lu("pa-invite") === "1" || Number(lu("pa-invite-n") ?? 0) >= 3) return
+        if (lu("pa-invite") === "1" || Number(lu("pa-invite-n") ?? 0) >= 1) return
         delai = window.setTimeout(() => {
           if (etatRef.current !== "repos" || inviteVue.current) return
           inviteVue.current = true
@@ -779,7 +785,7 @@ export function PresentationAuto() {
           ecrire("pa-invite-n", String(Number(lu("pa-invite-n") ?? 0) + 1))
           vueDepuis.current = performance.now()
           setInvite(true)
-          plafondInvite.current = window.setTimeout(cacherInvite, 45000)
+          plafondInvite.current = window.setTimeout(cacherInvite, 12000)
         }, 250)
       },
       // Le haut de la section a passe les 40 % bas de l'ecran (sur telephone, la section est bien trop haute pour un seuil de surface).

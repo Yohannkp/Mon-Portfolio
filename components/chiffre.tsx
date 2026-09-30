@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 
 /**
  * Le chiffre cle d'un projet. S'il commence par un nombre ("360", "0,88", "+15 %", "7 Md"),
- * il monte de 0 a sa valeur quand le projet apparait ; sinon ("MongoDB → SQLite") il s'affiche tel quel.
+ * il monte de 0 a sa valeur quand le projet apparait ; sinon il s'affiche tel quel.
  * Le texte final est TOUJOURS celui de la donnee : l'animation ne fait que l'atteindre.
  */
 const MOTIF = /^(\+?)(\d+(?:,\d+)?)(.*)$/

@@ -4,9 +4,9 @@
    Au survol, « Recommencer » puis la legende apparaissent a droite du bouton.
    ========================================================================== */
 
-/* A gauche, aligne sur le bord gauche du contenu (max-w-6xl + gouttiere de 24px) : le bouton
-   reste a droite du rail de lecture, qui longe le bord de la fenetre. Sur petit ecran, 16px. */
-.pa { position: fixed; left: max(16px, calc(50vw - 36rem + 24px)); bottom: 22px; z-index: 45;
+/* Grand ecran : dans la marge de gauche, juste avant le bord du contenu (max-w-6xl + gouttiere de 24px),
+   donc jamais sur le texte. Il faut 1280px pour que la marge accueille le bouton et son interrupteur. */
+.pa { position: fixed; left: max(16px, calc(50vw - 36rem - 48px)); bottom: 22px; z-index: 45;
   display: flex; flex-direction: column; align-items: flex-start; gap: .8rem; pointer-events: none; }
 
 .pa__carte { max-width: min(520px, calc(100vw - 32px)); padding: .8rem 1.15rem; text-align: left;
@@ -68,6 +68,17 @@
 .pa__recom { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; cursor: pointer; border: 1px solid var(--bord-doux); border-radius: 50%;
   color: var(--muted-foreground); background: var(--card); box-shadow: var(--ombre-carte); transition: color .2s, border-color .2s, transform .2s; }
 .pa__recom:hover { color: var(--foreground); border-color: var(--muted-foreground); transform: rotate(-30deg); }
+
+/* Sous 1280px la marge ne suffit plus : le bouton passe en bas a droite, et il attend que le visiteur
+   ait quitte l'accroche pour apparaitre (au premier ecran, il couvrait le texte d'introduction). */
+@media (max-width: 1279px) {
+  .pa { left: auto; right: 16px; bottom: 16px; align-items: flex-end; }
+  .pa__rang::before { left: auto; right: 100%; }
+  .pa__menu { left: auto; right: calc(100% + 12px); flex-direction: row-reverse; transform-origin: right center; transform: translate(14px, -50%) scale(.9); }
+  .pa__invite { left: auto; right: 0; transform-origin: calc(100% - 24px) 100%; }
+  .pa__invite::after { left: auto; right: 18px; }
+  .pa[data-haut="1"][data-etat="repos"][data-invite="0"] .pa__rang { opacity: 0; transform: translateY(10px); pointer-events: none; }
+}
 
 /* Telephone : un petit rond en bas a droite (le pouce y arrive, et le texte est aligne a gauche).
    « Recommencer » n'apparait que si une visite est commencee : pas de survol au doigt. */
