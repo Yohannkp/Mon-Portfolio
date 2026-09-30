@@ -43,6 +43,13 @@
 
 /* Au survol : trois bulles a droite du bouton. « Retour » et « ×2 » se tiennent enfoncees : tant qu'on
    appuie, la visite recule ou avance a double vitesse ; « Recommencer » remet tout au debut. */
+/* Le petit interrupteur du son, pose sur l'angle du bouton : toujours la, discret. */
+.pa__son { position: absolute; left: 38px; top: -8px; z-index: 2; display: grid; place-items: center; width: 24px; height: 24px; padding: 0; cursor: pointer;
+  border: 1px solid var(--bord-doux); border-radius: 50%; color: var(--accent); background: var(--card); box-shadow: var(--ombre-carte);
+  transition: transform .2s cubic-bezier(.2, .7, .2, 1), color .2s, border-color .2s; }
+.pa__son[data-on="0"] { color: var(--muted-foreground); }
+.pa__son:hover { transform: scale(1.12); border-color: color-mix(in oklch, var(--accent) 55%, var(--border)); }
+.pa__son:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pa__menu { position: absolute; left: calc(100% + 12px); top: 50%; display: flex; align-items: center; gap: .5rem;
   transform: translate(-14px, -50%) scale(.9); transform-origin: left center; opacity: 0; pointer-events: none;
   transition: opacity .25s ease, transform .35s cubic-bezier(.2, .8, .2, 1); }
@@ -67,6 +74,7 @@
 @media (max-width: 720px) {
   .pa { left: auto; right: 16px; bottom: 16px; align-items: flex-end; }
   .pa__btn { width: 48px; height: 48px; }
+  .pa__son { left: 30px; }
   .pa__rang::before { display: none; }
   /* Pas de survol au doigt : les bulles sont la des qu'une visite est commencee, a gauche du bouton. */
   .pa__menu { left: auto; right: calc(100% + 8px); flex-direction: row-reverse; transform: translate(0, -50%); }

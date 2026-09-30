@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { EXPRESSIONS, cheminBouche, nouvelleExpr, versExpr, type Humeur } from "@/components/robot-emotions"
 
 /**
  * L'objet : un cube filaire qui devient un robot, puis accompagne la lecture.
@@ -33,7 +34,6 @@ import { useEffect, useRef } from "react"
  * variables CSS sur trois elements ; le GPU compose le reste.
  */
 
-type Humeur = "neutre" | "concentre" | "content" | "curieux"
 type Point = { x: number; y: number }
 type Bulle = { titre?: string; texte: string; place?: "dessus" | "dessous"; largeur?: number }
 
@@ -49,6 +49,8 @@ type Sortie = {
   fantome?: { x: number; y: number; regard?: Point | null; force: number; ech: number } | null
   /** Passe devant le contenu : pour se poser dans un emplacement reserve (le guide d'une demonstration). */
   devant?: boolean
+  /** Il est passe dans la marge de gauche (visite automatique) : la legende du rail s'efface pour lui laisser la place. */
+  gauche?: boolean
 }
 
 type Ctx = {
@@ -130,17 +132,156 @@ const IDS = [
 ]
 
 /** Un accessoire du visage, partage par le robot et par son fantome. */
+const EPAULE_X = 84
+const EPAULE_Y = 44
+const ARM = { L1: 70, L2: 72 }
+
+/**
+ * Dessine un bras : epaule fixe, main donnee, coude calcule (cinematique inverse a deux os, coude vers l'exterieur et le bas).
+ * Le bras n'est PAS fait de deux batons : c'est un seul tube souple, une courbe qui passe par l'epaule, le coude et la main,
+ * dont la largeur diminue vers le poignet. Aucune articulation visible, donc rien qui « casse » quand le coude bouge.
+ * `k` (0..1) fait « pousser » le bras ; `bd` (0..1) tend l'index ; `ouv` (0..1) ouvre la main a plat (le poing serre a 0).
+ */
+function dessinerBras(el: HTMLElement, cote: 1 | -1, h: { x: number; y: number }, k: number, bd: number, ouv: number, resp: number) {
+  const g = el.querySelector(`.obj__bras-${cote === 1 ? "d" : "g"}`)
+  if (!g) return
+  const $ = (sel: string) => g.querySelector<SVGElement>(sel)!
+  const kk = Math.max(k, 0.05)
+  const L1 = ARM.L1 * Math.max(k, 0.02)
+  const L2 = ARM.L2 * Math.max(k, 0.02)
+  const sx = EPAULE_X * cote
+  const sy = EPAULE_Y + resp
+  let dx = h.x * cote - sx
+  let dy = h.y - sy
+  let d = Math.hypot(dx, dy) || 1
+  const dc = Math.min(L1 + L2 - 0.5, Math.max(Math.abs(L1 - L2) + 0.5, d))
+  const ux = dx / d
+  const uy = dy / d
+  dx = ux * dc
+  dy = uy * dc
+  d = dc
+  const a = (L1 * L1 - L2 * L2 + d * d) / (2 * d)
+  const hh = Math.sqrt(Math.max(0, L1 * L1 - a * a))
+  const c1 = { x: sx + ux * a - uy * hh, y: sy + uy * a + ux * hh }
+  const c2 = { x: sx + ux * a + uy * hh, y: sy + uy * a - ux * hh }
+  const note = (p: { x: number; y: number }) => p.x * cote + p.y * 0.6
+  const e = note(c1) > note(c2) ? c1 : c2
+  const hx = sx + dx
+  const hy = sy + dy
+  const f = (v: number) => v.toFixed(1)
+  const set = (sel: string, attr: string, v: string) => $(sel).setAttribute(attr, v)
+
+  // Le tube : une courbe de Bezier quadratique qui passe exactement par le coude en son milieu.
+  const cx = 2 * e.x - (sx + hx) / 2
+  const cy = 2 * e.y - (sy + hy) / 2
+  const N = 14
+  const pts: { x: number; y: number; nx: number; ny: number; w: number }[] = []
+  for (let i = 0; i <= N; i++) {
+    const t = i / N
+    const u = 1 - t
+    const x = u * u * sx + 2 * u * t * cx + t * t * hx
+    const y = u * u * sy + 2 * u * t * cy + t * t * hy
+    let tx = 2 * u * (cx - sx) + 2 * t * (hx - cx)
+    let ty = 2 * u * (cy - sy) + 2 * t * (hy - cy)
+    const tn = Math.hypot(tx, ty) || 1
+    tx /= tn
+    ty /= tn
+    // Un peu plus large a l'epaule et au coude (le muscle), fin au poignet.
+    const w = (10 - 4.4 * t + 1.2 * Math.sin(Math.PI * t)) * kk
+    pts.push({ x, y, nx: -ty, ny: tx, w })
+  }
+  const gauche = pts.map((p) => `${f(p.x + p.nx * p.w)} ${f(p.y + p.ny * p.w)}`)
+  const droite = pts.map((p) => `${f(p.x - p.nx * p.w)} ${f(p.y - p.ny * p.w)}`).reverse()
+  const dernier = pts[N]
+  const premier = pts[0]
+  set(
+    ".b-bras",
+    "d",
+    `M${gauche.join(" L")} A${f(dernier.w)} ${f(dernier.w)} 0 0 0 ${droite[0]} L${droite.join(" L")} A${f(premier.w)} ${f(premier.w)} 0 0 0 ${gauche[0]}Z`,
+  )
+  // Un reflet le long du bras : il donne le volume (la lumiere vient d'en haut a gauche).
+  set(".b-lueur", "d", `M${pts.map((p) => `${f(p.x + p.nx * p.w * 0.35)} ${f(p.y + p.ny * p.w * 0.35)}`).join(" L")}`)
+  set(".b-epaule", "cx", f(sx))
+  set(".b-epaule", "cy", f(sy))
+
+  // La main : direction de l'avant-bras. Poing = sphere dense ; paume ouverte = plan (doigts ecartes) ; index tendu pour montrer.
+  let fx = hx - e.x
+  let fy = hy - e.y
+  const fn = Math.hypot(fx, fy) || 1
+  fx /= fn
+  fy /= fn
+  const pr = (11 + 2.5 * (1 - ouv) * (1 - bd) - 1 * ouv) * kk
+  const px = hx + fx * 4
+  const py = hy + fy * 4
+  set(".b-paume", "cx", f(px))
+  set(".b-paume", "cy", f(py))
+  set(".b-paume", "r", f(pr))
+  const doigt = (sel: string, ang: number, long: number, larg: number) => {
+    if (long < 1.5) return set(sel, "d", "")
+    const cs = Math.cos(ang * cote)
+    const sn = Math.sin(ang * cote)
+    const dx2 = fx * cs - fy * sn
+    const dy2 = fx * sn + fy * cs
+    const x1 = px + dx2 * pr * 0.55
+    const y1 = py + dy2 * pr * 0.55
+    const x2 = x1 + dx2 * long
+    const y2 = y1 + dy2 * long
+    const nx = -dy2
+    const ny = dx2
+    set(
+      sel,
+      "d",
+      `M${f(x1 + nx * larg)} ${f(y1 + ny * larg)} L${f(x2 + nx * larg * 0.8)} ${f(y2 + ny * larg * 0.8)} A${f(larg * 0.8)} ${f(larg * 0.8)} 0 0 0 ${f(x2 - nx * larg * 0.8)} ${f(y2 - ny * larg * 0.8)} L${f(x1 - nx * larg)} ${f(y1 - ny * larg)}Z`,
+    )
+  }
+  const ecart = ouv * (1 - bd)
+  doigt(".b-index", -0.5 * ecart, Math.max(31 * bd, 19 * ouv) * kk, 4.4 * kk)
+  doigt(".b-doigt-1", -0.12 * ecart, 20 * ecart * kk, 4.2 * kk)
+  doigt(".b-doigt-2", 0.28 * ecart, 19 * ecart * kk, 4.1 * kk)
+  doigt(".b-doigt-3", 0.66 * ecart, 15 * ecart * kk, 3.8 * kk)
+  set(".b-pouce", "cx", f(px - fy * cote * (10 + 2 * ouv) - fx * 1))
+  set(".b-pouce", "cy", f(py + fx * cote * (10 + 2 * ouv) - fy * 1))
+}
+
+/** Les bras, qui ne servent qu'a la colere. Les os, les articulations et la main sont dessines par le JS a chaque image (cinematique inverse). */
+function Bras() {
+  const cote = (c: "g" | "d") => (
+    <g className={`obj__bras-${c}`}>
+      <path className="b-os b-bras" />
+      <path className="b-lueur" />
+      <circle className="b-art b-epaule" r="11" />
+      <path className="b-main b-index" />
+      <path className="b-main b-doigt b-doigt-1" />
+      <path className="b-main b-doigt b-doigt-2" />
+      <path className="b-main b-doigt b-doigt-3" />
+      <circle className="b-main b-paume" />
+      <circle className="b-main b-pouce" r="5.5" />
+    </g>
+  )
+  return (
+    <svg className="obj__bras" viewBox="-170 -170 340 340" aria-hidden="true">
+      {cote("g")}
+      {cote("d")}
+    </svg>
+  )
+}
+
 function Visage() {
   return (
     <div className="obj__corps">
       <div className="obj__antenne" />
       <div className="obj__tete" />
       <div className="obj__visiere">
+        <span className="obj__sourcil obj__sourcil--g" />
+        <span className="obj__sourcil obj__sourcil--d" />
         <div className="obj__yeux">
           <span className="obj__oeil obj__oeil--g" />
           <span className="obj__oeil obj__oeil--d" />
         </div>
       </div>
+      <svg className="obj__bouche" viewBox="-30 -14 60 28" aria-hidden="true">
+        <path d="M-11 0 Q0 2 11 0" />
+      </svg>
       <div className="obj__anneau" />
     </div>
   )
@@ -199,7 +340,23 @@ export function Objet3D() {
       bulleCle: "",
       bulleMin: 0,
       survol: null as Element | null,
+      // Vie du visage : clignements irreguliers, micro-saccades du regard, emotion ponctuelle (evenement), chatouilles.
+      clin: 0,
+      sacc: { x: 0, y: 0, t: 0 },
+      emo: null as { h: Humeur; jusqua: number } | null,
+      pokes: [] as number[],
     }
+    const X = nouvelleExpr()
+    const boucheEl = el.querySelector<SVGPathElement>(".obj__bouche path")
+
+    // --- La colere : le visiteur file devant les simulations -------------------------------------------
+    // Une fois par visite : le robot se fache, devient tout rouge, se balance, descend pour prendre de l'elan,
+    // puis remonte en TIRANT la page avec lui jusqu'a la section des simulations. Fluide de bout en bout :
+    // tout est une fonction du temps, la page et le robot partent du meme mouvement.
+    const R = { etat: "non" as "non" | "joue", t0: 0, y0: 0, yCible: 0, yFixe: false, dx: 0, dy: 0, rot: 0, rage: 0, sq: 0, rk: 1, fier: false, choc: false, offChoc: 0, lock: false, glisse: false, montre: false, gx0: 0, gy0: 0, gk0: 1, spx: 0, spy: 0, spk: 1 }
+    const BR = { g: { x: 0, y: 0, vx: 0, vy: 0 }, d: { x: 0, y: 0, vx: 0, vy: 0 }, pdx: 0, pdy: 0, dirx: -0.6, diry: 0.8 }
+    const choc = q(".obj-choc")
+    const fuite = { dedans: false, entree: 0, prevMid: window.scrollY + window.innerHeight * 0.5 }
 
     // --- Etat lisse (ce qui est effectivement a l'ecran) --------------------
     const N = {
@@ -367,9 +524,13 @@ export function Objet3D() {
       // Pendant la visite, la carte presentee grandit et mord sur la marge : le robot se cale
       // sur son bord reel (le rect suit l'animation), il glisse donc avec elle, sans jamais passer dessous.
       const enFocus = cartes[idx].dataset.focus === "1"
-      const mC = enFocus ? Math.max(0, c.W - r.right) : c.marge
-      const xC = enFocus ? r.right + mC / 2 : c.xM
-      const eC = enFocus ? borne((mC - 34) / 215, 0.3, 0.62) : c.echM
+      // De temps en temps, pendant la visite, il traverse la page jusqu'a la marge de GAUCHE, y reste quelques projets, puis revient.
+      const gauche = enFocus && PROJETS_A_GAUCHE.has(idx) && r.left > 90
+      const mC = enFocus ? Math.max(0, gauche ? r.left - 60 : c.W - r.right) : c.marge
+      const xC = !enFocus ? c.xM : gauche ? (r.left + 36) / 2 : r.right + mC / 2
+      const eC = enFocus ? borne((mC - 34) / (gauche ? 190 : 215), 0.3, 0.62) : c.echM
+      // Pendant la traversee il passe DEVANT le contenu (sinon les cartes le cacheraient), puis se pose.
+      const traverse = enFocus && Math.abs(N.x - xC) > 60
       const largeurBulle = borne(mC - 24, 0, 200)
       return {
         x: xC,
@@ -380,6 +541,8 @@ export function Objet3D() {
         humeur: depuis < 900 ? "content" : "neutre",
         // Trop etroit pour la bulle (ecran a peine plus large que 1281 px) : elle se tait, la visite a deja sa phrase.
         bulle: { titre: code, texte: prouve ? `Démontre : ${prouve}` : "", largeur: largeurBulle },
+        devant: traverse,
+        gauche,
       }
     }
 
@@ -594,7 +757,13 @@ export function Objet3D() {
       "sec-competences": ["data-preuve"],
       "sec-methode": ["data-actif"],
     }
-    const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-preuve", "data-actif"]
+    /** La colere (defilement trop rapide devant les simulations) n'a lieu qu'UNE fois par visite de la page : rechargee, elle peut revenir. */
+let rageJouee = false
+
+/** Les projets (0..6) pendant lesquels, dans la visite automatique, le robot va dans la marge de gauche. */
+const PROJETS_A_GAUCHE = new Set([1, 2, 5])
+
+const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-preuve", "data-actif"]
 
     // ======================================================================
     //  CALCUL DE LA CIBLE, PUIS PEINTURE
@@ -684,8 +853,12 @@ export function Objet3D() {
       // Un element interactif survole prend le regard : c'est ce que le visiteur va faire.
       const surv = mem.survol && document.contains(mem.survol) ? mem.survol : null
       const g = regardVers({ x: N.x, y: N.y }, surv ? centre(surv.getBoundingClientRect()) : cible.regard, c.now)
-      N.gx = mix(N.gx, g.x * 9, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
-      N.gy = mix(N.gy, g.y * 6, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
+      // Micro-saccades : l'oeil ne fixe jamais un point parfaitement immobile (+/- 1 px, toutes les quelques centaines de ms).
+      if (!reduit && c.now > mem.sacc.t) {
+        mem.sacc = { x: Math.round((Math.random() * 2.4 - 1.2) * 10) / 10, y: Math.round((Math.random() * 1.6 - 0.8) * 10) / 10, t: c.now + 250 + Math.random() * 550 }
+      }
+      N.gx = mix(N.gx, g.x * 9 + mem.sacc.x, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
+      N.gy = mix(N.gy, g.y * 6 + mem.sacc.y, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
 
       const bob = reduit ? 0 : Math.sin(c.now / 520) * 4 + N.saut
 
@@ -700,15 +873,52 @@ export function Objet3D() {
       el.style.setProperty("--gy", `${N.gy.toFixed(2)}px`)
       el.style.setProperty("--incl", `${N.incl.toFixed(2)}deg`)
       // Dans le guide d'une demonstration, il passe devant le panneau (qui a un fond).
-      const devant = cible.devant ? "1" : "0"
+      if (R.etat === "joue") jouerRage(c, dt)
+      const devant = cible.devant || R.etat === "joue" ? "1" : "0"
       if (el.dataset.devant !== devant) el.dataset.devant = devant
-      const humeur =
-        el.dataset.anim === "fier"
-          ? "content"
-          : surv && (cible.humeur ?? "neutre") === "neutre"
-            ? "curieux"
-            : (cible.humeur ?? "neutre")
-      if (el.dataset.humeur !== humeur) el.dataset.humeur = humeur
+      const gauche = cible.gauche ? "1" : "0"
+      if (html.dataset.robotGauche !== gauche) html.dataset.robotGauche = gauche
+      // Quelle emotion ? Un evenement ponctuel (pause, fin de visite...) prime, puis la reaction au survol, puis la scene.
+      if (mem.emo && c.now > mem.emo.jusqua) mem.emo = null
+      const anim = el.dataset.anim
+      const humeur: Humeur = mem.emo
+        ? mem.emo.h
+        : anim === "fier"
+          ? "fier"
+          : anim === "avant"
+            ? "surpris"
+            : anim === "tour" || anim === "balance"
+              ? "content"
+              : surv && (cible.humeur ?? "neutre") === "neutre"
+                ? "curieux"
+                : (cible.humeur ?? "neutre")
+      // Les yeux en arc (CSS) pour la joie et la fierte : le « sourire de Duchenne ».
+      const attr = humeur === "fier" ? "content" : humeur
+      if (el.dataset.humeur !== attr) el.dataset.humeur = attr
+
+      // Transition d'un etat a l'autre : amortie (les muscles ont une masse), jamais lineaire.
+      versExpr(X, EXPRESSIONS[humeur], snap || reduit ? 1 : 1 - Math.exp(-dt / 150))
+      // Quand la voix parle, la bouche s'ouvre et se ferme (elle « articule » sans texte : deux oscillations desaccordees).
+      const parle = !reduit && document.documentElement.dataset.robotParle === "1"
+        ? 0.12 + 0.42 * Math.abs(Math.sin(c.now / 68)) * (0.55 + 0.45 * Math.abs(Math.sin(c.now / 213)))
+        : 0
+      el.style.setProperty("--ex", X.ex.toFixed(3))
+      el.style.setProperty("--eyl", X.eyl.toFixed(3))
+      el.style.setProperty("--eyr", X.eyr.toFixed(3))
+      el.style.setProperty("--bt", `${X.bt.toFixed(2)}deg`)
+      el.style.setProperty("--byl", `${X.byl.toFixed(2)}px`)
+      el.style.setProperty("--byr", `${X.byr.toFixed(2)}px`)
+      el.style.setProperty("--bo", X.bo.toFixed(3))
+      boucheEl?.setAttribute("d", cheminBouche(X, parle))
+
+      // Le clignement : un passage rapide a la ligne (~140 ms), a intervalles irreguliers de 2 a 6 s, parfois double.
+      if (!reduit && c.now > mem.clin) {
+        el.dataset.clin = "1"
+        window.setTimeout(() => {
+          delete el.dataset.clin
+        }, 150)
+        mem.clin = c.now + (Math.random() < 0.16 ? 330 : 2000 + Math.random() * 4000)
+      }
 
       // Le fantome : la seconde recherche.
       const f = cible.fantome
@@ -788,12 +998,264 @@ export function Objet3D() {
       rafId = requestAnimationFrame(boucle)
     }
 
+    const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+    const easeOut = (x: number) => 1 - Math.pow(1 - x, 3)
+    /** Le defilement est verrouille pendant tout le trajet (le robot ramene la page) : aucune main ne peut lutter avec lui. */
+    const verrou = (on: boolean) => {
+      if (on) html.dataset.scrollVerrou = "1"
+      else delete html.dataset.scrollVerrou
+    }
+    const finRage = () => {
+      R.etat = "non"
+      verrou(false)
+      delete html.dataset.robotRage
+      delete el.dataset.rage
+      for (const v of ["--rx", "--rdy", "--rrot", "--rage", "--rsq", "--rk", "--bk"]) el.style.removeProperty(v)
+      delete q("#sec-demos")?.dataset.robotMontre
+    }
+    const lancerRage = (top: number) => {
+      rageJouee = true
+      Object.assign(R, { montre: false, etat: "joue", t0: performance.now(), y0: window.scrollY, yCible: Math.max(0, top - 110), yFixe: false, dx: 0, dy: 0, rot: 0, rage: 0, sq: 0, rk: 1, fier: false, choc: false, offChoc: 0, lock: true, glisse: false })
+      BR.pdx = 0
+      BR.pdy = 0
+      for (const c of [BR.g, BR.d]) Object.assign(c, { x: EPAULE_X, y: EPAULE_Y, vx: 0, vy: 0 })
+      html.dataset.robotRage = "1"
+      el.dataset.rage = "1"
+      verrou(true)
+      mem.emo = { h: "colere", jusqua: R.t0 + 2500 }
+      N.saut = -22
+    }
+    /** Le visiteur vient de traverser toute la section des simulations d'un trait : trop vite pour l'avoir vue. */
+    const detecterFuite = () => {
+      const sec = q("#sec-demos")
+      const mid = window.scrollY + window.innerHeight * 0.5
+      const prev = fuite.prevMid
+      fuite.prevMid = mid
+      if (!sec || rageJouee || R.etat === "joue" || reduit || html.dataset.visite === "1" || N.mut < 0.7) return
+      const now = performance.now()
+      const r = sec.getBoundingClientRect()
+      const top = r.top + window.scrollY
+      const bas = top + r.height
+      if (mid >= top && mid <= bas && !fuite.dedans) {
+        fuite.dedans = true
+        fuite.entree = now
+      } else if (mid < top) fuite.dedans = false
+      if (!(mid > bas && prev <= bas)) return
+      const dwell = prev < top ? 0 : fuite.dedans ? now - fuite.entree : 1e9
+      fuite.dedans = false
+      // S'il a joue avec la demonstration, il l'a vue : pas de colere.
+      const demo = sec.querySelector<HTMLElement>(".demo")
+      if (dwell < 1100 && demo && demo.dataset.etape === "0") lancerRage(top)
+    }
+    /**
+     * La choregraphie (ms depuis le depart), pendant laquelle le defilement est verrouille :
+     *   0 - 950       fache : rouge, poings qui battent, balancement qui s'eteint
+     *   950 - 1600    descend (prend de l'elan), les bras en arriere
+     *   1600 - 2500   s'elance vers le haut en s'accelerant, la page tiree derriere lui, bras dresses... et COGNE le plafond
+     *   2500 - 3100   choc : ecrase, l'ecran tremble ; la page finit d'arriver aux simulations
+     *   3100 - 3900   se rend devant la section, plus grand, et tend les bras vers elle
+     *   3900 - 5600   la designe des deux mains (la section brille), en la montrant tour a tour
+     *   5600 - 6300   se calme, rabaisse les bras et regagne sa place habituelle
+     */
+    const jouerRage = (c: Ctx, dt: number) => {
+      const tt = c.now - R.t0
+      const T1 = 950, T2 = 1600, TC = 2500, T3 = 3100, TG = 3900, TH = 5600, T4 = 6300, TL = 5000
+      if (tt >= T2 && !R.yFixe) {
+        R.yFixe = true
+        R.y0 = window.scrollY
+      }
+      const haut = 113 * N.ech // du centre du robot au sommet de son antenne
+      const offPlafond = -(N.y - haut) - 8 // decalage qui amene le sommet du robot au plafond (et un peu dans l'en-tete)
+      const p2 = borne((tt - T1) / (T2 - T1), 0, 1)
+      const p3 = borne((tt - T2) / (TC - T2), 0, 1)
+      if (tt < TC) {
+        const env = Math.min(1, tt / 160) * (1 - borne((tt - 750) / 200, 0, 1))
+        R.dx = 9 * Math.sin(tt / 78) * env
+        R.rot = 12 * Math.sin(tt / 78 + 0.6) * env - 6 * p2 * (1 - p3) - 7 * Math.sin(Math.PI * p3 * 0.9)
+        // Il s'elance : le mouvement s'acccelere jusqu'au choc (courbe cubique), il ne ralentit pas avant de frapper.
+        R.dy = tt < T2 ? 150 * easeOut(p2) : mix(150, offPlafond, p3 * p3 * p3)
+        R.rage = tt < 450 ? ease(tt / 450) : 1
+        R.sq = 0
+        if (tt >= T2) {
+          const pp = ease(borne((tt - (T2 + 100)) / (T3 - T2 - 100), 0, 1))
+          window.scrollTo({ top: mix(R.y0, R.yCible, pp), behavior: "instant" as ScrollBehavior })
+        }
+      } else if (tt < T3) {
+        if (!R.choc) {
+          R.choc = true
+          R.offChoc = offPlafond
+          mem.emo = { h: "surpris", jusqua: c.now + 650 }
+          if (choc) {
+            choc.style.setProperty("--cx", `${N.x.toFixed(0)}px`)
+            choc.dataset.on = "1"
+            window.setTimeout(() => {
+              delete choc.dataset.on
+            }, 650)
+          }
+        }
+        const tau = tt - TC
+        const pp = ease(borne((tt - (T2 + 100)) / (T3 - T2 - 100), 0, 1))
+        // Le choc : la page tremble (secousses amorties), le robot s'ecrase puis rebondit vers le bas.
+        const tremble = 8 * Math.exp(-tau / 170) * Math.sin(tau / 11)
+        window.scrollTo({ top: mix(R.y0, R.yCible, pp) + tremble, behavior: "instant" as ScrollBehavior })
+        R.sq = Math.exp(-tau / 130)
+        R.dy = R.offChoc + 110 * easeOut(borne(tau / 520, 0, 1))
+        R.dx = 3 * Math.exp(-tau / 200) * Math.sin(tau / 40)
+        R.rot = mix(R.rot, 0, 1 - Math.exp(-dt / 120))
+        R.rage = 1
+      } else {
+        if (R.lock) window.scrollTo({ top: R.yCible, behavior: "instant" as ScrollBehavior })
+        if (!R.glisse) {
+          // Il va se placer devant la section : a droite du titre, dans le vide, un peu plus grand, tourne vers la demonstration.
+          R.glisse = true
+          const sec = q("#sec-demos")
+          const demo = q("#sec-demos .demo")
+          const rs = sec?.getBoundingClientRect()
+          const rd = demo?.getBoundingClientRect()
+          const spotX = Math.min(window.innerWidth * 0.76, window.innerWidth - 190)
+          const spotY = borne((rs ? rs.top : 110) + 200, 210, window.innerHeight - 250)
+          R.gx0 = R.dx
+          R.gy0 = R.dy
+          R.gk0 = R.rk
+          R.spx = spotX - N.x
+          R.spy = spotY - N.y
+          R.spk = borne(0.8 / N.ech, 0.8, 2.4)
+          const vx = (rd ? rd.left + rd.width * 0.42 : spotX - 300) - spotX
+          const vy = (rd ? rd.top + rd.height * 0.3 : spotY + 300) - spotY
+          const n = Math.hypot(vx, vy) || 1
+          // Direction du geste : vers la demonstration, mais assez a l'horizontale pour que les bras se tendent et se lisent comme un « regardez ca ».
+          const dy0 = borne(vy / n, 0.2, 0.5)
+          BR.dirx = -Math.sqrt(1 - dy0 * dy0)
+          BR.diry = dy0
+          mem.emo = { h: "fier", jusqua: c.now + 1800 }
+        }
+        const k = 1 - Math.exp(-dt / 300)
+        R.sq = mix(R.sq, 0, 1 - Math.exp(-dt / 90))
+        R.rage = 1 - ease(borne((tt - T3 - 200) / 1000, 0, 1))
+        if (tt >= TL && R.lock) {
+          R.lock = false
+          verrou(false)
+        }
+        if (tt < TH) {
+          const g = ease(borne((tt - T3) / (TG - T3), 0, 1))
+          R.dx = mix(R.gx0, R.spx, g)
+          R.dy = mix(R.gy0, R.spy, g)
+          R.rk = mix(R.gk0, R.spk, g)
+          R.rot = mix(R.rot, -7 * g, k)
+          if (tt >= TG && !R.montre) {
+            R.montre = true
+            mem.emo = { h: "fier", jusqua: c.now + (TH - TG) }
+          }
+        } else {
+          const g = ease(borne((tt - TH) / (T4 - TH), 0, 1))
+          R.dx = mix(R.spx, 0, g)
+          R.dy = mix(R.spy, 0, g)
+          R.rk = mix(R.spk, 1, g)
+          R.rot = mix(R.rot, 0, k)
+        }
+        if (tt >= T4) return finRage()
+      }
+
+      // ---- Les bras ----------------------------------------------------------------------------------
+      // Chaque phase a SON profil de mouvement (raideur / amortissement du ressort), comme le veut le langage du corps :
+      //   colere      : bras droits et verrouilles, qui frappent l'air (raide, peu d'amortissement)
+      //   elan        : bras en arriere, puis dresses avec DEPASSEMENT (overshoot) et retour elastique
+      //   choc        : « snap » : les mains s'ouvrent d'un coup, paumes en avant (surprise, sans adoucissement)
+      //   montrer     : ouvert, expansif, avec un leger rebond, index tendu
+      //   retour      : mouvement LOURD, tres amorti (l'energie retombe), bras qui pendent
+      // Une respiration (sinus sur l'epaule) fait que le corps n'est jamais fige : rapide et saccadee dans la colere, lente ensuite.
+      const sec = tt >= T2 ? q("#sec-demos") : null
+      if (sec && sec.dataset.robotMontre !== "1") sec.dataset.robotMontre = "1"
+      const bk = ease(borne((tt - 250) / 550, 0, 1)) * (1 - ease(borne((tt - (T4 - 500)) / 450, 0, 1)))
+      const bd = ease(borne((tt - T3) / 350, 0, 1)) * (1 - ease(borne((tt - TH) / 400, 0, 1)))
+      // Paume ouverte : au choc (« stop ! » de surprise), elle se referme en l'index tendu quand il montre.
+      const ouv = tt < TC ? 0 : tt < T3 ? 1 : 1 - ease(borne((tt - T3) / 350, 0, 1))
+      const s = Math.max(dt, 1) / 1000
+      const lagX = borne(-((R.dx - BR.pdx) / s) * 0.02, -40, 40)
+      const lagY = borne(-((R.dy - BR.pdy) / s) * 0.02, -45, 45)
+      BR.pdx = R.dx
+      BR.pdy = R.dy
+      const calme = ease(borne((tt - T3) / 900, 0, 1))
+      const resp = (1 - calme) * (2.4 * Math.sin(tt / 62) + 1.2 * Math.sin(tt / 27 + 1)) + calme * 1.6 * Math.sin(tt / 420)
+      const REACH = ARM.L1 + ARM.L2 - 4
+      for (const cote of [1, -1] as const) {
+        const h = cote === 1 ? BR.d : BR.g
+        const tl = tt - (cote === 1 ? 0 : 70) // la main gauche est un peu decalee : le geste n'est pas symetrique
+        let tx: number, ty: number
+        let raideur: number, zeta: number
+        if (tl < T1) {
+          // Bras tendus, coudes verrouilles, qui fouettent l'air vers l'exterieur.
+          const w = tl / 78 + (cote === 1 ? 0 : 1.7)
+          const ang = ((58 + 16 * Math.sin(w)) * Math.PI) / 180 // depuis la verticale basse, vers l'exterieur
+          tx = EPAULE_X + REACH * Math.sin(ang)
+          ty = EPAULE_Y + REACH * Math.cos(ang)
+          raideur = 320
+          zeta = 0.55
+        } else if (tl < T2) {
+          const e = ease(borne((tl - T1) / (T2 - T1), 0, 1))
+          tx = mix(EPAULE_X + REACH * 0.85, 118, e)
+          ty = mix(EPAULE_Y + REACH * 0.52, 132, e)
+          raideur = 170
+          zeta = 0.7
+        } else if (tl < TC) {
+          const e = ease(borne((tl - T2) / (TC - T2), 0, 1))
+          tx = mix(118, 62, e)
+          ty = mix(132, -100, e)
+          raideur = 150
+          zeta = 0.32 // peu amorti : il depasse en haut puis rebondit
+        } else if (tl < T3) {
+          // Le « snap » de la surprise : quasi instantane, sans adoucissement.
+          tx = 92
+          ty = -78 + 34 * (1 - Math.exp(-(tl - TC) / 200))
+          raideur = 900
+          zeta = 0.75
+        } else if (tl < TH) {
+          // Les deux bras se tendent vers la section, puis la montrent tour a tour (petits coups vers l'avant).
+          const g = ease(borne((tl - T3) / (TG - T3), 0, 1))
+          const jab = tl > TG ? 0.07 * Math.sin((tl - TG) / 190 + (cote === 1 ? 0 : Math.PI)) : 0
+          const px = EPAULE_X * cote + BR.dirx * REACH * (1 + jab)
+          const py = EPAULE_Y + BR.diry * REACH * (1 + jab)
+          tx = mix(92, px * cote, g)
+          ty = mix(-44, py, g)
+          raideur = 210
+          zeta = 0.45 // un leger rebond a l'arrivee : l'enthousiasme
+        } else {
+          // L'energie retombe : geste lourd, tres amorti, les bras pendent.
+          const e = ease(borne((tl - TH) / (T4 - TH - 200), 0, 1))
+          tx = mix((EPAULE_X * cote + BR.dirx * REACH) * cote, 104, e)
+          ty = mix(EPAULE_Y + BR.diry * REACH, 118, e)
+          raideur = 70
+          zeta = 0.95
+        }
+        tx += lagX * cote
+        ty += lagY
+        // Ressort amorti (integre par petits pas pour rester stable)
+        const amort = 2 * zeta * Math.sqrt(raideur)
+        for (let i = 0, n = Math.max(1, Math.ceil(s / 0.006)); i < n; i++) {
+          const h8 = s / n
+          h.vx += ((tx - h.x) * raideur - amort * h.vx) * h8
+          h.vy += ((ty - h.y) * raideur - amort * h.vy) * h8
+          h.x += h.vx * h8
+          h.y += h.vy * h8
+        }
+        dessinerBras(el, cote, h, bk, bd, ouv, resp)
+      }
+      el.style.setProperty("--bk", bk.toFixed(3))
+      el.style.setProperty("--rk", R.rk.toFixed(3))
+      el.style.setProperty("--rx", `${R.dx.toFixed(2)}px`)
+      el.style.setProperty("--rdy", `${R.dy.toFixed(2)}px`)
+      el.style.setProperty("--rrot", `${R.rot.toFixed(2)}deg`)
+      el.style.setProperty("--rage", R.rage.toFixed(3))
+      el.style.setProperty("--rsq", R.sq.toFixed(3))
+    }
+
     const surDefilement = () => {
       const y = window.scrollY
       N.dyBrut += borne(y - N.dernierY, -90, 90)
       N.brut += Math.min(Math.abs(y - N.dernierY), 90) // plafonne : un saut d'ancre ne doit pas faire exploser l'objet
       N.dernierY = y
       if (!actif()) return
+      detecterFuite()
       // Les evenements de defilement continuent d'arriver quand le navigateur
       // suspend les images (onglet en arriere-plan) : on peint alors sans lissage,
       // pour que le robot soit juste au retour sur l'onglet.
@@ -837,6 +1299,11 @@ export function Objet3D() {
         reaction.fin = performance.now() + ms + 250
         el.dataset.anim = nom
         html.dataset.robotAnim = nom
+        // Un visiteur qui le chatouille trop finit par l'agacer : 3 survols en 10 s = colere, 5 = degout.
+        const t = performance.now()
+        mem.pokes = mem.pokes.filter((x) => t - x < 10000).concat(t)
+        if (mem.pokes.length >= 5) mem.emo = { h: "degout", jusqua: t + 1700 }
+        else if (mem.pokes.length >= 3) mem.emo = { h: "colere", jusqua: t + 1500 }
         window.clearTimeout(reaction.t)
         reaction.t = window.setTimeout(finirReaction, ms)
       }
@@ -853,6 +1320,12 @@ export function Objet3D() {
       if (tab) mem.clic = { ...centre(tab.getBoundingClientRect()), t: performance.now() }
     }
 
+    // Le reste du site peut faire ressentir quelque chose au robot : window.dispatchEvent(new CustomEvent("robot-emotion", { detail: { humeur, ms } })).
+    const surEmotion = (e: Event) => {
+      const d = (e as CustomEvent<{ humeur: Humeur; ms?: number }>).detail
+      if (d && EXPRESSIONS[d.humeur]) mem.emo = { h: d.humeur, jusqua: performance.now() + (d.ms ?? 1500) }
+    }
+    window.addEventListener("robot-emotion", surEmotion)
     document.addEventListener("visibilitychange", surReveil)
     window.addEventListener("scroll", surDefilement, { passive: true })
     window.addEventListener("resize", surDefilement, { passive: true })
@@ -878,6 +1351,8 @@ export function Objet3D() {
       finirReaction()
       window.clearTimeout(mem.bulleMin)
       large.removeEventListener("change", majService)
+      window.removeEventListener("robot-emotion", surEmotion)
+      if (R.etat === "joue") finRage()
       document.removeEventListener("visibilitychange", surReveil)
       window.removeEventListener("scroll", surDefilement)
       window.removeEventListener("resize", surDefilement)
@@ -886,6 +1361,7 @@ export function Objet3D() {
       TOUS_ATTRS.forEach((a) => marquer(a, []))
       delete html.dataset.robotActif
       delete html.dataset.robotScene
+      delete html.dataset.robotGauche
       delete (window as unknown as { __robot?: unknown }).__robot
     }
   }, [])
@@ -894,8 +1370,11 @@ export function Objet3D() {
     <>
       {/* Le fond qui s'assombrit quand le robot se met en avant (voir globals.css). */}
       <div className="obj-ombre" aria-hidden="true" />
+      {/* L'impact du robot contre le plafond de l'ecran (colere devant les simulations). */}
+      <div className="obj-choc" aria-hidden="true" />
       <div ref={racine} className="obj" data-humeur="neutre">
         <div className="obj__halo" aria-hidden="true" />
+        <Bras />
         <div className="obj__scene" aria-hidden="true">
           <div className="obj__cube">
             <div className="obj__f" />

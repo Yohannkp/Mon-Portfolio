@@ -46,6 +46,30 @@ Un cube filaire, à droite du hero, se transforme en petit robot dès qu'on desc
 
 Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se pose sur ce qu'on survole, il s'incline avec la vitesse de défilement, et un clic sur un onglet attire son attention. Quand on passe la souris sur lui, il réagit au hasard (jamais deux fois la même de suite) : il prend un air fier, il s'avance en brillant pendant que le fond s'assombrit, il tourne sur lui-même, ou il se balance de gauche à droite.
 
+### La colère du robot (une seule fois)
+
+Si le visiteur défile **à la main** et traverse la section des simulations d'un trait (moins d'une seconde et demie, sans y avoir joué), le robot se fâche : visage furieux, tout rouge (`hue-rotate` piloté par `--rage`), il se balance, **descend pour prendre de l'élan**, puis **s'élance vers le haut en s'accélérant, la page tirée derrière lui, et cogne le plafond de l'écran** (anneau d'impact, l'écran tremble, il s'écrase puis rebondit). La page finit d'arriver aux simulations, il se calme (fier), le rouge s'efface et il regagne sa place dans le guide.
+
+**Il se fait pousser des bras** pendant la colère. Chaque bras est **un seul tube souple** (une courbe qui passe par l'épaule, le coude et la main, plus fin au poignet, avec un reflet), pas deux bâtons articulés : rien ne « casse » au coude. Le coude se place tout seul (cinématique inverse à deux os) et chaque main suit sa cible par un ressort. Chaque phase a son propre profil de mouvement, d'après la cinématique des émotions :
+
+- **colère** : bras tendus, coudes verrouillés, qui fouettent l'air (ressort raide, peu amorti), poings serrés ;
+- **élan** : bras en arrière, puis dressés avec **dépassement** (overshoot) et rebond élastique ;
+- **choc** : « snap » (quasi instantané) et **paumes ouvertes**, doigts écartés, comme un « stop ! » de surprise ;
+- **montrer** : les deux bras se tendent vers la démonstration, l'**index** se déplie, ils la désignent tour à tour avec un léger rebond, pendant qu'elle brille ;
+- **retour** : geste lourd, très amorti, bras qui pendent, puis il regagne sa place.
+
+Une **respiration** (sinus sur l'épaule) l'empêche d'être figé : rapide et saccadée dans la colère, lente ensuite. Le robot se rend devant la section (à droite du titre, plus grand) pour la désigner avant de retourner à son emplacement habituel.
+
+**Le défilement est verrouillé pendant tout le trajet** (`html[data-scroll-verrou] { overflow: hidden }`, avec `scrollbar-gutter: stable` pour que la page ne saute pas quand la barre disparaît), puis rendu au moment où il désigne la section (le geste continue). Toute la chorégraphie est une fonction du temps (fluide de bout en bout). Une seule fois par visite de la page (rechargée, elle peut revenir) ; jamais pendant la présentation automatique, sur téléphone ou si les animations sont réduites.
+
+### Les émotions du robot
+
+Inspirées de la géométrie des émotions (Paul Ekman) : pas de visage réaliste, seulement des yeux, deux sourcils et une bouche, déformés en variables CSS et en un seul tracé SVG (`components/robot-emotions.ts`).
+
+- **Joie** : bouche à courbure positive et yeux en arc (le sourire de Duchenne). **Tristesse** : moue et extrémités intérieures des sourcils vers le haut. **Colère** : sourcils inclinés vers le centre, bouche resserrée. **Surprise** : yeux grands ouverts, sourcils hauts, bouche en ovale. **Dégoût** : asymétrique, un côté de la bouche relevé et des yeux inégaux. S'y ajoutent la concentration, la curiosité et la fierté.
+- **Ce qui donne la vie, c'est le mouvement** : chaque valeur est amortie vers sa cible (l'inertie des muscles), le robot cligne à intervalles irréguliers (2 à 6 s, environ 140 ms, parfois double), son regard fait de minuscules saccades, et sa bouche s'ouvre et se ferme quand la voix parle.
+- **Quand** : la scène (concentré sur le schéma, curieux sur les chiffres, content à la fin), la visite (content au lancement et à la fin, triste quand le visiteur reprend la main en défilant, surpris au retour arrière, curieux à l'avance rapide), les réactions au survol, et un visiteur qui le chatouille trop finit par l'agacer (3 survols en 10 s : colère, 5 : dégoût). Le reste du site peut lui faire ressentir quelque chose avec `window.dispatchEvent(new CustomEvent("robot-emotion", { detail: { humeur: "triste", ms: 2000 } }))`.
+
 **Les démonstrations sont des visites guidées.** Le robot ne laisse plus une animation filer : il explique la simulation une étape à la fois, dans le panneau, à côté de la scène.
 
 - Chaque étape a un titre et une phrase que le robot écrit à une vitesse lisible, puis un temps de lecture proportionnel à la longueur du texte (de 5 à 9 secondes par étape). Une fine barre montre le temps avant la suite.
@@ -89,12 +113,23 @@ Un bouton rond, en bas à gauche de la page d'accueil (il s'efface pendant que v
 - **▶ / ■** lance ou arrête la visite. Au repos, le bouton n'est qu'une icône ; en lecture, la phrase du guide s'affiche au-dessus (« Étape 5 / 17 · Projet 2 sur 6 · Mina-Translator »), et un anneau autour du bouton indique l'avancement.
 - **Défiler arrête aussitôt** : molette, tactile, clavier (flèches, espace, Page haut/bas, Échap) ou glissement de la barre de défilement.
 - **Rappuyer reprend là où l'on est**, pas au début, et continue jusqu'à la fin. Après la fin, ▶ repart du début.
+- **Voix et musique :** au lancement, une voix lit la phrase de chaque arrêt et une musique d'ambiance tient le fond. Rien n'est téléchargé : la voix est celle du navigateur (Web Speech API, la meilleure voix française de l'appareil, les voix « naturelles » en priorité), la musique est générée en direct (Web Audio : nappes d'accords doux, réverbération, quelques notes cristallines, sans fichier ni droit d'auteur). La musique baisse quand la voix parle et tout s'arrête en fondu à la pause. Un petit haut-parleur sur l'angle du bouton coupe ou remet le son (préférence gardée dans `localStorage`). Le son ne démarre qu'après un clic, comme l'exigent les navigateurs ; la qualité de la voix dépend de l'appareil.
+- **La voix pilote le défilement** (`components/audio-visite.ts`) : la position suit la phrase en cours, mot après mot (événements `boundary` de la synthèse ; à défaut, l'horloge avec un rythme de voix appris phrase après phrase). Le schéma RAG lit une phrase par étape et chaque note apparaît au moment où on en parle (positions mesurées sur la page) ; dans les démonstrations, chaque étape est lue et la démonstration n'avance qu'une fois lue. La voix n'est jamais coupée. Pendant l'avance rapide ×2 elle se tait (le minuteur reprend exactement où l'on est), puis reprend la phrase en cours au relâchement.
+- **Le robot traverse la page** : pendant certains projets (le 2ᵉ, le 3ᵉ et le 6ᵉ), il passe devant le contenu jusqu'à la marge de gauche, y reste, puis revient à droite quelques projets plus tard. La légende du rail s'efface pour lui laisser la place ; sans marge suffisante, il reste à droite.
 - **Invitation :** quand le visiteur arrive de lui-même sur les projets (en faisant défiler, pas pendant une visite), une petite carte douce monte au-dessus du bouton et lui propose de lancer la visite à partir de là ; un anneau respire autour du bouton. Elle reste visible même pendant que le visiteur défile (le bouton ne s'efface pas tant qu'elle est là) et, s'il file très vite, au moins 6 secondes. Fermée d'un geste (croix, « Plus tard », Échap), elle ne revient plus de la session ; simplement quittée, elle peut revenir, trois fois au plus (`sessionStorage`). `/?invitation` remet ces compteurs à zéro pour la revoir.
 - **Au survol**, trois bulles apparaissent à droite du bouton. **Retour** et **×2** se tiennent enfoncées : tant qu'on appuie, la visite remonte (de plus en plus vite) ou avance à double vitesse, et la phrase, la carte et le robot suivent. Au relâchement, elle reprend normalement si elle jouait, sinon elle reste en pause. **Recommencer** remet la page tout en haut, la démonstration à sa première étape, et relance la visite à zéro. Au clavier : Espace ou Entrée maintenus. Sur téléphone, les bulles sont visibles dès qu'une visite est commencée, à gauche du bouton.
 
 Les 17 arrêts suivent le fil de la page : accueil, schéma RAG (balayé lentement, car il est piloté par le défilement), chiffres, les sept projets un par un avec sa question et sa preuve (le projet présenté grandit nettement, de 10 %, pendant que les six autres reculent et s'estompent ; le robot se cale sur son bord, et le schéma du projet se met en mouvement : une vague qui parcourt ses éléments dans l'ordre, et des flux sur les traits en tirets), les démonstrations (la visite guidée de la démo se joue jusqu'au bout avant de continuer), à propos, compétences, méthode, veille, contact.
 
 Rien n'est « joué » à part : la visite ne fait que **faire défiler la page**, donc les animations et le robot se comportent exactement comme si l'on défilait à la main. Le moteur est dans `components/presentation-auto.tsx` ; ajouter un arrêt, c'est ajouter une entrée à la liste `ARRETS`. Avec `prefers-reduced-motion`, les trajets entre deux arrêts sont instantanés.
+
+## Présentation en direct (`/presentation`, réservée à l'auteur)
+
+L'accueil, avec à la place de la visite automatique une **télécommande** en bas de page : **Précédent** et **Suivant** passent d'étape en étape, dans l'ordre de la page, **sans rien sauter, y compris les sous-parties d'une section**. Aujourd'hui 26 étapes : l'accueil, le schéma RAG (l'introduction puis ses cinq étapes), les chiffres, les projets (l'introduction, chacun des sept projets un par un, puis « le reste »), les démonstrations (un scénario par étape : l'onglet est choisi et sa visite guidée repart du début), à propos, compétences, méthode, veille, contact. Les étapes sont relues à chaque appui : si la page change, la télécommande suit ; si l'on défile à la main, elle reprend d'où l'on est.
+
+- **Clavier** : flèches gauche / droite et Page précédente / suivante (ce que les télécommandes de salle envoient).
+- **Le robot présente** : un petit bond à chaque étape, le projet présenté grandit, et il ne se fâche pas pendant qu'on présente.
+- **Accès réservé** (`proxy.ts`) : la page n'est pas dans le plan du site, pas dans `robots.txt`, marquée `noindex`, et répond **404** à toute personne sans la clé. La clé est la variable d'environnement `PRESENTATION_CLE` (à définir sur Vercel : *Settings → Environment Variables*, puis redéployer). **Première visite sur chaque appareil, une seule fois** : `https://…/presentation?cle=LA_CLE` — un cookie (httpOnly, sécurisé, 30 jours) est posé et l'adresse marche ensuite sans la clé. **Fermée par défaut** : en production, sans la variable, elle est introuvable pour tout le monde ; en développement local sans clé, elle est ouverte. Ce n'est pas un compte utilisateur : quiconque connaît la clé y accède.
 
 ## Contact : ce que fait vraiment le formulaire
 
