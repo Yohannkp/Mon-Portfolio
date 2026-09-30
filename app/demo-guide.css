@@ -354,3 +354,9 @@
   .mi__chaine { grid-template-columns: 1fr 1fr; }
   .mi__fleche { display: none; }
 }
+
+/* Au doigt : les points d'etape restent fins, mais se touchent facilement. */
+@media (pointer: coarse) {
+  .gd__points button { position: relative; }
+  .gd__points button::after { content: ""; position: absolute; inset: -14px 0; }
+}

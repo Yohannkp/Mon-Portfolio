@@ -163,6 +163,7 @@
 .rag__svgbox { width: 100%; max-width: 72rem; margin-inline: auto; padding: 0 1.5rem; }
 .rag__diagram { width: 100%; height: auto; display: block; overflow: visible; }
 .rag__spacer { height: 40vh; }
+.rag__astuce { display: none; }
 
 .rag__arrow { fill: var(--border); }
 .rag__flow { fill: none; stroke: var(--border); stroke-width: 1.5; }
@@ -187,6 +188,12 @@
   .rag__spacer { display: none; }
   .rag__notebox { height: auto; }
   .rag-note { position: static; opacity: 1 !important; transform: none !important; max-width: none; margin-bottom: .9rem; }
+  /* Le schema garde une taille lisible : on le fait glisser plutot que de le reduire a 4 px. */
+  .rag__svgbox { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; padding-bottom: .75rem; }
+  .rag__diagram { min-width: 700px; }
+  .rag-node { opacity: 1 !important; }
+  .rag__astuce { display: block; padding: 0 1.5rem .5rem; font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); }
 }
 @media (prefers-reduced-motion: reduce) {
   .rag-note { opacity: 1 !important; transform: none !important; }
@@ -425,6 +432,47 @@ main > section, main > div { position: relative; z-index: 1; }
   border: 1px solid color-mix(in oklch, var(--accent) 60%, transparent);
   transform: rotateX(72deg) rotateZ(calc(var(--ry, 0deg) * 0.6)); }
 
+/* ---------- reactions au survol ----------------------------------------- */
+/* Le JS pose data-anim sur .obj (fier | avant | tour | balance) pendant la duree de la reaction. */
+.obj__corps { position: absolute; inset: 0; transform-style: preserve-3d; }
+
+/* Fier : la tete se releve, il se gonfle un peu, les yeux sourient (humeur "content", cote JS). */
+.obj[data-anim="fier"] .obj__corps { animation: obj-fier 2s cubic-bezier(.3, .7, .2, 1) both; }
+@keyframes obj-fier {
+  0% { transform: none; } 18%, 78% { transform: translateY(-9px) rotateX(-10deg) scale(1.1); } 100% { transform: none; }
+}
+.obj[data-anim="fier"] .obj__antenne::after { animation: obj-fier-pointe 2s ease both; }
+@keyframes obj-fier-pointe { 20%, 78% { box-shadow: 0 0 26px 9px color-mix(in oklch, var(--accent) 85%, transparent); } }
+
+/* En avant : il s'approche, brille, et le fond s'assombrit derriere lui. */
+.obj[data-anim="avant"] { --op: 1 !important; }
+.obj[data-anim="avant"] .obj__corps { animation: obj-avant 2.2s cubic-bezier(.3, .7, .2, 1) both; }
+@keyframes obj-avant {
+  0% { transform: none; filter: none; }
+  22%, 76% { transform: translateZ(90px) scale(1.24);
+    filter: brightness(1.28) drop-shadow(0 0 22px color-mix(in oklch, var(--accent) 80%, transparent)); }
+  100% { transform: none; filter: none; }
+}
+.obj[data-anim="avant"] .obj__halo { opacity: 1; transform: scale(1.35); }
+.obj__halo { transition: opacity .5s ease, transform .5s ease; }
+.obj-ombre { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .55s ease;
+  background: radial-gradient(circle at 50% 50%, rgb(0 0 0 / .34), rgb(0 0 0 / .5)); }
+html[data-robot-anim="avant"] .obj-ombre { opacity: 1; }
+
+/* Il tourne sur lui-meme, un tour complet. */
+.obj[data-anim="tour"] .obj__corps { animation: obj-tour 1.3s cubic-bezier(.5, 0, .2, 1) both; }
+@keyframes obj-tour { from { transform: rotateY(0); } to { transform: rotateY(360deg); } }
+
+/* Il se balance de gauche a droite en pivotant. */
+.obj[data-anim="balance"] .obj__corps { animation: obj-balance 1.9s ease-in-out both; }
+@keyframes obj-balance {
+  0% { transform: none; }
+  20% { transform: translateX(-46px) rotateY(-42deg); }
+  50% { transform: translateX(46px) rotateY(42deg); }
+  80% { transform: translateX(-26px) rotateY(-24deg); }
+  100% { transform: none; }
+}
+
 /* ---------- le fantome : la seconde recherche, en parallele ------------- */
 .obj-fantome { --mut: 1; --ry: 0deg; opacity: var(--fo, 0); }
 .obj-fantome .obj__bot { opacity: 1; }
@@ -445,7 +493,7 @@ main > section, main > div { position: relative; z-index: 1; }
 .obj-bulle b:empty { display: none; }
 .obj-bulle span { display: block; font-size: .78rem; line-height: 1.45; color: var(--muted-foreground); }
 
-@media (max-width: 1280px) { .obj, .obj-fantome, .obj-bulle { display: none; } }
+@media (max-width: 1280px) { .obj, .obj-fantome, .obj-bulle, .obj-ombre { display: none; } }
 @media (prefers-reduced-motion: reduce) { .obj__oeil { animation: none; } }
 
 /* Son cercle, en fin de page : l'emplacement ou le robot reste, au-dessus du titre de contact.

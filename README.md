@@ -22,7 +22,7 @@ Le site cherche un stage de 4 à 6 mois à partir d'avril 2027.
 1. **Hero** — le titre, la disponibilité et les deux appels à l'action.
 2. **Schéma RAG** — un pipeline animé (requête → recherche hybride vectorielle + BM25 → fusion RRF → reranking → réponse citée), épinglé pendant le défilement.
 3. **En chiffres** — le bandeau de compteurs.
-4. **Projets** — six études de cas : la question qu'un recruteur se pose, la preuve chiffrée en grand, un schéma de l'idée, et la méthode qui se déplie en un clic.
+4. **Projets** — sept études de cas : la question qu'un recruteur se pose, la preuve chiffrée en grand, un schéma de l'idée, et la méthode qui se déplie en un clic.
 5. **Démonstrations** — quatre visites guidées, chacune menée par le robot (RAG-Local sur des fichiers, un scan rendu cherchable, SELF_DEV_AGENT, Mina-Translator). Ce sont des simulations, et la page le dit.
 6. **À propos**, **Compétences**, **Méthode**, **Veille** — le profil, les technologies regroupées par famille avec une preuve pour chacune, la démarche de travail et ce qui est en cours d'apprentissage.
 7. **Contact** — l'appel final.
@@ -44,7 +44,7 @@ Un cube filaire, à droite du hero, se transforme en petit robot dès qu'on desc
 | Veille | Il lit les trois chantiers en cours |
 | Contact | Il reste grand dans son cercle, au-dessus du titre, et regarde le bouton « Me contacter » |
 
-Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se pose sur ce qu'on survole, il s'incline avec la vitesse de défilement, et un clic sur un onglet attire son attention.
+Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se pose sur ce qu'on survole, il s'incline avec la vitesse de défilement, et un clic sur un onglet attire son attention. Quand on passe la souris sur lui, il réagit au hasard (jamais deux fois la même de suite) : il prend un air fier, il s'avance en brillant pendant que le fond s'assombrit, il tourne sur lui-même, ou il se balance de gauche à droite.
 
 **Les démonstrations sont des visites guidées.** Le robot ne laisse plus une animation filer : il explique la simulation une étape à la fois, dans le panneau, à côté de la scène.
 
@@ -79,7 +79,7 @@ Le code est dans `components/objet-3d.tsx` (les scènes) et dans la fin de `app/
 Une liste de technologies ne dit pas pourquoi un projet compte. Chaque projet est donc décrit par un **dossier** (`lib/dossiers.ts`) : le problème posé, ce qui a été fait, ce que cela démontre, et **une preuve chiffrée quand elle existe**.
 
 - **Aucun chiffre inventé.** Chaque valeur vient d'un projet documenté (360 paires, AUC 0,88, 85 % de précision, +15 % de rotation des stocks, 0 requête sortante…). Un projet sans chiffre n'en reçoit pas : il a un enjeu et un résultat.
-- **Sur l'accueil**, six projets phares sont des études de cas. Chacun répond à une question de recruteur (« Peut-il livrer un système d'IA sans exposer les données ? »), avec un schéma qui illustre l'idée (`components/glyphes.tsx`). Le schéma est une illustration, jamais une mesure.
+- **Sur l'accueil**, sept projets phares sont des études de cas. Chacun répond à une question de recruteur (« Peut-il livrer un système d'IA sans exposer les données ? »), avec un schéma qui illustre l'idée (`components/glyphes.tsx`). Le schéma est une illustration, jamais une mesure.
 - **Sur `/projects`**, un bandeau réunit les huit preuves chiffrées, puis les 17 projets sont classés en quatre axes : mettre des modèles en production, affiner et entraîner, mesurer et prouver, construire des applications. Un sommaire collant suit l'axe lu. Il remplace l'ancien mur de filtres techniques.
 
 ## La présentation automatique (accueil uniquement)
@@ -91,7 +91,7 @@ Un bouton rond, en bas à gauche de la page d'accueil (il s'efface pendant que v
 - **Rappuyer reprend là où l'on est**, pas au début, et continue jusqu'à la fin. Après la fin, ▶ repart du début.
 - **Au survol**, « Recommencer » apparaît : la page remonte tout en haut, la démonstration repart de sa première étape, et la visite reprend à zéro.
 
-Les 17 arrêts suivent le fil de la page : accueil, schéma RAG (balayé lentement, car il est piloté par le défilement), chiffres, les six projets un par un avec sa question et sa preuve (les cinq autres s'estompent pendant qu'un projet est présenté), les démonstrations (la visite guidée de la démo se joue jusqu'au bout avant de continuer), à propos, compétences, méthode, veille, contact.
+Les 17 arrêts suivent le fil de la page : accueil, schéma RAG (balayé lentement, car il est piloté par le défilement), chiffres, les sept projets un par un avec sa question et sa preuve (le projet présenté grandit nettement, de 10 %, pendant que les six autres reculent et s'estompent ; le robot se cale sur son bord, et le schéma du projet se met en mouvement : une vague qui parcourt ses éléments dans l'ordre, et des flux sur les traits en tirets), les démonstrations (la visite guidée de la démo se joue jusqu'au bout avant de continuer), à propos, compétences, méthode, veille, contact.
 
 Rien n'est « joué » à part : la visite ne fait que **faire défiler la page**, donc les animations et le robot se comportent exactement comme si l'on défilait à la main. Le moteur est dans `components/presentation-auto.tsx` ; ajouter un arrêt, c'est ajouter une entrée à la liste `ARRETS`. Avec `prefers-reduced-motion`, les trajets entre deux arrêts sont instantanés.
 
@@ -100,6 +100,16 @@ Rien n'est « joué » à part : la visite ne fait que **faire défiler la page*
 Ce site n'a pas de serveur de courrier. Le formulaire **ne prétend donc pas envoyer** : il prépare le message dans l'application e-mail du visiteur (`mailto:` avec sujet et corps remplis), lui dit clairement qu'il lui reste à l'envoyer, et lui donne l'adresse si rien ne s'ouvre (boutons « Rouvrir » et « Copier l'adresse »). La saisie est conservée si on clique sur « Modifier le message ». Les coordonnées viennent d'un seul endroit : `lib/contact.ts`.
 
 Pour recevoir les messages directement dans une boîte, sans passer par l'application e-mail du visiteur, il faudrait un service d'envoi (Formspree, Web3Forms, Resend…) et sa clé : c'est une décision à part.
+
+## Version mobile
+
+Le site est vérifié de 360 à 768 px de large : aucune page ne déborde à l'horizontale.
+
+- **Schéma RAG :** sous 820 px il garde une taille lisible (700 px) et se fait glisser du doigt, avec une indication au-dessus, plutôt que d'être réduit à quelques pixels. Les étapes s'empilent en cartes.
+- **Présentation automatique :** un petit rond en bas à droite (le texte est aligné à gauche). « Recommencer » n'apparaît que lorsqu'une visite est commencée, puisqu'il n'y a pas de survol au doigt. Le bouton s'efface pendant le défilement manuel.
+- **Projets :** les cartes passent en une colonne, le schéma ou l'image occupe toute la largeur.
+- **Au doigt** (`pointer: coarse`) : les liens texte, « Comment j'ai fait » et les points d'étape des démonstrations gardent leur apparence mais ont une zone tactile de 44 px.
+- **Sans robot** (moins de 1281 px) : la page se lit à l'identique, sans lui.
 
 ## Transitions et interactions
 

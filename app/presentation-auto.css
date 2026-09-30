@@ -55,10 +55,14 @@
   opacity: 0; transform: translateX(-6px); transition: opacity .25s ease, transform .25s ease; }
 .pa__rang:hover .pa__label, .pa__btn:focus-visible ~ .pa__label { opacity: 1; transform: none; }
 
+/* Telephone : un petit rond en bas a droite (le pouce y arrive, et le texte est aligne a gauche).
+   « Recommencer » n'apparait que si une visite est commencee : pas de survol au doigt. */
 @media (max-width: 720px) {
-  .pa { bottom: 16px; }
-  .pa__label { display: none; }
-  .pa__recom { opacity: 1; transform: none; pointer-events: auto; width: 36px; height: 36px; left: calc(100% + 8px); }
+  .pa { left: auto; right: 16px; bottom: 16px; align-items: flex-end; }
+  .pa__btn { width: 48px; height: 48px; }
+  .pa__label, .pa__rang::before { display: none; }
+  .pa__recom { left: auto; right: calc(100% + 8px); width: 36px; height: 36px; transform: none; opacity: 0; pointer-events: none; }
+  .pa[data-etat="lecture"] .pa__recom, .pa[data-etat="pause"] .pa__recom, .pa[data-fin="1"] .pa__recom { opacity: 1; pointer-events: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pa__carte, .pa__btn, .pa__recom, .pa__label, .pa__progres { transition: none; }

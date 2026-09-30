@@ -25,13 +25,19 @@
 .cas-liste { display: flex; flex-direction: column; gap: 1.1rem; }
 .cas { display: grid; grid-template-columns: 210px minmax(0, 1fr) 176px; gap: 2.1rem; align-items: start;
   padding: 2rem 2.1rem; border: 1px solid var(--bord-doux); border-radius: var(--r-carte); background: var(--card);
-  transition: border-color .35s ease, box-shadow .35s ease, opacity .7s ease, filter .7s ease, scale .7s cubic-bezier(.2, .7, .2, 1); }
+  transition: border-color .35s ease, box-shadow .8s ease, opacity .8s ease, filter .8s ease, scale .95s cubic-bezier(.22, .8, .2, 1); }
 .cas:hover { border-color: color-mix(in oklch, var(--accent) 45%, var(--border)); box-shadow: var(--ombre-carte); }
 /* Presentation automatique : pendant qu'un projet est presente, les autres s'estompent un peu
    (present, mais en retrait) et celui qu'on presente ressort. Pose par components/presentation-auto.tsx. */
-.cas-liste[data-focus="1"] .cas[data-focus="0"] { opacity: .38; filter: saturate(.55); scale: .985; }
-.cas-liste[data-focus="1"] .cas[data-focus="1"] { border-color: color-mix(in oklch, var(--accent) 55%, var(--border));
-  box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent) 28%, transparent), 0 24px 50px -28px color-mix(in oklch, var(--accent) 45%, transparent); }
+.cas { position: relative; }
+.cas-liste[data-focus="1"] .cas[data-focus="0"] { opacity: .32; filter: saturate(.5); scale: .95; }
+/* Le projet presente devient nettement plus grand que les autres : il occupe la scene.
+   `scale` (pas de changement de mise en page) : le mouvement reste fluide, sur le GPU, et la visite ne derive pas. */
+.cas-liste[data-focus="1"] .cas[data-focus="1"] { z-index: 3; scale: 1.1; will-change: scale;
+  border-color: color-mix(in oklch, var(--accent) 60%, var(--border));
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent) 32%, transparent),
+    0 44px 90px -34px color-mix(in oklch, var(--accent) 60%, transparent),
+    0 0 90px -30px color-mix(in oklch, var(--accent) 40%, transparent); }
 .cas__gauche { display: flex; flex-direction: column; gap: .35rem; }
 .cas__n { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px; letter-spacing: .16em; color: var(--muted-foreground); }
 .cas__chiffre { display: block; margin-top: .55rem; font-family: var(--font-geist-mono), ui-monospace, monospace;
@@ -141,8 +147,43 @@
   .axe__compte { display: none; }
 }
 
+/* Presentation automatique : le schema du projet presente se met en mouvement. Chaque element porte deja
+   son rang (--d) ; l'entree en scene devient une vague continue qui raconte l'idee du projet, dans l'ordre,
+   et les traits en tirets s'ecoulent comme un flux. Seulement transform / opacite : aucune charge de calcul. */
+@keyframes gl-joue {
+  0%, 100% { opacity: .5; transform: scale(1); }
+  30%, 45% { opacity: 1; transform: scale(1.14); }
+  70% { opacity: .9; transform: scale(1); }
+}
+@keyframes gl-flux { to { stroke-dashoffset: -14; } }
+.cas[data-focus="1"] .gl [data-a] { transform-box: fill-box; transform-origin: center;
+  animation: gl-joue 2.9s ease-in-out calc(var(--d, 0ms) * 1.7) infinite; }
+.cas[data-focus="1"] .gl .gl__tirets { animation: gl-flux .9s linear infinite; }
+.cas[data-focus="1"] .gl [data-a].gl__tirets { animation: gl-joue 2.9s ease-in-out calc(var(--d, 0ms) * 1.7) infinite, gl-flux .9s linear infinite; }
+.cas[data-focus="1"] .cas__visuel { transition: border-color .6s ease, box-shadow .6s ease;
+  border-color: color-mix(in oklch, var(--accent) 50%, var(--border));
+  box-shadow: 0 0 34px -12px color-mix(in oklch, var(--accent) 60%, transparent); }
+
+/* Tablette et telephone : pas de place pour deborder, le projet presente grandit peu. */
+@media (max-width: 1024px) {
+  .cas-liste[data-focus="1"] .cas[data-focus="0"] { scale: .98; }
+  .cas-liste[data-focus="1"] .cas[data-focus="1"] { scale: 1.03; }
+}
+@media (max-width: 600px) {
+  .cas { padding: 1.3rem 1.1rem; }
+  .cas__visuel, .dos__visuel { max-width: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gl [data-a] { opacity: 1; transform: none; transition: none; }
   .cas__resultat, .cas__comment svg, .dos__visuel img { transition: none; }
-  .cas-liste[data-focus="1"] .cas[data-focus="0"] { scale: 1; }
+  .cas[data-focus="1"] .gl [data-a], .cas[data-focus="1"] .gl .gl__tirets { animation: none; }
+  .cas-liste[data-focus="1"] .cas[data-focus="0"] { scale: .98; }
+  .cas-liste[data-focus="1"] .cas[data-focus="1"] { scale: 1.03; }
+}
+
+/* Au doigt : les liens et boutons textuels gardent leur apparence, mais leur zone tactile grandit (44 px). */
+@media (pointer: coarse) {
+  .cas__comment, .cas__lien { position: relative; }
+  .cas__comment::before, .cas__lien::before { content: ""; position: absolute; inset: -12px -6px; }
 }

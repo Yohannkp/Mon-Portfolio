@@ -132,7 +132,7 @@ const IDS = [
 /** Un accessoire du visage, partage par le robot et par son fantome. */
 function Visage() {
   return (
-    <>
+    <div className="obj__corps">
       <div className="obj__antenne" />
       <div className="obj__tete" />
       <div className="obj__visiere">
@@ -142,7 +142,7 @@ function Visage() {
         </div>
       </div>
       <div className="obj__anneau" />
-    </>
+    </div>
   )
 }
 
@@ -364,14 +364,22 @@ export function Objet3D() {
       const prouve = Array.from(cartes[idx].querySelectorAll(".cas__prouve li"))
         .map((li) => li.textContent)
         .join(" · ")
+      // Pendant la visite, la carte presentee grandit et mord sur la marge : le robot se cale
+      // sur son bord reel (le rect suit l'animation), il glisse donc avec elle, sans jamais passer dessous.
+      const enFocus = cartes[idx].dataset.focus === "1"
+      const mC = enFocus ? Math.max(0, c.W - r.right) : c.marge
+      const xC = enFocus ? r.right + mC / 2 : c.xM
+      const eC = enFocus ? borne((mC - 34) / 215, 0.3, 0.62) : c.echM
+      const largeurBulle = borne(mC - 24, 0, 200)
       return {
-        x: c.xM,
+        x: xC,
         y: borne(centre(r).y, c.H * 0.28, c.H * 0.72),
-        ech: c.echM,
+        ech: eC,
         op: 0.95,
         regard: versLien && lien ? centre(lien.getBoundingClientRect()) : { x: r.left + r.width * 0.32, y: r.top + r.height * 0.4 },
         humeur: depuis < 900 ? "content" : "neutre",
-        bulle: { titre: code, texte: prouve ? `Démontre : ${prouve}` : "" },
+        // Trop etroit pour la bulle (ecran a peine plus large que 1281 px) : elle se tait, la visite a deja sa phrase.
+        bulle: { titre: code, texte: prouve ? `Démontre : ${prouve}` : "", largeur: largeurBulle },
       }
     }
 
@@ -694,7 +702,12 @@ export function Objet3D() {
       // Dans le guide d'une demonstration, il passe devant le panneau (qui a un fond).
       const devant = cible.devant ? "1" : "0"
       if (el.dataset.devant !== devant) el.dataset.devant = devant
-      const humeur = surv && (cible.humeur ?? "neutre") === "neutre" ? "curieux" : (cible.humeur ?? "neutre")
+      const humeur =
+        el.dataset.anim === "fier"
+          ? "content"
+          : surv && (cible.humeur ?? "neutre") === "neutre"
+            ? "curieux"
+            : (cible.humeur ?? "neutre")
       if (el.dataset.humeur !== humeur) el.dataset.humeur = humeur
 
       // Le fantome : la seconde recherche.
@@ -795,7 +808,42 @@ export function Objet3D() {
       const c = calculer(performance.now(), true)
       peindre(c, 16, true)
     }
+    // Survol du robot : quatre petites reactions, jamais deux fois la meme de suite.
+    // Le robot est derriere le contenu (il ne recoit pas d'evenement) : on teste donc la position.
+    const REACTIONS = [
+      { nom: "fier", ms: 2000 },
+      { nom: "avant", ms: 2200 },
+      { nom: "tour", ms: 1300 },
+      { nom: "balance", ms: 1900 },
+    ]
+    const reaction = { fin: 0, derniere: -1, dedans: false, t: 0 }
+    const surRobot = (x: number, y: number) => {
+      if (html.dataset.robotActif !== "1" || N.mut < 0.7 || N.op < 0.3) return false
+      const r = el.getBoundingClientRect()
+      const k = r.width / 340
+      return Math.abs(x - (r.left + r.width / 2)) < 96 * k && Math.abs(y - (r.top + r.height / 2)) < 84 * k
+    }
+    const finirReaction = () => {
+      delete el.dataset.anim
+      delete html.dataset.robotAnim
+    }
+    const testerSurvol = (x: number, y: number) => {
+      const dedans = !reduit && surRobot(x, y)
+      if (dedans && !reaction.dedans && performance.now() > reaction.fin) {
+        let i = Math.floor(Math.random() * REACTIONS.length)
+        if (i === reaction.derniere) i = (i + 1) % REACTIONS.length
+        reaction.derniere = i
+        const { nom, ms } = REACTIONS[i]
+        reaction.fin = performance.now() + ms + 250
+        el.dataset.anim = nom
+        html.dataset.robotAnim = nom
+        window.clearTimeout(reaction.t)
+        reaction.t = window.setTimeout(finirReaction, ms)
+      }
+      reaction.dedans = dedans
+    }
     const surSouris = (e: PointerEvent) => {
+      testerSurvol(e.clientX, e.clientY)
       mem.souris = { x: e.clientX, y: e.clientY, t: performance.now() }
       const cible1 = (e.target as Element | null)?.closest?.("a, button, [role=tab]") ?? null
       mem.survol = cible1 && !cible1.closest(".obj") ? cible1 : null
@@ -826,6 +874,8 @@ export function Objet3D() {
 
     return () => {
       window.cancelAnimationFrame(rafId)
+      window.clearTimeout(reaction.t)
+      finirReaction()
       window.clearTimeout(mem.bulleMin)
       large.removeEventListener("change", majService)
       document.removeEventListener("visibilitychange", surReveil)
@@ -842,6 +892,8 @@ export function Objet3D() {
 
   return (
     <>
+      {/* Le fond qui s'assombrit quand le robot se met en avant (voir globals.css). */}
+      <div className="obj-ombre" aria-hidden="true" />
       <div ref={racine} className="obj" data-humeur="neutre">
         <div className="obj__halo" aria-hidden="true" />
         <div className="obj__scene" aria-hidden="true">
