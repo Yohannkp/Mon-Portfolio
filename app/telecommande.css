@@ -1,0 +1,24 @@
+/* La telecommande de /presentation : une pilule en bas et au centre, discrete, avec Precedent / Suivant. */
+.tc { position: fixed; left: 50%; bottom: 18px; z-index: 45; display: flex; align-items: center; gap: .6rem;
+  max-width: calc(100vw - 24px); padding: .45rem; transform: translateX(-50%);
+  border: 1px solid color-mix(in oklch, var(--accent) 35%, var(--bord-doux)); border-radius: 999px;
+  background: color-mix(in oklch, var(--card) 90%, transparent); backdrop-filter: blur(14px);
+  box-shadow: var(--ombre-carte), 0 0 0 4px color-mix(in oklch, var(--accent) 7%, transparent); }
+.tc__btn { display: inline-flex; align-items: center; gap: .3rem; padding: .62rem 1rem; cursor: pointer; border: 1px solid var(--bord-doux); border-radius: 999px;
+  font-size: .86rem; font-weight: 500; color: var(--foreground); background: var(--card);
+  transition: transform .2s cubic-bezier(.2, .7, .2, 1), background .2s, color .2s, border-color .2s, opacity .2s; }
+.tc__btn:hover:not(:disabled) { transform: translateY(-1px); border-color: color-mix(in oklch, var(--accent) 55%, var(--border)); }
+.tc__btn:active:not(:disabled) { transform: scale(.96); }
+.tc__btn:disabled { opacity: .35; cursor: default; }
+.tc__btn--plein { color: var(--background); background: var(--accent); border-color: var(--accent); }
+.tc__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tc__etat { display: flex; flex-direction: column; align-items: center; min-width: 0; max-width: min(46vw, 520px); padding: 0 .4rem; text-align: center; line-height: 1.25; }
+.tc__n { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px; letter-spacing: .16em; color: var(--accent); }
+.tc__titre { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .82rem; color: var(--muted-foreground); }
+.tc__titre b { font-weight: 500; color: var(--foreground); }
+@media (max-width: 640px) {
+  .tc { gap: .35rem; bottom: 12px; }
+  .tc__btn span { display: none; }
+  .tc__btn { padding: .65rem .8rem; }
+  .tc__etat { max-width: 52vw; }
+}

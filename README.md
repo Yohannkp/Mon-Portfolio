@@ -113,6 +113,14 @@ Les 17 arrêts suivent le fil de la page : accueil, schéma RAG (balayé lenteme
 
 Rien n'est « joué » à part : la visite ne fait que **faire défiler la page**, donc les animations et le robot se comportent exactement comme si l'on défilait à la main. Le moteur est dans `components/presentation-auto.tsx` ; ajouter un arrêt, c'est ajouter une entrée à la liste `ARRETS`. Avec `prefers-reduced-motion`, les trajets entre deux arrêts sont instantanés.
 
+## Présentation en direct (`/presentation`, réservée à l'auteur)
+
+L'accueil, avec à la place de la visite automatique une **télécommande** en bas de page : **Précédent** et **Suivant** passent d'étape en étape, dans l'ordre de la page, **sans rien sauter, y compris les sous-parties d'une section**. Aujourd'hui 26 étapes : l'accueil, le schéma RAG (l'introduction puis ses cinq étapes), les chiffres, les projets (l'introduction, chacun des sept projets un par un, puis « le reste »), les démonstrations (un scénario par étape : l'onglet est choisi et sa visite guidée repart du début), à propos, compétences, méthode, veille, contact. Les étapes sont relues à chaque appui : si la page change, la télécommande suit ; si l'on défile à la main, elle reprend d'où l'on est.
+
+- **Clavier** : flèches gauche / droite et Page précédente / suivante (ce que les télécommandes de salle envoient).
+- **Le robot présente** : un petit bond à chaque étape, le projet présenté grandit, et il ne se fâche pas pendant qu'on présente.
+- **Accès réservé** (`proxy.ts`) : la page n'est pas dans le plan du site, pas dans `robots.txt`, marquée `noindex`, et répond **404** à toute personne sans la clé. La clé est la variable d'environnement `PRESENTATION_CLE` (à définir sur Vercel : *Settings → Environment Variables*, puis redéployer). **Première visite sur chaque appareil, une seule fois** : `https://…/presentation?cle=LA_CLE` — un cookie (httpOnly, sécurisé, 30 jours) est posé et l'adresse marche ensuite sans la clé. **Fermée par défaut** : en production, sans la variable, elle est introuvable pour tout le monde ; en développement local sans clé, elle est ouverte. Ce n'est pas un compte utilisateur : quiconque connaît la clé y accède.
+
 ## Contact : ce que fait vraiment le formulaire
 
 Ce site n'a pas de serveur de courrier. Le formulaire **ne prétend donc pas envoyer** : il prépare le message dans l'application e-mail du visiteur (`mailto:` avec sujet et corps remplis), lui dit clairement qu'il lui reste à l'envoyer, et lui donne l'adresse si rien ne s'ouvre (boutons « Rouvrir » et « Copier l'adresse »). La saisie est conservée si on clique sur « Modifier le message ». Les coordonnées viennent d'un seul endroit : `lib/contact.ts`.
