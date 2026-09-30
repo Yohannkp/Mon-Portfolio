@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { FastForward, Play, Rewind, RotateCcw, Square, Volume2, VolumeX, X } from "lucide-react"
-import { creerAmbiance, dureeEstimee, parler, preparerVoix, taire, voixDisponible, type Ambiance } from "@/components/audio-visite"
+import { creerAmbiance, dureeEstimee, parler, preparerVoix, progression, taire, voixDisponible, type Ambiance } from "@/components/audio-visite"
 import { DOSSIERS, NB_PHARES_MOT, PHARES } from "@/lib/dossiers"
 
 /**
@@ -34,6 +34,13 @@ type Arret = {
   /** S'il existe, l'arret est un balayage lent de y0 a y1 ; sinon, un temps de lecture a y0. */
   y1?: () => number
   duree: number
+  /**
+   * Ce que dit la voix, en plusieurs phrases si l'arret est long (le schema RAG, par exemple, lit une phrase par etape).
+   * Sans cela : la phrase de l'arret. `debuts` dit ou en est le balayage (0..1) au debut de chaque phrase, plus 1 a la fin :
+   * le defilement est alors PILOTE par la voix, phrase apres phrase.
+   */
+  beats?: () => string[]
+  debuts?: number[]
   /** Attend la fin d'une animation de la page (avec un plafond : on ne reste jamais bloque). */
   jusqua?: { cond: () => boolean; min: number; max: number; apres: number }
 }
@@ -83,6 +90,17 @@ const ARRETS: Arret[] = [
     y0: () => haut(q(".rag__scroll")) - 0.3 * H(),
     y1: () => haut(q(".rag__scroll")) + (q(".rag__scroll")?.getBoundingClientRect().height ?? 0) - H(),
     duree: 17000,
+    // Avec la voix, une phrase par etape du schema : le defilement suit la voix, et chaque note apparait quand on en parle.
+    // Les `debuts` sont les positions (0..1 du balayage) ou chaque note du schema apparait (mesurees sur la page).
+    beats: () => [
+      "Une requête traverse un pipeline RAG : recherche hybride, fusion, reranking, puis une réponse citée.",
+      "Étape un, la réécriture : la question est reformulée pour devenir autonome, sinon la recherche ne retrouve rien.",
+      "Étape deux, deux recherches : une vectorielle pour le sens, une BM25 pour les mots exacts.",
+      "Étape trois, la fusion RRF : aucun poids à deviner, c'est le rang qui compte, pas le score.",
+      "Étape quatre, le reranking : un cross-encoder ne garde que les six meilleurs candidats, sur le processeur.",
+      "Étape cinq, la réponse : générée en streaming, avec des citations qui ouvrent la page exacte du PDF. S'il ne sait pas, il le dit.",
+    ],
+    debuts: [0, 0.27, 0.44, 0.6, 0.75, 0.89, 1],
   },
   {
     cle: "chiffres",
@@ -213,7 +231,8 @@ export function PresentationAuto() {
   const [son, setSon] = useState(true)
   const sonRef = useRef(true)
   const ambiance = useRef<Ambiance | null>(null)
-  const parle = useRef({ actif: false, jusqua: 0 })
+  // La voix pilote la visite : phrases a dire (beats), la phrase en cours, et les garde-fous.
+  const vx = useRef({ beats: [] as string[], debuts: [0, 1] as number[], j: 0, actif: false, fini: true, entre: false, limite: 0, tok: 0, pMax: 0, demoE: "" })
   const avantLecture = useRef(false)
   const recul = useRef(0)
   const [invite, setInvite] = useState(false)
@@ -234,29 +253,106 @@ export function PresentationAuto() {
     if (Math.round(window.scrollY) !== cible) window.scrollTo({ top: cible, behavior: "instant" as ScrollBehavior })
   }
 
-  const dire = (phrase: string) => {
-    if (!sonRef.current || !voixDisponible()) {
-      parle.current.actif = false
+  const html = () => document.documentElement
+  const finVoixMarque = () => {
+    ambiance.current?.assourdir(false)
+    delete html().dataset.robotParle
+  }
+  const arreterVoix = () => {
+    const v = vx.current
+    v.tok++
+    v.actif = false
+    v.fini = true
+    v.entre = false
+    taire()
+    finVoixMarque()
+  }
+  const direBeat = () => {
+    const v = vx.current
+    const tok = v.tok
+    const t = v.beats[v.j]
+    if (t === undefined) {
+      v.fini = true
       return
     }
-    parle.current = { actif: true, jusqua: performance.now() + dureeEstimee(phrase) + 1500 }
+    v.entre = false
+    v.limite = performance.now() + dureeEstimee(t) * 1.5 + 2500
     ambiance.current?.assourdir(true)
-    parler(phrase, () => {
-      parle.current.actif = false
-      ambiance.current?.assourdir(false)
+    html().dataset.robotParle = "1"
+    parler(t, () => {
+      if (v.tok !== tok) return
+      if (v.j < v.beats.length - 1) {
+        v.j++
+        v.entre = true
+        window.setTimeout(() => {
+          if (v.tok === tok) direBeat()
+        }, 320)
+      } else {
+        v.fini = true
+        finVoixMarque()
+      }
     })
   }
+  /** Lance la lecture d'une suite de phrases, a partir de la phrase qui contient l'avancement p0. */
+  const lireBeats = (beats: string[], debuts: number[], p0 = 0) => {
+    const v = vx.current
+    v.tok++
+    taire()
+    const on = sonRef.current && voixDisponible() && vitesse.current === 1 && beats.length > 0
+    let j = 0
+    for (let k = 0; k < beats.length; k++) if (debuts[k] <= p0 + 0.001) j = k
+    Object.assign(v, { beats, debuts, j, actif: on, fini: !on, entre: false, limite: 0, pMax: p0 })
+    if (on) direBeat()
+    else finVoixMarque()
+  }
+  const demarrerBeats = (a: Arret, p0 = 0) => {
+    let beats = a.beats ? a.beats() : []
+    if (!beats.length) beats = [texte(a.phrase)]
+    const n = beats.length
+    const debuts = a.debuts && a.debuts.length === n + 1 ? a.debuts : Array.from({ length: n + 1 }, (_, k) => k / n)
+    lireBeats(beats, debuts, p0)
+  }
+  /** Ou en est le balayage de l'arret a la position actuelle (0..1). */
+  const pDepuisScroll = (a: Arret) => (a.y1 ? borne((window.scrollY - a.y0()) / ((a.y1() - a.y0()) || 1), 0, 1) : 0)
+  /** Quand la voix cesse de piloter le balayage (son coupe, avance rapide), le minuteur reprend exactement la ou l'on est. */
+  const passerAuTemps = () => {
+    const s = m.current
+    const a = s.liste[s.i]
+    if (!a || !a.y1 || s.phase !== "balayer") return
+    const p = pDepuisScroll(a)
+    s.p0 = p
+    s.ecoule = 0
+    s.duree = a.duree * (1 - p)
+  }
   /** Tant que la voix parle, la visite attend : on ne coupe jamais une phrase. (Pas pendant l'avance rapide.) */
-  const voixOccupee = () => sonRef.current && vitesse.current === 1 && parle.current.actif && performance.now() < parle.current.jusqua
+  const voixOccupee = () => {
+    const v = vx.current
+    return sonRef.current && vitesse.current === 1 && v.actif && !v.fini && performance.now() < v.limite
+  }
+  /** Dans la demonstration, chaque etape est lue : tant que l'etape affichee n'a pas ete dite, la demonstration attend. */
+  const demoEnAttente = () => {
+    const s = m.current
+    const a = s.liste[s.i]
+    if (etatRef.current !== "lecture" || !sonRef.current || vitesse.current !== 1 || !voixDisponible() || a?.cle !== "demos") return false
+    const d = q("#sec-demos .demo")
+    return !!d && d.dataset.etape !== vx.current.demoE
+  }
+  const occupeeTotale = () => voixOccupee() || demoEnAttente()
+  // La visite guidee d'une demonstration (demo-guide.tsx) demande ici si elle peut passer a l'etape suivante.
+  useEffect(() => {
+    const w = window as unknown as { __voixOccupee?: () => boolean }
+    w.__voixOccupee = occupeeTotale
+    return () => {
+      delete w.__voixOccupee
+    }
+  })
   const demarrerSon = () => {
     if (!sonRef.current) return
     ambiance.current = ambiance.current ?? creerAmbiance()
     ambiance.current?.demarrer()
   }
   const couperSon = () => {
-    taire()
-    parle.current.actif = false
-    ambiance.current?.assourdir(false)
+    arreterVoix()
     ambiance.current?.arreter()
   }
   const basculerSon = () => {
@@ -266,11 +362,13 @@ export function PresentationAuto() {
     try {
       localStorage.setItem("pa-son", v ? "1" : "0")
     } catch {}
-    if (!v) couperSon()
-    else if (etatRef.current === "lecture") {
+    if (!v) {
+      passerAuTemps()
+      couperSon()
+    } else if (etatRef.current === "lecture") {
       demarrerSon()
       const a = m.current.liste[m.current.i]
-      if (a) dire(texte(a.phrase))
+      if (a && m.current.phase !== "aller") demarrerBeats(a, pDepuisScroll(a))
     }
   }
 
@@ -293,8 +391,8 @@ export function PresentationAuto() {
     const a0 = a.y0()
     const a1 = a.y1 ? a.y1() : a0
     montrer(i)
-    if (vitesse.current === 1) dire(texte(a.phrase))
-    else parle.current.actif = false
+    arreterVoix()
+    vx.current.demoE = ""
 
     const dedans = !!a.y1 && depuisY >= Math.min(a0, a1) - 30 && depuisY <= Math.max(a0, a1) + 30
     if (dedans) {
@@ -309,6 +407,8 @@ export function PresentationAuto() {
       s.phase = "balayer"
       s.duree = a.duree
     }
+    // La voix commence a l'arrivee (pendant le trajet, on ne dit rien) ; en reprise de balayage, a la phrase qui correspond.
+    if (s.phase !== "aller") demarrerBeats(a, s.phase === "balayer" ? s.p0 : 0)
   }
 
   const suivant = () => {
@@ -340,11 +440,23 @@ export function PresentationAuto() {
         s.ecoule = 0
         s.p0 = 0
         s.duree = a.duree
+        demarrerBeats(a, 0)
       }
     } else if (s.phase === "balayer") {
-      const k = borne(s.ecoule / (s.duree || 1), 0, 1)
+      let k = borne(s.ecoule / (s.duree || 1), 0, 1)
       // Positions relues a chaque image : si la mise en page bouge (image chargee, police), on suit.
-      const p = a.y1 ? lerp(s.p0, 1, k) : 0
+      let p = a.y1 ? lerp(s.p0, 1, k) : 0
+      const v = vx.current
+      if (a.y1 && v.actif) {
+        // Le balayage est PILOTE par la voix : la position suit la phrase en cours, mot apres mot.
+        if (!v.fini && performance.now() > v.limite) v.fini = true // garde-fou : une voix qui ne finit jamais ne bloque pas la visite
+        const debut = v.debuts[v.j] ?? 0
+        const fin = v.debuts[v.j + 1] ?? 1
+        const pv = v.fini ? 1 : debut + (fin - debut) * (v.entre ? 0 : progression())
+        p = Math.max(pv, v.pMax)
+        v.pMax = p
+        k = p >= 1 ? 1 : 0
+      }
       poser(a.y1 ? lerp(a0, a1, p) : a0)
       frac = a.y1 ? p : k
       if (k >= 1) {
@@ -356,14 +468,22 @@ export function PresentationAuto() {
     } else if (s.phase === "attendre") {
       poser(a0)
       const j = a.jusqua!
-      if ((s.ecoule >= j.min && j.cond()) || s.ecoule >= j.max) {
+      // La demonstration est guidee a la voix : chaque etape est lue, et elle n'avance qu'une fois lue.
+      const d = q("#sec-demos .demo")
+      const e = d?.dataset.etape ?? ""
+      if (d && sonRef.current && vitesse.current === 1 && voixDisponible() && e !== vx.current.demoE && !voixOccupee()) {
+        vx.current.demoE = e
+        const t = d.querySelector(".sr-only")?.textContent?.trim()
+        if (t) lireBeats([t], [0, 1], 0)
+      }
+      if (((s.ecoule >= j.min && j.cond()) || s.ecoule >= j.max) && !occupeeTotale()) {
         s.phase = "apres"
         s.ecoule = 0
       }
       frac = 0.5
     } else {
       poser(a0)
-      if (s.ecoule >= a.jusqua!.apres && !voixOccupee()) suivant()
+      if (s.ecoule >= a.jusqua!.apres && !occupeeTotale()) suivant()
       frac = 1
     }
 
@@ -469,8 +589,8 @@ export function PresentationAuto() {
     if (manoeuvre) return
     avantLecture.current = etatRef.current === "lecture"
     vitesse.current = 2
-    taire()
-    parle.current.actif = false
+    passerAuTemps()
+    arreterVoix()
     setManoeuvre("avance")
     if (!avantLecture.current) basculer()
   }
@@ -482,7 +602,7 @@ export function PresentationAuto() {
     else if (etatRef.current === "lecture") {
       // Retour a la vitesse normale : on reprend la phrase de l'arret ou l'on est arrive.
       const a = m.current.liste[m.current.i]
-      if (a) dire(texte(a.phrase))
+      if (a && m.current.phase !== "aller") demarrerBeats(a, pDepuisScroll(a))
     }
   }
 
@@ -491,8 +611,7 @@ export function PresentationAuto() {
     const s = m.current
     avantLecture.current = etatRef.current === "lecture"
     cancelAnimationFrame(s.raf)
-    taire()
-    parle.current.actif = false
+    arreterVoix()
     window.clearTimeout(cacheFin.current)
     setFin(false)
     s.termine = false

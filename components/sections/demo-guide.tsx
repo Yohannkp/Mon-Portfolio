@@ -161,9 +161,19 @@ export function GuideShell({
   }, [])
 
   // Etape suivante, une fois la phrase ecrite ET le temps de lecture ecoule.
+  // Pendant la presentation automatique, la voix lit chaque etape : on n'avance qu'une fois qu'elle a fini.
   useEffect(() => {
     if (!enMarche || !fini || dernier) return
-    const id = window.setTimeout(() => setEtape((x) => Math.min(x + 1, n - 1)), attente)
+    const occupee = () => (window as unknown as { __voixOccupee?: () => boolean }).__voixOccupee?.() ?? false
+    let id = 0
+    const avancer = () => {
+      if (occupee()) {
+        id = window.setTimeout(avancer, 180)
+        return
+      }
+      setEtape((x) => Math.min(x + 1, n - 1))
+    }
+    id = window.setTimeout(avancer, attente)
     return () => window.clearTimeout(id)
   }, [enMarche, fini, dernier, etape, attente, n])
 

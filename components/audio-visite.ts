@@ -50,10 +50,41 @@ export function nettoyer(t: string) {
     .trim()
 }
 
-/** Duree estimee d'une phrase (ms) : sert de garde-fou si le navigateur ne signale jamais la fin. */
-export const dureeEstimee = (t: string) => Math.min(20000, 1500 + nettoyer(t).length * 78)
+/**
+ * Le rythme de la voix, appris en ecoutant : millisecondes par caractere. On part d'une valeur moyenne,
+ * puis chaque phrase terminee affine la mesure (moyenne mobile) : la synchronisation s'ameliore d'elle-meme.
+ */
+let msParCar = 74
+/** Duree estimee d'une phrase (ms) : sert aussi de garde-fou si le navigateur ne signale jamais la fin. */
+export const dureeEstimee = (t: string) => Math.min(24000, 900 + nettoyer(t).length * msParCar)
 
-/** Lit `texte`. `onFin` est appele une seule fois, a la fin, en cas d'erreur, ou si la phrase est remplacee. */
+/** Ou en est la phrase en cours. Se met a jour a chaque evenement de la voix, et se prolonge entre deux. */
+type Suivi = { debut: number; len: number; c: number; tc: number; mots: number; p: number; fini: boolean }
+let suivi: Suivi | null = null
+
+/**
+ * Avancement (0..1) de la phrase en cours de lecture.
+ *  - si le navigateur signale les mots (evenement `boundary`), on suit le mot en cours et on interpole entre deux mots ;
+ *  - sinon (certaines voix reseau n'en envoient pas), on suit l'horloge avec le rythme appris ci-dessus.
+ * Jamais de retour en arriere ; 1 seulement quand la voix a vraiment fini.
+ */
+export function progression(): number {
+  const u = suivi
+  if (!u) return 0
+  if (u.fini) return 1
+  const now = performance.now()
+  let p: number
+  if (u.mots > 0) {
+    const c = Math.min(u.c + (now - u.tc) / msParCar, u.c + 14)
+    p = c / u.len
+  } else {
+    p = (now - u.debut) / (msParCar * u.len)
+  }
+  u.p = Math.max(u.p, Math.min(0.985, p))
+  return u.p
+}
+
+/** Lit `texte`. `onFin` est appele une seule fois, a la fin ou en cas d'erreur (pas si la phrase est remplacee). */
 export function parler(texte: string, onFin?: () => void) {
   if (!voixDisponible()) {
     onFin?.()
@@ -61,18 +92,39 @@ export function parler(texte: string, onFin?: () => void) {
   }
   const moi = ++jeton
   const synth = window.speechSynthesis
+  const propre = nettoyer(texte)
+  suivi = { debut: performance.now(), len: Math.max(1, propre.length), c: 0, tc: 0, mots: 0, p: 0, fini: false }
   synth.cancel()
   const dire = () => {
     if (moi !== jeton) return
-    const u = new SpeechSynthesisUtterance(nettoyer(texte))
+    const u = new SpeechSynthesisUtterance(propre)
     voixChoisie = voixChoisie ?? choisirVoix()
     if (voixChoisie) u.voice = voixChoisie
     u.lang = voixChoisie?.lang ?? "fr-FR"
     u.rate = 0.97
     u.pitch = 1
     u.volume = 1
+    const cette = suivi
+    // Si le navigateur ne signale pas le debut, l'horloge part de l'appel a speak().
+    if (cette) cette.debut = performance.now()
+    u.onstart = () => {
+      if (moi === jeton && cette) cette.debut = performance.now()
+    }
+    u.onboundary = (e: SpeechSynthesisEvent) => {
+      if (moi !== jeton || !cette) return
+      cette.c = e.charIndex
+      cette.tc = performance.now()
+      cette.mots++
+    }
     const fin = () => {
-      if (moi === jeton) onFin?.()
+      if (moi !== jeton) return
+      if (cette) {
+        // On apprend le rythme de la voix (phrases assez longues seulement, et rythme plausible).
+        const dur = performance.now() - cette.debut
+        if (cette.len >= 30 && dur > 600) msParCar = Math.min(150, Math.max(45, msParCar * 0.55 + (dur / cette.len) * 0.45))
+        cette.fini = true
+      }
+      onFin?.()
     }
     u.onend = fin
     u.onerror = fin
@@ -86,6 +138,7 @@ export function parler(texte: string, onFin?: () => void) {
 export function taire() {
   jeton++
   enCours = null
+  suivi = null
   if (voixDisponible()) window.speechSynthesis.cancel()
 }
 
