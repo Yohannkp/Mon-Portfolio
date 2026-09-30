@@ -351,7 +351,11 @@ main > section, main > div { position: relative; z-index: 1; }
   width: 340px; height: 340px; margin: -170px 0 0 -170px;
   transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--ech, 1));
 }
-.obj { opacity: var(--op, .62); transition: opacity .4s ease; }
+.obj { opacity: var(--op, .62); transition: opacity .4s ease;
+  transform: translate3d(calc(var(--tx, 0px) + var(--rx, 0px)), calc(var(--ty, 0px) + var(--rdy, 0px)), 0) scale(var(--ech, 1)) rotate(var(--rrot, 0deg)); }
+/* La colere : tout le robot vire au rouge (la teinte bleue tourne vers le rouge, la saturation monte), piloté par --rage (0..1). */
+.obj[data-rage] { filter: hue-rotate(calc(var(--rage, 0) * 172deg)) saturate(calc(1 + var(--rage, 0) * 1.3)) brightness(calc(1 + var(--rage, 0) * .08)); }
+html[data-robot-rage="1"] .obj-bulle { opacity: 0; }
 /* Dans le guide d'une demonstration : devant le panneau, halo discret pour ne pas voiler le texte voisin. */
 .obj[data-devant="1"] { z-index: 2; }
 .obj[data-devant="1"] .obj__halo { opacity: .28; }

@@ -215,6 +215,13 @@ export function Objet3D() {
     const X = nouvelleExpr()
     const boucheEl = el.querySelector<SVGPathElement>(".obj__bouche path")
 
+    // --- La colere : le visiteur file devant les simulations -------------------------------------------
+    // Une fois par visite : le robot se fache, devient tout rouge, se balance, descend pour prendre de l'elan,
+    // puis remonte en TIRANT la page avec lui jusqu'a la section des simulations. Fluide de bout en bout :
+    // tout est une fonction du temps, la page et le robot partent du meme mouvement.
+    const R = { etat: "non" as "non" | "joue", t0: 0, y0: 0, yCible: 0, yFixe: false, coupe: false, dx: 0, dy: 0, rot: 0, rage: 0, fier: false }
+    const fuite = { dedans: false, entree: 0, prevMid: window.scrollY + window.innerHeight * 0.5 }
+
     // --- Etat lisse (ce qui est effectivement a l'ecran) --------------------
     const N = {
       init: true,
@@ -614,7 +621,10 @@ export function Objet3D() {
       "sec-competences": ["data-preuve"],
       "sec-methode": ["data-actif"],
     }
-    /** Les projets (0..6) pendant lesquels, dans la visite automatique, le robot va dans la marge de gauche. */
+    /** La colere (defilement trop rapide devant les simulations) n'a lieu qu'UNE fois par visite de la page : rechargee, elle peut revenir. */
+let rageJouee = false
+
+/** Les projets (0..6) pendant lesquels, dans la visite automatique, le robot va dans la marge de gauche. */
 const PROJETS_A_GAUCHE = new Set([1, 2, 5])
 
 const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-preuve", "data-actif"]
@@ -727,7 +737,8 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       el.style.setProperty("--gy", `${N.gy.toFixed(2)}px`)
       el.style.setProperty("--incl", `${N.incl.toFixed(2)}deg`)
       // Dans le guide d'une demonstration, il passe devant le panneau (qui a un fond).
-      const devant = cible.devant ? "1" : "0"
+      if (R.etat === "joue") jouerRage(c, dt)
+      const devant = cible.devant || R.etat === "joue" ? "1" : "0"
       if (el.dataset.devant !== devant) el.dataset.devant = devant
       const gauche = cible.gauche ? "1" : "0"
       if (html.dataset.robotGauche !== gauche) html.dataset.robotGauche = gauche
@@ -851,12 +862,113 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       rafId = requestAnimationFrame(boucle)
     }
 
+    const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+    const easeOut = (x: number) => 1 - Math.pow(1 - x, 3)
+    const coupeRage = (e: Event) => {
+      if (R.etat !== "joue" || R.coupe) return
+      // Pendant qu'il se fache et prend son elan, le defilement du visiteur continue (l'inertie du trackpad dure ~1 s) : on l'ignore.
+      // Seule une action volontaire APRES ce moment, pendant qu'il tire la page, la lui reprend.
+      if (performance.now() - R.t0 < 1800) return
+      if (e.type === "keydown" && !["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Escape"].includes((e as KeyboardEvent).key)) return
+      R.coupe = true // le visiteur reprend la main : il ne tire plus la page, le robot se calme
+    }
+    const ecouterRage = (on: boolean) => {
+      const f = on ? window.addEventListener : window.removeEventListener
+      for (const t of ["wheel", "touchstart", "keydown", "mousedown"] as const) f.call(window, t, coupeRage, { capture: true, passive: true })
+    }
+    const finRage = () => {
+      R.etat = "non"
+      ecouterRage(false)
+      delete html.dataset.robotRage
+      delete el.dataset.rage
+      for (const v of ["--rx", "--rdy", "--rrot", "--rage"]) el.style.removeProperty(v)
+    }
+    const lancerRage = (top: number) => {
+      rageJouee = true
+      Object.assign(R, { etat: "joue", t0: performance.now(), y0: window.scrollY, yCible: Math.max(0, top - 110), yFixe: false, coupe: false, dx: 0, dy: 0, rot: 0, rage: 0, fier: false })
+      html.dataset.robotRage = "1"
+      el.dataset.rage = "1"
+      mem.emo = { h: "colere", jusqua: R.t0 + 3300 }
+      N.saut = -22
+      ecouterRage(true)
+    }
+    /** Le visiteur vient de traverser toute la section des simulations d'un trait : trop vite pour l'avoir vue. */
+    const detecterFuite = () => {
+      const sec = q("#sec-demos")
+      const mid = window.scrollY + window.innerHeight * 0.5
+      const prev = fuite.prevMid
+      fuite.prevMid = mid
+      if (!sec || rageJouee || R.etat === "joue" || reduit || html.dataset.visite === "1" || N.mut < 0.7) return
+      const now = performance.now()
+      const r = sec.getBoundingClientRect()
+      const top = r.top + window.scrollY
+      const bas = top + r.height
+      if (mid >= top && mid <= bas && !fuite.dedans) {
+        fuite.dedans = true
+        fuite.entree = now
+      } else if (mid < top) fuite.dedans = false
+      if (!(mid > bas && prev <= bas)) return
+      const dwell = prev < top ? 0 : fuite.dedans ? now - fuite.entree : 1e9
+      fuite.dedans = false
+      // S'il a joue avec la demonstration, il l'a vue : pas de colere.
+      const demo = sec.querySelector<HTMLElement>(".demo")
+      if (dwell < 1100 && demo && demo.dataset.etape === "0") lancerRage(top)
+    }
+    /**
+     * La choregraphie (ms depuis le depart) :
+     *   0 - 950     fache : rouge, balancement qui s'eteint
+     *   950 - 1600  descend (prend de l'elan), un peu penche en arriere
+     *   1600 - 3200 remonte d'un trait, la page tiree avec lui jusqu'aux simulations
+     *   3200 -      fier, se calme, le rouge s'efface, il regagne sa place
+     */
+    const jouerRage = (c: Ctx, dt: number) => {
+      const t = c.now - R.t0
+      const T1 = 950, T2 = 1600, T3 = 3200, T4 = 4400
+      if (R.coupe && t < T3) R.t0 = c.now - T3 // il reprend la main : on saute a l'apaisement
+      const tt = c.now - R.t0
+      if (tt >= T2 && !R.yFixe) {
+        R.yFixe = true
+        R.y0 = window.scrollY // le visiteur a peut-etre continue de descendre : on part d'ou il est
+      }
+      if (tt < T3) {
+        const env = Math.min(1, tt / 160) * (1 - borne((tt - 750) / 200, 0, 1))
+        const p2 = borne((tt - T1) / (T2 - T1), 0, 1)
+        const p3 = borne((tt - T2) / (T3 - T2), 0, 1)
+        const offHaut = c.haut + 110 - N.y
+        R.dx = 9 * Math.sin(tt / 78) * env
+        R.rot = 12 * Math.sin(tt / 78 + 0.6) * env - 6 * p2 - 9 * Math.sin(Math.PI * p3)
+        R.dy = tt < T2 ? 150 * easeOut(p2) : mix(150, offHaut, ease(p3))
+        R.rage = tt < 450 ? ease(tt / 450) : 1
+        if (tt >= T2 && !R.coupe) {
+          // La page suit le robot avec un leger retard : il la tire.
+          const pp = ease(borne((p3 - 0.06) / 0.94, 0, 1))
+          window.scrollTo({ top: mix(R.y0, R.yCible, pp), behavior: "instant" as ScrollBehavior })
+        }
+      } else {
+        if (!R.fier) {
+          R.fier = true
+          mem.emo = { h: "fier", jusqua: c.now + 1700 }
+        }
+        const k = 1 - Math.exp(-dt / 300)
+        R.dx = mix(R.dx, 0, k)
+        R.dy = mix(R.dy, 0, k)
+        R.rot = mix(R.rot, 0, k)
+        R.rage = 1 - ease(borne((tt - T3 - 200) / 1000, 0, 1))
+        if (tt >= T4) return finRage()
+      }
+      el.style.setProperty("--rx", `${R.dx.toFixed(2)}px`)
+      el.style.setProperty("--rdy", `${R.dy.toFixed(2)}px`)
+      el.style.setProperty("--rrot", `${R.rot.toFixed(2)}deg`)
+      el.style.setProperty("--rage", R.rage.toFixed(3))
+    }
+
     const surDefilement = () => {
       const y = window.scrollY
       N.dyBrut += borne(y - N.dernierY, -90, 90)
       N.brut += Math.min(Math.abs(y - N.dernierY), 90) // plafonne : un saut d'ancre ne doit pas faire exploser l'objet
       N.dernierY = y
       if (!actif()) return
+      detecterFuite()
       // Les evenements de defilement continuent d'arriver quand le navigateur
       // suspend les images (onglet en arriere-plan) : on peint alors sans lissage,
       // pour que le robot soit juste au retour sur l'onglet.
@@ -953,6 +1065,7 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       window.clearTimeout(mem.bulleMin)
       large.removeEventListener("change", majService)
       window.removeEventListener("robot-emotion", surEmotion)
+      if (R.etat === "joue") finRage()
       document.removeEventListener("visibilitychange", surReveil)
       window.removeEventListener("scroll", surDefilement)
       window.removeEventListener("resize", surDefilement)

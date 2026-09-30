@@ -46,6 +46,10 @@ Un cube filaire, à droite du hero, se transforme en petit robot dès qu'on desc
 
 Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se pose sur ce qu'on survole, il s'incline avec la vitesse de défilement, et un clic sur un onglet attire son attention. Quand on passe la souris sur lui, il réagit au hasard (jamais deux fois la même de suite) : il prend un air fier, il s'avance en brillant pendant que le fond s'assombrit, il tourne sur lui-même, ou il se balance de gauche à droite.
 
+### La colère du robot (une seule fois)
+
+Si le visiteur défile **à la main** et traverse la section des simulations d'un trait (moins d'une seconde et demie, sans y avoir joué), le robot se fâche : visage furieux, tout rouge (`hue-rotate` piloté par `--rage`), il se balance, **descend pour prendre de l'élan**, puis **remonte d'un trait en tirant la page avec lui** (la page suit avec un léger retard) jusqu'aux simulations. Toute la chorégraphie est une fonction du temps (fluide de bout en bout), il passe devant le contenu, puis se calme (fier), le rouge s'efface et il regagne sa place dans le guide. Une seule fois par visite de la page (rechargée, elle peut revenir) ; jamais pendant la présentation automatique, sur téléphone ou si les animations sont réduites ; une action volontaire du visiteur pendant qu'il tire la page lui rend la main.
+
 ### Les émotions du robot
 
 Inspirées de la géométrie des émotions (Paul Ekman) : pas de visage réaliste, seulement des yeux, deux sourcils et une bouche, déformés en variables CSS et en un seul tracé SVG (`components/robot-emotions.ts`).
