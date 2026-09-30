@@ -147,6 +147,23 @@
   .axe__compte { display: none; }
 }
 
+/* Presentation automatique : le schema du projet presente se met en mouvement. Chaque element porte deja
+   son rang (--d) ; l'entree en scene devient une vague continue qui raconte l'idee du projet, dans l'ordre,
+   et les traits en tirets s'ecoulent comme un flux. Seulement transform / opacite : aucune charge de calcul. */
+@keyframes gl-joue {
+  0%, 100% { opacity: .5; transform: scale(1); }
+  30%, 45% { opacity: 1; transform: scale(1.14); }
+  70% { opacity: .9; transform: scale(1); }
+}
+@keyframes gl-flux { to { stroke-dashoffset: -14; } }
+.cas[data-focus="1"] .gl [data-a] { transform-box: fill-box; transform-origin: center;
+  animation: gl-joue 2.9s ease-in-out calc(var(--d, 0ms) * 1.7) infinite; }
+.cas[data-focus="1"] .gl .gl__tirets { animation: gl-flux .9s linear infinite; }
+.cas[data-focus="1"] .gl [data-a].gl__tirets { animation: gl-joue 2.9s ease-in-out calc(var(--d, 0ms) * 1.7) infinite, gl-flux .9s linear infinite; }
+.cas[data-focus="1"] .cas__visuel { transition: border-color .6s ease, box-shadow .6s ease;
+  border-color: color-mix(in oklch, var(--accent) 50%, var(--border));
+  box-shadow: 0 0 34px -12px color-mix(in oklch, var(--accent) 60%, transparent); }
+
 /* Tablette et telephone : pas de place pour deborder, le projet presente grandit peu. */
 @media (max-width: 1024px) {
   .cas-liste[data-focus="1"] .cas[data-focus="0"] { scale: .98; }
@@ -160,6 +177,7 @@
 @media (prefers-reduced-motion: reduce) {
   .gl [data-a] { opacity: 1; transform: none; transition: none; }
   .cas__resultat, .cas__comment svg, .dos__visuel img { transition: none; }
+  .cas[data-focus="1"] .gl [data-a], .cas[data-focus="1"] .gl .gl__tirets { animation: none; }
   .cas-liste[data-focus="1"] .cas[data-focus="0"] { scale: .98; }
   .cas-liste[data-focus="1"] .cas[data-focus="1"] { scale: 1.03; }
 }
