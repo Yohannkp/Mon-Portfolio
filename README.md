@@ -50,6 +50,8 @@ Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se po
 
 Si le visiteur défile **à la main** et traverse la section des simulations d'un trait (moins d'une seconde et demie, sans y avoir joué), le robot se fâche : visage furieux, tout rouge (`hue-rotate` piloté par `--rage`), il se balance, **descend pour prendre de l'élan**, puis **s'élance vers le haut en s'accélérant, la page tirée derrière lui, et cogne le plafond de l'écran** (anneau d'impact, l'écran tremble, il s'écrase puis rebondit). La page finit d'arriver aux simulations, il se calme (fier), le rouge s'efface et il regagne sa place dans le guide.
 
+**Il se fait pousser des bras** pendant la colère (poings serrés, ils se balancent avec lui), puis les dresse en montant : l'index se tend pour **désigner la section des simulations**, qui s'illumine au même instant (contour, voile lumineux, pulsation) avant de s'éteindre quand les bras se rétractent.
+
 **Le défilement est verrouillé pendant tout le trajet** (`html[data-scroll-verrou] { overflow: hidden }`, avec `scrollbar-gutter: stable` pour que la page ne saute pas quand la barre disparaît), puis rendu une fois le robot replacé. Toute la chorégraphie est une fonction du temps (fluide de bout en bout). Une seule fois par visite de la page (rechargée, elle peut revenir) ; jamais pendant la présentation automatique, sur téléphone ou si les animations sont réduites.
 
 ### Les émotions du robot

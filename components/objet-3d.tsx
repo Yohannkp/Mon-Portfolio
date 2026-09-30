@@ -132,6 +132,30 @@ const IDS = [
 ]
 
 /** Un accessoire du visage, partage par le robot et par son fantome. */
+/** Les bras, qui ne servent qu'a la colere : deux bras a poings/doigts, ancres aux flancs de la tete (voir globals.css). */
+function Bras() {
+  const bras = (cote: "g" | "d") => (
+    <g className={`obj__bras-${cote}`}>
+      <path className="obj__bras-os" d="M0 0 L7 44 L0 88" />
+      <circle className="obj__bras-art" cx="0" cy="0" r="9" />
+      <circle className="obj__bras-art" cx="7" cy="44" r="7.5" />
+      <g className="obj__main">
+        <rect className="obj__paume" x="-12" y="86" width="24" height="22" rx="9" />
+        <path className="obj__doigt obj__doigt--index" d="M-7 106 L-7 130" />
+        <path className="obj__doigt obj__doigt--autre" d="M-1 108 L-1 126" />
+        <path className="obj__doigt obj__doigt--autre" d="M5 108 L5 124" />
+        <path className="obj__doigt obj__doigt--autre" d="M10.5 106 L10.5 120" />
+      </g>
+    </g>
+  )
+  return (
+    <svg className="obj__bras" viewBox="-170 -170 340 340" aria-hidden="true">
+      {bras("g")}
+      {bras("d")}
+    </svg>
+  )
+}
+
 function Visage() {
   return (
     <div className="obj__corps">
@@ -875,7 +899,8 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       verrou(false)
       delete html.dataset.robotRage
       delete el.dataset.rage
-      for (const v of ["--rx", "--rdy", "--rrot", "--rage", "--rsq"]) el.style.removeProperty(v)
+      for (const v of ["--rx", "--rdy", "--rrot", "--rage", "--rsq", "--bk", "--bphi", "--bd"]) el.style.removeProperty(v)
+      delete q("#sec-demos")?.dataset.robotMontre
     }
     const lancerRage = (top: number) => {
       rageJouee = true
@@ -918,7 +943,7 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
      */
     const jouerRage = (c: Ctx, dt: number) => {
       const tt = c.now - R.t0
-      const T1 = 950, T2 = 1600, TC = 2500, T3 = 3100, T4 = 4300
+      const T1 = 950, T2 = 1600, TC = 2500, T3 = 3100, T4 = 4900
       if (tt >= T2 && !R.yFixe) {
         R.yFixe = true
         R.y0 = window.scrollY
@@ -976,6 +1001,18 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
         R.rage = 1 - ease(borne((tt - T3 - 200) / 1000, 0, 1))
         if (tt >= T4) return finRage()
       }
+      // Les bras : ils poussent sous la colere (poings serres), se balancent, puis se dressent avec lui.
+      // Au moment ou il s'elance, la section des simulations s'illumine ; les doigts la designent jusqu'au bout.
+      const pRise = borne((tt - T2) / (TC - T2), 0, 1)
+      const bk = ease(borne((tt - 250) / 500, 0, 1)) * (1 - ease(borne((tt - 4200) / 650, 0, 1)))
+      let phi = tt < T2 ? mix(52, 34, ease(borne((tt - T1) / (T2 - T1), 0, 1))) + 12 * Math.sin(tt / 78) * (1 - borne((tt - 750) / 200, 0, 1)) : mix(34, 166, ease(pRise))
+      if (tt > TC) phi += 4 * Math.sin((tt - TC) / 120) * Math.exp(-(tt - TC) / 1500)
+      const bd = ease(borne((tt - T2 - 250) / (TC - T2 - 250), 0, 1))
+      const secDemos = q("#sec-demos")
+      if (secDemos && tt >= T2 && secDemos.dataset.robotMontre !== "1") secDemos.dataset.robotMontre = "1"
+      el.style.setProperty("--bk", bk.toFixed(3))
+      el.style.setProperty("--bphi", `${phi.toFixed(2)}deg`)
+      el.style.setProperty("--bd", bd.toFixed(3))
       el.style.setProperty("--rx", `${R.dx.toFixed(2)}px`)
       el.style.setProperty("--rdy", `${R.dy.toFixed(2)}px`)
       el.style.setProperty("--rrot", `${R.rot.toFixed(2)}deg`)
@@ -1108,6 +1145,7 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       <div className="obj-choc" aria-hidden="true" />
       <div ref={racine} className="obj" data-humeur="neutre">
         <div className="obj__halo" aria-hidden="true" />
+        <Bras />
         <div className="obj__scene" aria-hidden="true">
           <div className="obj__cube">
             <div className="obj__f" />
