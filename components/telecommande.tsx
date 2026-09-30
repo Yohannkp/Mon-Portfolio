@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { PHARES } from "@/lib/dossiers"
+import { NB_PHARES_MOT, PHARES } from "@/lib/dossiers"
 
 /**
  * La telecommande de /presentation : « Precedent » et « Suivant » passent d'etape en etape, dans l'ordre de la page,
@@ -75,7 +75,7 @@ function construire(): Etape[] {
 
   const stations = q("#sec-stations")
   if (stations) {
-    ajoute({ cle: "projets", section: "Projets", titre: "Sept projets, sept preuves", y: () => haut(stations) + 20 })
+    ajoute({ cle: "projets", section: "Projets", titre: `${NB_PHARES_MOT.charAt(0).toUpperCase()}${NB_PHARES_MOT.slice(1)} projets, ${NB_PHARES_MOT} preuves`, y: () => haut(stations) + 20 })
     qa("#sec-stations .cas").forEach((carte, i) => {
       ajoute({
         cle: `projet-${i}`,

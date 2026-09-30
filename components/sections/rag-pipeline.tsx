@@ -65,7 +65,7 @@ export function RagPipeline() {
       if (cancelled || !root.current) return
       const { createTimeline, onScroll, svg, utils } = A
       const el = root.current
-      const q = (s: string) => el.querySelector(s)
+      const q = (s: string) => el.querySelector(s) as Element
 
       const flows = TRACES.map((_, i) => svg.createDrawable(q(`#rag-f${i}`) as SVGPathElement))
       const notes = el.querySelectorAll(".rag-note")

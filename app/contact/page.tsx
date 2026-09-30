@@ -99,7 +99,7 @@ export default function ContactPage() {
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
               Je cherche un stage de 4 à 6 mois à partir d&apos;avril 2027, en MLOps ou en data
-              engineering. Ouvert aux propositions en région parisienne ou en remote.
+              engineering. Ouvert aux propositions partout en France, au Luxembourg et en Belgique, en priorité en région parisienne.
             </p>
           </div>
         </div>

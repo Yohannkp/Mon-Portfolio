@@ -3,7 +3,7 @@
 import { foc, GuideShell, useTween, useTyping, type Etape } from "@/components/sections/demo-guide"
 
 /**
- * Mina-Translator : un corpus fait main, un petit modele affine, et la chaine
+ * Mina-Translator : un corpus genere puis audite, un petit modele affine, et la chaine
  * parole -> texte -> traduction. Les 360 points sont les 360 paires du corpus.
  */
 
@@ -17,8 +17,8 @@ const ETAPES: Etape[] = [
     humeur: "neutre",
   },
   {
-    titre: "Un corpus fait main",
-    texte: "J'ai constitué 360 paires de phrases, sur 7 domaines, chacune validée par un locuteur.",
+    titre: "Un corpus à construire",
+    texte: "Faute de corpus, j'en ai généré un, puis un script a audité chaque ligne : 360 paires exploitables sur 500, sur 7 domaines.",
     humeur: "concentre",
     attente: 1800,
   },
@@ -83,7 +83,7 @@ function Scene({ etape }: { etape: number }) {
         <div className="mi__stat" {...foc(etape === 7)}>
           <b>{paires}</b>
           <span>paires de phrases</span>
-          <em data-on={etape >= 1 ? "1" : "0"}>7 domaines · chacune validée par un locuteur</em>
+          <em data-on={etape >= 1 ? "1" : "0"}>7 domaines · auditées par script</em>
           <em data-on={etape === 0 ? "1" : "0"}>aucun corpus parallèle public</em>
         </div>
       </div>

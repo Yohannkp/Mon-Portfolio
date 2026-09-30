@@ -12,7 +12,7 @@ const steps = [
   {
     icon: Database,
     title: "Préparer la donnée",
-    description: "La difficulté est souvent la donnée : la constituer, la nettoyer, la valider. Pour Mina, 360 paires construites à la main.",
+    description: "La difficulté est souvent la donnée : la constituer, la nettoyer, la valider. Pour Mina, 500 paires générées, 360 retenues après un audit automatique.",
   },
   {
     icon: Code,

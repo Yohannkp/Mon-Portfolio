@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import type { EasingParam } from "animejs"
 import { Button } from "@/components/ui/button"
 
 const TITRE_1 = "MLOps & Machine Learning Engineering"
@@ -37,7 +38,7 @@ export function Hero() {
     import("animejs")
       .then((A) => {
         if (annule || !racine.current) return
-        const ressort = (A.spring ?? A.createSpring) as (o: object) => unknown
+        const ressort = (A.spring ?? A.createSpring) as (o: object) => EasingParam
         const mots = el.querySelectorAll(".mot")
         const suite = el.querySelectorAll("[data-apres]")
 

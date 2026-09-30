@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, Download, Heart, Zap, Eye } from "lucide-react"
+import { ArrowRight, Heart, Zap, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
@@ -30,10 +30,10 @@ const values = [
 
 const timeline = [
   {
-    year: "2026",
-    title: "Stage — développement backend en Go",
+    year: "Juil. - août 2026",
+    title: "Stage — développeur backend Go, Soft Optimum Services",
     description:
-      "Backend d'un moteur de traitement de données (ETL) déjà en production : Go, Docker Compose.",
+      "Cinq semaines sur un moteur de traitement de données déjà en production : Go, Docker Compose, détection de panne automatique (heartbeat), audit des dépendances et durcissement des conteneurs.",
   },
   {
     year: "2025 - Présent",
@@ -43,17 +43,22 @@ const timeline = [
   {
     year: "2025",
     title: "Certifications Google & IBM Data Analytics",
-    description: "Obtention des certifications Google Advanced Data Analytics Professional et IBM Data Analyst Professional. Maîtrise complète de l'analyse de données, visualisation avec Tableau, et statistiques avancées.",
+    description: "Certifications Google Advanced Data Analytics et IBM Data Analyst Professional : analyse de données, visualisation et statistiques.",
   },
   {
     year: "2024 - 2025",
-    title: "Bachelor Développement Fullstack & DevOps - Paris",
-    description: "Formation complète en développement web et mobile avec une spécialisation DevOps. Maîtrise des technologies frontend (React, Flutter), backend (Node.js, Symfony) et des pratiques d'intégration continue.",
+    title: "Master 1 Big Data & IA - IPSSI Paris",
+    description: "Machine learning et deep learning (PyTorch, scikit-learn), traitement de grands volumes de données et pipelines Big Data.",
+  },
+  {
+    year: "Janv. - avr. 2024",
+    title: "Stage — développeur mobile Flutter, TRUSTLINE",
+    description: "Application mobile d'un produit de gestion hôtelière déjà en service, connectée aux API REST existantes du produit.",
   },
   {
     year: "2023 - 2024",
-    title: "Projets Personnels & Freelance",
-    description: "Développement d'applications mobiles et web pour divers clients. Création d'une expertise en Flutter, Firebase et développement de solutions innovantes.",
+    title: "Bachelor Développement Fullstack & DevOps - IPSSI Paris",
+    description: "Formation en développement web et mobile avec une spécialisation DevOps : React, Flutter, Node.js, Symfony et intégration continue.",
   },
   {
     year: "2020 - 2023",
@@ -66,7 +71,7 @@ export default function AboutPage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-24">
       {/* Hero */}
-      <div className="grid gap-12 md:grid-cols-[1fr,280px] md:items-start">
+      <div className="grid gap-12 md:grid-cols-[1fr_280px] md:items-start">
         <div>
           <h1 className="text-4xl font-semibold tracking-tight">À propos</h1>
           <div className="mt-6 space-y-4 text-lg leading-relaxed text-muted-foreground">
@@ -117,7 +122,7 @@ export default function AboutPage() {
             <Badge variant="secondary" className="text-sm">Data engineering</Badge>
           </div>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Je cherche une équipe technique, en <strong className="text-foreground">région parisienne ou en remote</strong>,
+            Je cherche une équipe technique, en <strong className="text-foreground">France (région parisienne en priorité, mobile partout), au Luxembourg ou en Belgique</strong>,
             où je pourrai mettre des modèles en production : les servir, les conteneuriser, les déployer, et
             mesurer qu&apos;ils font ce qu&apos;on attend d&apos;eux.
           </p>
