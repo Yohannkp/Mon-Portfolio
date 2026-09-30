@@ -1,7 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { FastForward, Play, Rewind, RotateCcw, Square, X } from "lucide-react"
+import { FastForward, Play, Rewind, RotateCcw, Square, Volume2, VolumeX, X } from "lucide-react"
+import { creerAmbiance, dureeEstimee, parler, preparerVoix, taire, voixDisponible, type Ambiance } from "@/components/audio-visite"
 import { DOSSIERS, NB_PHARES_MOT, PHARES } from "@/lib/dossiers"
 
 /**
@@ -208,6 +209,11 @@ export function PresentationAuto() {
   const derniereMaj = useRef(0)
   const [manoeuvre, setManoeuvre] = useState<null | "retour" | "avance">(null)
   const vitesse = useRef(1)
+  // Le son : la voix lit la phrase de chaque arret, la musique tient l'ambiance. Preference gardee d'une visite a l'autre.
+  const [son, setSon] = useState(true)
+  const sonRef = useRef(true)
+  const ambiance = useRef<Ambiance | null>(null)
+  const parle = useRef({ actif: false, jusqua: 0 })
   const avantLecture = useRef(false)
   const recul = useRef(0)
   const [invite, setInvite] = useState(false)
@@ -226,6 +232,46 @@ export function PresentationAuto() {
     m.current.dernierY = cible
     // Le site defile en douceur par defaut : ici, on pilote image par image, donc instantane.
     if (Math.round(window.scrollY) !== cible) window.scrollTo({ top: cible, behavior: "instant" as ScrollBehavior })
+  }
+
+  const dire = (phrase: string) => {
+    if (!sonRef.current || !voixDisponible()) {
+      parle.current.actif = false
+      return
+    }
+    parle.current = { actif: true, jusqua: performance.now() + dureeEstimee(phrase) + 1500 }
+    ambiance.current?.assourdir(true)
+    parler(phrase, () => {
+      parle.current.actif = false
+      ambiance.current?.assourdir(false)
+    })
+  }
+  /** Tant que la voix parle, la visite attend : on ne coupe jamais une phrase. (Pas pendant l'avance rapide.) */
+  const voixOccupee = () => sonRef.current && vitesse.current === 1 && parle.current.actif && performance.now() < parle.current.jusqua
+  const demarrerSon = () => {
+    if (!sonRef.current) return
+    ambiance.current = ambiance.current ?? creerAmbiance()
+    ambiance.current?.demarrer()
+  }
+  const couperSon = () => {
+    taire()
+    parle.current.actif = false
+    ambiance.current?.assourdir(false)
+    ambiance.current?.arreter()
+  }
+  const basculerSon = () => {
+    const v = !sonRef.current
+    sonRef.current = v
+    setSon(v)
+    try {
+      localStorage.setItem("pa-son", v ? "1" : "0")
+    } catch {}
+    if (!v) couperSon()
+    else if (etatRef.current === "lecture") {
+      demarrerSon()
+      const a = m.current.liste[m.current.i]
+      if (a) dire(texte(a.phrase))
+    }
   }
 
   /** Affiche l'arret i (phrase, carte mise en avant, robot) sans toucher a la position ni au minuteur. */
@@ -247,6 +293,8 @@ export function PresentationAuto() {
     const a0 = a.y0()
     const a1 = a.y1 ? a.y1() : a0
     montrer(i)
+    if (vitesse.current === 1) dire(texte(a.phrase))
+    else parle.current.actif = false
 
     const dedans = !!a.y1 && depuisY >= Math.min(a0, a1) - 30 && depuisY <= Math.max(a0, a1) + 30
     if (dedans) {
@@ -303,7 +351,7 @@ export function PresentationAuto() {
         if (a.jusqua) {
           s.phase = "attendre"
           s.ecoule = 0
-        } else suivant()
+        } else if (!voixOccupee()) suivant()
       }
     } else if (s.phase === "attendre") {
       poser(a0)
@@ -315,7 +363,7 @@ export function PresentationAuto() {
       frac = 0.5
     } else {
       poser(a0)
-      if (s.ecoule >= a.jusqua!.apres) suivant()
+      if (s.ecoule >= a.jusqua!.apres && !voixOccupee()) suivant()
       frac = 1
     }
 
@@ -359,6 +407,7 @@ export function PresentationAuto() {
     ecouter(false)
     // Le visiteur reprend la main : les cartes reviennent toutes a leur place.
     focaliser(null)
+    couperSon()
     if (etatRef.current === "lecture") changerEtat("pause")
   }
 
@@ -368,6 +417,7 @@ export function PresentationAuto() {
     ecouter(false)
     s.termine = true
     focaliser(null)
+    couperSon()
     changerEtat("repos")
     setAvancement(1)
     setNarration({ n: s.liste.length, total: s.liste.length, titre: "Fin de la visite", phrase: "Merci de votre attention. Vous pouvez la relancer à tout moment." })
@@ -396,6 +446,7 @@ export function PresentationAuto() {
     s.dernierY = Math.round(depuisY)
     fixerArret(i, depuisY)
     changerEtat("lecture")
+    demarrerSon()
     ecouter(true)
     cancelAnimationFrame(s.raf)
     s.raf = requestAnimationFrame(boucle)
@@ -418,6 +469,8 @@ export function PresentationAuto() {
     if (manoeuvre) return
     avantLecture.current = etatRef.current === "lecture"
     vitesse.current = 2
+    taire()
+    parle.current.actif = false
     setManoeuvre("avance")
     if (!avantLecture.current) basculer()
   }
@@ -426,6 +479,11 @@ export function PresentationAuto() {
     vitesse.current = 1
     setManoeuvre(null)
     if (!avantLecture.current && etatRef.current === "lecture") arreter()
+    else if (etatRef.current === "lecture") {
+      // Retour a la vitesse normale : on reprend la phrase de l'arret ou l'on est arrive.
+      const a = m.current.liste[m.current.i]
+      if (a) dire(texte(a.phrase))
+    }
   }
 
   const debutRetour = () => {
@@ -433,6 +491,8 @@ export function PresentationAuto() {
     const s = m.current
     avantLecture.current = etatRef.current === "lecture"
     cancelAnimationFrame(s.raf)
+    taire()
+    parle.current.actif = false
     window.clearTimeout(cacheFin.current)
     setFin(false)
     s.termine = false
@@ -490,7 +550,16 @@ export function PresentationAuto() {
   useEffect(() => {
     reduit.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const s = m.current
+    try {
+      const v = localStorage.getItem("pa-son") !== "0"
+      sonRef.current = v
+      setSon(v)
+    } catch {}
+    const finVoix = preparerVoix()
     return () => {
+      finVoix()
+      taire()
+      ambiance.current?.arreter()
       cancelAnimationFrame(s.raf)
       ecouter(false)
       window.clearTimeout(cacheFin.current)
@@ -713,6 +782,16 @@ export function PresentationAuto() {
             />
           </svg>
           {enCours ? <Square size={16} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
+        </button>
+        <button
+          className="pa__son"
+          data-on={son ? "1" : "0"}
+          onClick={basculerSon}
+          aria-pressed={son}
+          aria-label={son ? "Couper le son (voix et musique)" : "Activer le son (voix et musique)"}
+          title={son ? "Voix et musique : activées" : "Voix et musique : coupées"}
+        >
+          {son ? <Volume2 size={13} /> : <VolumeX size={13} />}
         </button>
       </div>
     </div>
