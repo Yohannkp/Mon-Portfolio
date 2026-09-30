@@ -22,7 +22,7 @@ Le site cherche un stage de 4 à 6 mois à partir d'avril 2027.
 1. **Hero** — le titre, la disponibilité et les deux appels à l'action.
 2. **Schéma RAG** — un pipeline animé (requête → recherche hybride vectorielle + BM25 → fusion RRF → reranking → réponse citée), épinglé pendant le défilement.
 3. **En chiffres** — le bandeau de compteurs.
-4. **Projets** — six études de cas : la question qu'un recruteur se pose, la preuve chiffrée en grand, un schéma de l'idée, et la méthode qui se déplie en un clic.
+4. **Projets** — sept études de cas : la question qu'un recruteur se pose, la preuve chiffrée en grand, un schéma de l'idée, et la méthode qui se déplie en un clic.
 5. **Démonstrations** — quatre visites guidées, chacune menée par le robot (RAG-Local sur des fichiers, un scan rendu cherchable, SELF_DEV_AGENT, Mina-Translator). Ce sont des simulations, et la page le dit.
 6. **À propos**, **Compétences**, **Méthode**, **Veille** — le profil, les technologies regroupées par famille avec une preuve pour chacune, la démarche de travail et ce qui est en cours d'apprentissage.
 7. **Contact** — l'appel final.
@@ -79,7 +79,7 @@ Le code est dans `components/objet-3d.tsx` (les scènes) et dans la fin de `app/
 Une liste de technologies ne dit pas pourquoi un projet compte. Chaque projet est donc décrit par un **dossier** (`lib/dossiers.ts`) : le problème posé, ce qui a été fait, ce que cela démontre, et **une preuve chiffrée quand elle existe**.
 
 - **Aucun chiffre inventé.** Chaque valeur vient d'un projet documenté (360 paires, AUC 0,88, 85 % de précision, +15 % de rotation des stocks, 0 requête sortante…). Un projet sans chiffre n'en reçoit pas : il a un enjeu et un résultat.
-- **Sur l'accueil**, six projets phares sont des études de cas. Chacun répond à une question de recruteur (« Peut-il livrer un système d'IA sans exposer les données ? »), avec un schéma qui illustre l'idée (`components/glyphes.tsx`). Le schéma est une illustration, jamais une mesure.
+- **Sur l'accueil**, sept projets phares sont des études de cas. Chacun répond à une question de recruteur (« Peut-il livrer un système d'IA sans exposer les données ? »), avec un schéma qui illustre l'idée (`components/glyphes.tsx`). Le schéma est une illustration, jamais une mesure.
 - **Sur `/projects`**, un bandeau réunit les huit preuves chiffrées, puis les 17 projets sont classés en quatre axes : mettre des modèles en production, affiner et entraîner, mesurer et prouver, construire des applications. Un sommaire collant suit l'axe lu. Il remplace l'ancien mur de filtres techniques.
 
 ## La présentation automatique (accueil uniquement)
@@ -91,7 +91,7 @@ Un bouton rond, en bas à gauche de la page d'accueil (il s'efface pendant que v
 - **Rappuyer reprend là où l'on est**, pas au début, et continue jusqu'à la fin. Après la fin, ▶ repart du début.
 - **Au survol**, « Recommencer » apparaît : la page remonte tout en haut, la démonstration repart de sa première étape, et la visite reprend à zéro.
 
-Les 17 arrêts suivent le fil de la page : accueil, schéma RAG (balayé lentement, car il est piloté par le défilement), chiffres, les six projets un par un avec sa question et sa preuve (les cinq autres s'estompent pendant qu'un projet est présenté), les démonstrations (la visite guidée de la démo se joue jusqu'au bout avant de continuer), à propos, compétences, méthode, veille, contact.
+Les 17 arrêts suivent le fil de la page : accueil, schéma RAG (balayé lentement, car il est piloté par le défilement), chiffres, les sept projets un par un avec sa question et sa preuve (les six autres s'estompent pendant qu'un projet est présenté), les démonstrations (la visite guidée de la démo se joue jusqu'au bout avant de continuer), à propos, compétences, méthode, veille, contact.
 
 Rien n'est « joué » à part : la visite ne fait que **faire défiler la page**, donc les animations et le robot se comportent exactement comme si l'on défilait à la main. Le moteur est dans `components/presentation-auto.tsx` ; ajouter un arrêt, c'est ajouter une entrée à la liste `ARRETS`. Avec `prefers-reduced-motion`, les trajets entre deux arrêts sont instantanés.
 

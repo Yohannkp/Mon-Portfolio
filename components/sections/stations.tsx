@@ -7,10 +7,10 @@ import { ArrowRight, ChevronDown } from "lucide-react"
 import { Chiffre } from "@/components/chiffre"
 import { Glyphe } from "@/components/glyphes"
 import { useVu } from "@/components/use-vu"
-import { AXES, DOSSIERS, PHARES, dossiersParAxe, type Dossier } from "@/lib/dossiers"
+import { AXES, DOSSIERS, NB_PHARES_MOT, PHARES, dossiersParAxe, type Dossier } from "@/lib/dossiers"
 
 /**
- * Les six projets phares, presentes comme des etudes de cas : la question qu'un
+ * Les projets phares, presentes comme des etudes de cas : la question qu'un
  * recruteur se pose, la preuve chiffree en grand, le schema de l'idee, et la
  * methode a un clic. Les donnees viennent de lib/dossiers.ts.
  *
@@ -95,7 +95,9 @@ export function Stations() {
     <section id="sec-stations" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <p className="rag__kicker">Projets</p>
-        <h2 className="rag__h2">Six projets, six preuves</h2>
+        <h2 className="rag__h2">
+          {NB_PHARES_MOT.charAt(0).toUpperCase() + NB_PHARES_MOT.slice(1)} projets, {NB_PHARES_MOT} preuves
+        </h2>
         <p className="rag__lede mb-12">
           Chacun répond à une question qu&apos;un recruteur se pose. Le chiffre est ce que j&apos;ai pu établir ; la méthode
           se déplie en un clic, et le reste est dans le dépôt.

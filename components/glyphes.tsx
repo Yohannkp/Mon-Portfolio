@@ -29,6 +29,27 @@ function Rag() {
   )
 }
 
+function Sql() {
+  return (
+    <>
+      <rect x="6" y="10" width="38" height="64" rx="5" className="gl__trait gl__doux" />
+      {[0, 1, 2, 3].map((i) => (
+        <path key={i} data-a style={d(i, 70)} d={`M12 ${24 + i * 14} H38`} className="gl__trait gl__doux" />
+      ))}
+      <path data-a style={d(4)} d="M48 42 H58" className="gl__trait gl__doux" />
+      <g data-a style={d(5)}>
+        <rect x="60" y="28" width="30" height="28" rx="5" className="gl__plein gl__accent" />
+        <text x="66" y="46" className="gl__texte gl__accent">CTE</text>
+      </g>
+      <path data-a style={d(6)} d="M93 42 H102" className="gl__trait gl__accent" />
+      {[0, 1, 2].map((i) => (
+        <rect key={i} data-a style={d(7 + i)} x={104 + i * 11} y={62 - (3 - i) * 16} width="8" height={(3 - i) * 16} rx="2"
+          className={`gl__plein ${i === 0 ? "gl__accent" : "gl__doux"}`} />
+      ))}
+    </>
+  )
+}
+
 function Mina() {
   const points: React.ReactNode[] = []
   for (let c = 0; c < 30; c++) {
@@ -129,6 +150,7 @@ function Texte() {
 
 const GLYPHES: Record<GlypheId, () => React.JSX.Element> = {
   rag: Rag,
+  sql: Sql,
   mina: Mina,
   agent: Agent,
   bascule: Bascule,

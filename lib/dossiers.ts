@@ -6,7 +6,7 @@
  * (lib/projects.ts, ou les depots). Un projet sans chiffre ne recoit pas de chiffre :
  * il a un enjeu et un resultat, c'est plus honnete qu'un nombre de decoration.
  *
- * Source unique : l'accueil (les six phares) et la page /projects s'en servent.
+ * Source unique : l'accueil (les projets phares) et la page /projects s'en servent.
  */
 
 export type Axe = "production" | "modele" | "mesure" | "application"
@@ -34,7 +34,7 @@ export const AXES: { id: Axe; titre: string; promesse: string }[] = [
   },
 ]
 
-export type GlypheId = "rag" | "mina" | "agent" | "bascule" | "paires" | "ab" | "texte"
+export type GlypheId = "rag" | "sql" | "mina" | "agent" | "bascule" | "paires" | "ab" | "texte"
 
 export type Dossier = {
   slug: string
@@ -59,7 +59,7 @@ export type Dossier = {
   /** `contain` pour un graphique : on ne rogne pas une courbe. */
   ajuste?: "cover" | "contain"
   glyphe?: GlypheId
-  /** Les six projets de l'accueil : leur rang, leur titre et la question qu'un recruteur se pose. */
+  /** Les projets phares de l'accueil : leur rang, leur titre et la question qu'un recruteur se pose. */
   phare?: { rang: number; titre: string; question: string }
 }
 
@@ -93,7 +93,7 @@ export const DOSSIERS: Dossier[] = [
     stack: ["Ollama", "Tool calling", "AST", "Python"],
     depot: "https://github.com/Yohannkp/Claude-local",
     glyphe: "agent",
-    phare: { rang: 3, titre: "Un agent qui vérifie son propre travail", question: "Peut-il rendre fiable un modèle qui ne l'est pas ?" },
+    phare: { rang: 4, titre: "Un agent qui vérifie son propre travail", question: "Peut-il rendre fiable un modèle qui ne l'est pas ?" },
   },
   {
     slug: "prediction-productivite",
@@ -123,7 +123,7 @@ export const DOSSIERS: Dossier[] = [
     stack: ["QLoRA", "Whisper", "FastAPI", "Streamlit"],
     depot: "https://github.com/Yohannkp/mina-translator",
     glyphe: "mina",
-    phare: { rang: 2, titre: "Une langue sans corpus", question: "Sait-il travailler quand la donnée n'existe pas ?" },
+    phare: { rang: 3, titre: "Une langue sans corpus", question: "Sait-il travailler quand la donnée n'existe pas ?" },
   },
   {
     slug: "snake-rl-dqn",
@@ -139,7 +139,7 @@ export const DOSSIERS: Dossier[] = [
     depot: "https://github.com/Yohannkp/Apprentissage-par-renforcement-Snake-Game",
     image: "/projects/Apprentissage par renforcement Snake Game.png",
     ajuste: "contain",
-    phare: { rang: 5, titre: "Un environnement écrit à la main", question: "Comprend-il ce qu'il entraîne ?" },
+    phare: { rang: 6, titre: "Un environnement écrit à la main", question: "Comprend-il ce qu'il entraîne ?" },
   },
   {
     slug: "analyse-emotions-temps-reel",
@@ -182,7 +182,7 @@ export const DOSSIERS: Dossier[] = [
     depot: "https://github.com/Yohannkp/Optimisation-des-ventes",
     image: "/projects/optimisation-ventes-chips.png",
     glyphe: "paires",
-    phare: { rang: 6, titre: "Mesurer sans pouvoir randomiser", question: "Peut-il prouver un effet quand on ne peut pas tirer au sort ?" },
+    phare: { rang: 7, titre: "Mesurer sans pouvoir randomiser", question: "Peut-il prouver un effet quand on ne peut pas tirer au sort ?" },
   },
   {
     slug: "finance-credit-scoring",
@@ -218,10 +218,12 @@ export const DOSSIERS: Dossier[] = [
     enjeu: "Identifier les segments de clients à forte valeur dans plus de 300 000 transactions.",
     resultat: "Des requêtes SQL analytiques (CTE, fonctions de fenêtrage). Les leviers dégagés ont contribué à une hausse de la rotation des stocks.",
     chiffre: { valeur: "+15 %", unite: "de rotation des stocks" },
-    prouve: ["SQL avancé"],
+    prouve: ["SQL avancé", "Analyse métier"],
     stack: ["SQL", "CTE", "Fonctions de fenêtrage"],
     depot: "https://github.com/Yohannkp/Supermarket-Sales-Analysis-SQL-Driven-Business-Insights",
     image: "/projects/Supermarket Sales Analysis – SQL-Driven Business Insights.png",
+    glyphe: "sql",
+    phare: { rang: 2, titre: "Trouver la valeur dans 300 000 transactions", question: "Sait-il faire parler une grande base avec du SQL ?" },
   },
   {
     slug: "ab-test-landing-page",
@@ -253,7 +255,7 @@ export const DOSSIERS: Dossier[] = [
     fiche: "/projects/leboncoin-mern",
     image: "/projects/leboncoin.png",
     glyphe: "bascule",
-    phare: { rang: 4, titre: "Changer de base sans tout casser", question: "Sait-il faire évoluer un backend sans le casser ?" },
+    phare: { rang: 5, titre: "Changer de base sans tout casser", question: "Sait-il faire évoluer un backend sans le casser ?" },
   },
   {
     slug: "applyflow",
@@ -316,3 +318,8 @@ export const dossiersParAxe = (axe: Axe) => DOSSIERS.filter((d) => d.axe === axe
 
 /** Les preuves chiffrees : ce que la page /projects met en avant en tete. */
 export const PREUVES = DOSSIERS.filter((d) => d.chiffre)
+
+/** Le nombre de projets phares, en toutes lettres (« Sept projets, sept preuves »). */
+const MOTS = ["zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix"]
+export const NB_PHARES = PHARES.length
+export const NB_PHARES_MOT = MOTS[PHARES.length] ?? String(PHARES.length)

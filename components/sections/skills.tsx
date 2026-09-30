@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { Badge } from "@/components/ui/badge"
 
@@ -18,7 +19,7 @@ const skillCategories = [
   },
   {
     name: "Données",
-    skills: ["PostgreSQL", "Neo4j", "ETL", "Power BI"],
+    skills: ["SQL avancé (CTE, fenêtrage)", "PostgreSQL", "Neo4j", "ETL", "Power BI"],
   },
 ]
 
@@ -54,11 +55,17 @@ export function Skills() {
                 {category.name}
               </h3>
               <div className="mt-4 flex flex-wrap gap-2">
-                {category.skills.map((skill) => (
-                  <Badge key={skill} variant="secondary">
-                    {skill}
-                  </Badge>
-                ))}
+                {category.skills.map((skill) =>
+                  skill.startsWith("SQL avancé") ? (
+                    <Link key={skill} href="/projects#mesure" title="Voir la preuve : Ventes en supermarché">
+                      <Badge className="border-accent/50 bg-accent/15 text-accent hover:bg-accent/25">{skill} ↗</Badge>
+                    </Link>
+                  ) : (
+                    <Badge key={skill} variant="secondary">
+                      {skill}
+                    </Badge>
+                  ),
+                )}
               </div>
             </motion.div>
           ))}

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Play, RotateCcw, Square } from "lucide-react"
-import { DOSSIERS, PHARES } from "@/lib/dossiers"
+import { DOSSIERS, NB_PHARES_MOT, PHARES } from "@/lib/dossiers"
 
 /**
  * La presentation automatique : une visite de l'accueil qui defile toute seule.
@@ -92,7 +92,7 @@ const ARRETS: Arret[] = [
   {
     cle: "projets",
     titre: "Projets",
-    phrase: "Six projets, six preuves : chacun répond à une question qu'un recruteur se pose.",
+    phrase: `${NB_PHARES_MOT.charAt(0).toUpperCase() + NB_PHARES_MOT.slice(1)} projets, ${NB_PHARES_MOT} preuves : chacun répond à une question qu'un recruteur se pose.`,
     ok: existe("#sec-stations"),
     y0: () => haut(q("#sec-stations")) + 20,
     duree: 3400,

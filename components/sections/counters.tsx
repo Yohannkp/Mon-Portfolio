@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { NB_PHARES } from "@/lib/dossiers"
 
 const CHIFFRES = [
   { valeur: 24, suffixe: "", libelle: "Dépôts publics" },
   { valeur: 2, suffixe: "", libelle: "Stages en entreprise" },
-  { valeur: 6, suffixe: "", libelle: "Projets en vitrine" },
+  { valeur: NB_PHARES, suffixe: "", libelle: "Projets en vitrine" },
   { valeur: 100, suffixe: " %", libelle: "Exécution locale" },
 ]
 
