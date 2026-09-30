@@ -41,29 +41,84 @@
 .pa__progres { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset .35s linear; }
 .pa__btn[data-etat="lecture"] .pa__progres { stroke: var(--background); }
 
-.pa__recom { position: absolute; left: calc(100% + 10px); display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
-  cursor: pointer; border: 1px solid var(--bord-doux); border-radius: 50%; color: var(--muted-foreground);
-  background: color-mix(in oklch, var(--card) 92%, transparent); backdrop-filter: blur(12px);
-  opacity: 0; transform: translateX(-14px) scale(.8); pointer-events: none;
-  transition: opacity .25s ease, transform .3s cubic-bezier(.2, .7, .2, 1), color .2s, border-color .2s; }
-.pa__rang:hover .pa__recom, .pa__rang:focus-within .pa__recom { opacity: 1; transform: none; pointer-events: auto; }
-.pa__recom:hover { color: var(--foreground); border-color: var(--muted-foreground); }
-
-.pa__label { position: absolute; left: calc(100% + 60px); white-space: nowrap; padding: .4rem .7rem; pointer-events: none;
-  border: 1px solid var(--bord-doux); border-radius: 999px; font-size: .78rem; color: var(--muted-foreground);
-  background: color-mix(in oklch, var(--card) 92%, transparent); backdrop-filter: blur(12px);
-  opacity: 0; transform: translateX(-6px); transition: opacity .25s ease, transform .25s ease; }
-.pa__rang:hover .pa__label, .pa__btn:focus-visible ~ .pa__label { opacity: 1; transform: none; }
+/* Au survol : trois bulles a droite du bouton. « Retour » et « ×2 » se tiennent enfoncees : tant qu'on
+   appuie, la visite recule ou avance a double vitesse ; « Recommencer » remet tout au debut. */
+.pa__menu { position: absolute; left: calc(100% + 12px); top: 50%; display: flex; align-items: center; gap: .5rem;
+  transform: translate(-14px, -50%) scale(.9); transform-origin: left center; opacity: 0; pointer-events: none;
+  transition: opacity .25s ease, transform .35s cubic-bezier(.2, .8, .2, 1); }
+.pa__rang:hover .pa__menu, .pa__rang:focus-within .pa__menu, .pa[data-manoeuvre="1"] .pa__menu { opacity: 1; transform: translate(0, -50%); pointer-events: auto; }
+.pa__pill { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem .8rem; cursor: pointer; white-space: nowrap;
+  border: 1px solid var(--bord-doux); border-radius: 999px; font-size: .8rem; font-weight: 500; color: var(--foreground);
+  background: var(--card); box-shadow: var(--ombre-carte); user-select: none; -webkit-user-select: none; touch-action: none;
+  -webkit-touch-callout: none; transition: transform .2s cubic-bezier(.2, .7, .2, 1), background .2s, color .2s, border-color .2s, box-shadow .25s; }
+.pa__pill small { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); }
+.pa__pill svg { color: var(--accent); }
+.pa__pill:hover { border-color: color-mix(in oklch, var(--accent) 55%, var(--border)); transform: translateY(-1px); }
+.pa__pill[data-actif="1"] { transform: scale(.96); color: var(--background); background: var(--accent); border-color: var(--accent);
+  box-shadow: 0 0 0 5px color-mix(in oklch, var(--accent) 22%, transparent), 0 0 26px -6px var(--accent); }
+.pa__pill[data-actif="1"] svg, .pa__pill[data-actif="1"] small { color: var(--background); }
+.pa__pill:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.pa__recom { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; cursor: pointer; border: 1px solid var(--bord-doux); border-radius: 50%;
+  color: var(--muted-foreground); background: var(--card); box-shadow: var(--ombre-carte); transition: color .2s, border-color .2s, transform .2s; }
+.pa__recom:hover { color: var(--foreground); border-color: var(--muted-foreground); transform: rotate(-30deg); }
 
 /* Telephone : un petit rond en bas a droite (le pouce y arrive, et le texte est aligne a gauche).
    « Recommencer » n'apparait que si une visite est commencee : pas de survol au doigt. */
 @media (max-width: 720px) {
   .pa { left: auto; right: 16px; bottom: 16px; align-items: flex-end; }
   .pa__btn { width: 48px; height: 48px; }
-  .pa__label, .pa__rang::before { display: none; }
-  .pa__recom { left: auto; right: calc(100% + 8px); width: 36px; height: 36px; transform: none; opacity: 0; pointer-events: none; }
-  .pa[data-etat="lecture"] .pa__recom, .pa[data-etat="pause"] .pa__recom, .pa[data-fin="1"] .pa__recom { opacity: 1; pointer-events: auto; }
+  .pa__rang::before { display: none; }
+  /* Pas de survol au doigt : les bulles sont la des qu'une visite est commencee, a gauche du bouton. */
+  .pa__menu { left: auto; right: calc(100% + 8px); flex-direction: row-reverse; transform: translate(0, -50%); }
+  .pa[data-etat="lecture"] .pa__menu, .pa[data-etat="pause"] .pa__menu, .pa[data-fin="1"] .pa__menu { opacity: 1; pointer-events: auto; }
+  .pa__pill { padding: .45rem .65rem; }
+  .pa__pill small { display: none; }
+  .pa__recom { width: 36px; height: 36px; }
+}
+
+/* ---------- L'invitation : douce, mais impossible a rater ---------------------------------------
+   Une carte qui monte doucement au-dessus du bouton, avec sa petite pointe, et un anneau qui respire
+   autour du bouton tant qu'elle est la. Elle ne prend jamais le focus et se ferme d'un geste. */
+.pa__invite { position: absolute; left: 0; bottom: calc(100% + 18px); width: min(330px, calc(100vw - 32px)); padding: 1rem 1.1rem 1rem;
+  border: 1px solid color-mix(in oklch, var(--accent) 45%, var(--bord-doux)); border-radius: var(--r-carte);
+  background: color-mix(in oklch, var(--card) 90%, var(--accent) 10%); backdrop-filter: blur(14px);
+  box-shadow: var(--ombre-carte), 0 0 0 4px color-mix(in oklch, var(--accent) 9%, transparent), 0 18px 50px -20px color-mix(in oklch, var(--accent) 55%, transparent);
+  opacity: 0; transform: translateY(12px) scale(.97); pointer-events: none; transform-origin: 28px 100%;
+  transition: opacity .7s ease, transform .8s cubic-bezier(.2, .8, .2, 1); }
+.pa__invite[data-on="1"] { opacity: 1; transform: none; pointer-events: auto; animation: pa-respire 3.6s ease-in-out .9s infinite; }
+.pa__invite::after { content: ""; position: absolute; left: 22px; bottom: -7px; width: 12px; height: 12px; rotate: 45deg;
+  border-right: 1px solid color-mix(in oklch, var(--accent) 45%, var(--bord-doux)); border-bottom: 1px solid color-mix(in oklch, var(--accent) 45%, var(--bord-doux));
+  background: color-mix(in oklch, var(--card) 90%, var(--accent) 10%); }
+.pa__invite-k { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--accent); }
+.pa__invite-t { margin-top: .4rem; padding-right: 1rem; font-size: .92rem; line-height: 1.55; color: var(--foreground); }
+.pa__invite-a { display: flex; align-items: center; gap: .9rem; margin-top: .85rem; }
+.pa__invite-go { display: inline-flex; align-items: center; gap: .45rem; padding: .5rem .95rem; cursor: pointer; border: 0; border-radius: 999px;
+  font-size: .82rem; font-weight: 500; color: var(--background); background: var(--accent);
+  transition: transform .2s cubic-bezier(.2, .7, .2, 1), box-shadow .25s ease; }
+.pa__invite-go:hover { transform: translateY(-1px); box-shadow: 0 8px 22px -8px var(--accent); }
+.pa__invite-go:active { transform: scale(.96); }
+.pa__invite-non { padding: .3rem .2rem; cursor: pointer; border: 0; background: none; font-size: .8rem; color: var(--muted-foreground); transition: color .2s; }
+.pa__invite-non:hover { color: var(--foreground); }
+.pa__invite-x { position: absolute; right: .55rem; top: .55rem; display: grid; place-items: center; width: 24px; height: 24px; padding: 0; cursor: pointer;
+  border: 0; border-radius: 50%; background: none; color: var(--muted-foreground); transition: color .2s, background .2s; }
+.pa__invite-x:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 8%, transparent); }
+.pa__invite button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@keyframes pa-respire {
+  0%, 100% { box-shadow: var(--ombre-carte), 0 0 0 4px color-mix(in oklch, var(--accent) 8%, transparent), 0 18px 50px -20px color-mix(in oklch, var(--accent) 45%, transparent); }
+  50% { box-shadow: var(--ombre-carte), 0 0 0 8px color-mix(in oklch, var(--accent) 14%, transparent), 0 18px 60px -16px color-mix(in oklch, var(--accent) 70%, transparent); }
+}
+/* Tant que l'invitation est la, le bouton reste visible meme pendant le defilement : c'est ce qu'elle designe. */
+.pa[data-invite="1"][data-defile="1"] .pa__rang, .pa[data-manoeuvre="1"] .pa__rang { opacity: 1; transform: none; pointer-events: auto; }
+/* Le bouton lui-meme : un anneau qui s'elargit doucement, pour relier la carte a ce qu'elle designe. */
+.pa[data-invite="1"] .pa__btn::before { content: ""; position: absolute; inset: -2px; border-radius: 50%; pointer-events: none;
+  border: 2px solid var(--accent); opacity: 0; animation: pa-onde 2.6s ease-out .9s infinite; }
+@keyframes pa-onde { 0% { transform: scale(1); opacity: .55; } 100% { transform: scale(1.7); opacity: 0; } }
+@media (max-width: 720px) {
+  .pa__invite { left: auto; right: 0; transform-origin: calc(100% - 24px) 100%; }
+  .pa__invite::after { left: auto; right: 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pa__carte, .pa__btn, .pa__recom, .pa__label, .pa__progres { transition: none; }
+  .pa__invite[data-on="1"], .pa[data-invite="1"] .pa__btn::before { animation: none; }
+  .pa__carte, .pa__btn, .pa__recom, .pa__menu, .pa__pill, .pa__progres { transition: none; }
 }

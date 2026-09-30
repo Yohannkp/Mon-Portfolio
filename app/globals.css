@@ -4,25 +4,27 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.965 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.965 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.55 0.15 250);
-  --accent-foreground: oklch(0.985 0 0);
+  /* Mode clair : un papier doux, pas un blanc pur. Le fond, les cartes et le texte sont tous adoucis
+     (fond ~ #ecedf1, cartes un cran plus clair, encre bleu-gris et non noire) pour ne pas eblouir. */
+  --background: oklch(0.945 0.006 255);
+  --foreground: oklch(0.255 0.02 258);
+  --card: oklch(0.972 0.004 255);
+  --card-foreground: oklch(0.255 0.02 258);
+  --popover: oklch(0.972 0.004 255);
+  --popover-foreground: oklch(0.255 0.02 258);
+  --primary: oklch(0.3 0.025 258);
+  --primary-foreground: oklch(0.975 0.004 255);
+  --secondary: oklch(0.915 0.008 255);
+  --secondary-foreground: oklch(0.3 0.025 258);
+  --muted: oklch(0.915 0.008 255);
+  --muted-foreground: oklch(0.44 0.02 258);
+  --accent: oklch(0.5 0.15 252);
+  --accent-foreground: oklch(0.975 0.004 255);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.55 0.15 250);
+  --border: oklch(0.865 0.01 255);
+  --input: oklch(0.865 0.01 255);
+  --ring: oklch(0.5 0.15 252);
   --chart-1: oklch(0.646 0.222 41.116); /* New from default */
   --chart-2: oklch(0.6 0.118 184.704); /* New from default */
   --chart-3: oklch(0.398 0.07 227.392); /* New from default */
@@ -248,8 +250,8 @@
 .demo__titre { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; font-weight: 500;
   letter-spacing: .14em; text-transform: uppercase; color: var(--muted-foreground); }
 .demo__sim { margin-left: auto; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px;
-  font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: oklch(0.8 0.13 75);
-  border: 1px solid color-mix(in oklch, oklch(0.8 0.13 75) 40%, transparent); border-radius: 999px; padding: .3rem .55rem; }
+  font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--sim-c, oklch(0.8 0.13 75));
+  border: 1px solid color-mix(in oklch, var(--sim-c, oklch(0.8 0.13 75)) 40%, transparent); border-radius: 999px; padding: .3rem .55rem; }
 /* ---------- onglets de demonstration ---------- */
 .onglets { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 2rem;
   border-bottom: 1px solid var(--border); padding-bottom: .75rem; }
@@ -457,6 +459,8 @@ main > section, main > div { position: relative; z-index: 1; }
 .obj__halo { transition: opacity .5s ease, transform .5s ease; }
 .obj-ombre { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .55s ease;
   background: radial-gradient(circle at 50% 50%, rgb(0 0 0 / .34), rgb(0 0 0 / .5)); }
+:root:not(.dark) { --sim-c: oklch(0.5 0.12 65); }
+:root:not(.dark) .obj-ombre { background: radial-gradient(circle at 50% 50%, rgb(20 28 50 / .1), rgb(20 28 50 / .22)); }
 html[data-robot-anim="avant"] .obj-ombre { opacity: 1; }
 
 /* Il tourne sur lui-meme, un tour complet. */

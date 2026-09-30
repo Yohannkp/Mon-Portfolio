@@ -89,7 +89,8 @@ Un bouton rond, en bas à gauche de la page d'accueil (il s'efface pendant que v
 - **▶ / ■** lance ou arrête la visite. Au repos, le bouton n'est qu'une icône ; en lecture, la phrase du guide s'affiche au-dessus (« Étape 5 / 17 · Projet 2 sur 6 · Mina-Translator »), et un anneau autour du bouton indique l'avancement.
 - **Défiler arrête aussitôt** : molette, tactile, clavier (flèches, espace, Page haut/bas, Échap) ou glissement de la barre de défilement.
 - **Rappuyer reprend là où l'on est**, pas au début, et continue jusqu'à la fin. Après la fin, ▶ repart du début.
-- **Au survol**, « Recommencer » apparaît : la page remonte tout en haut, la démonstration repart de sa première étape, et la visite reprend à zéro.
+- **Invitation :** quand le visiteur arrive de lui-même sur les projets (en faisant défiler, pas pendant une visite), une petite carte douce monte au-dessus du bouton et lui propose de lancer la visite à partir de là ; un anneau respire autour du bouton. Elle reste visible même pendant que le visiteur défile (le bouton ne s'efface pas tant qu'elle est là) et, s'il file très vite, au moins 6 secondes. Fermée d'un geste (croix, « Plus tard », Échap), elle ne revient plus de la session ; simplement quittée, elle peut revenir, trois fois au plus (`sessionStorage`). `/?invitation` remet ces compteurs à zéro pour la revoir.
+- **Au survol**, trois bulles apparaissent à droite du bouton. **Retour** et **×2** se tiennent enfoncées : tant qu'on appuie, la visite remonte (de plus en plus vite) ou avance à double vitesse, et la phrase, la carte et le robot suivent. Au relâchement, elle reprend normalement si elle jouait, sinon elle reste en pause. **Recommencer** remet la page tout en haut, la démonstration à sa première étape, et relance la visite à zéro. Au clavier : Espace ou Entrée maintenus. Sur téléphone, les bulles sont visibles dès qu'une visite est commencée, à gauche du bouton.
 
 Les 17 arrêts suivent le fil de la page : accueil, schéma RAG (balayé lentement, car il est piloté par le défilement), chiffres, les sept projets un par un avec sa question et sa preuve (le projet présenté grandit nettement, de 10 %, pendant que les six autres reculent et s'estompent ; le robot se cale sur son bord, et le schéma du projet se met en mouvement : une vague qui parcourt ses éléments dans l'ordre, et des flux sur les traits en tirets), les démonstrations (la visite guidée de la démo se joue jusqu'au bout avant de continuer), à propos, compétences, méthode, veille, contact.
 
@@ -100,6 +101,10 @@ Rien n'est « joué » à part : la visite ne fait que **faire défiler la page*
 Ce site n'a pas de serveur de courrier. Le formulaire **ne prétend donc pas envoyer** : il prépare le message dans l'application e-mail du visiteur (`mailto:` avec sujet et corps remplis), lui dit clairement qu'il lui reste à l'envoyer, et lui donne l'adresse si rien ne s'ouvre (boutons « Rouvrir » et « Copier l'adresse »). La saisie est conservée si on clique sur « Modifier le message ». Les coordonnées viennent d'un seul endroit : `lib/contact.ts`.
 
 Pour recevoir les messages directement dans une boîte, sans passer par l'application e-mail du visiteur, il faudrait un service d'envoi (Formspree, Web3Forms, Resend…) et sa clé : c'est une décision à part.
+
+## Mode clair
+
+Le mode clair n'est pas un blanc pur : fond gris-bleu doux (≈ `#ecedf1`), cartes un cran plus claires, texte bleu-gris plutôt que noir, bleu d'accent plus profond pour rester lisible, et un fond qui ne s'assombrit que légèrement quand le robot se met en avant. La couleur de la barre du navigateur (mobile) suit aussi le thème.
 
 ## Version mobile
 

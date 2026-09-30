@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Play, RotateCcw, Square } from "lucide-react"
+import { FastForward, Play, Rewind, RotateCcw, Square, X } from "lucide-react"
 import { DOSSIERS, NB_PHARES_MOT, PHARES } from "@/lib/dossiers"
 
 /**
@@ -206,6 +206,12 @@ export function PresentationAuto() {
   const cacheFin = useRef(0)
   const racine = useRef<HTMLDivElement>(null)
   const derniereMaj = useRef(0)
+  const [manoeuvre, setManoeuvre] = useState<null | "retour" | "avance">(null)
+  const vitesse = useRef(1)
+  const avantLecture = useRef(false)
+  const recul = useRef(0)
+  const [invite, setInvite] = useState(false)
+  const inviteVue = useRef(false)
 
   const changerEtat = useCallback((e: Etat) => {
     etatRef.current = e
@@ -222,6 +228,15 @@ export function PresentationAuto() {
     if (Math.round(window.scrollY) !== cible) window.scrollTo({ top: cible, behavior: "instant" as ScrollBehavior })
   }
 
+  /** Affiche l'arret i (phrase, carte mise en avant, robot) sans toucher a la position ni au minuteur. */
+  const montrer = (i: number) => {
+    const s = m.current
+    const a = s.liste[i]
+    document.documentElement.dataset.visiteEtape = String(i)
+    focaliser(a.carte ?? null)
+    setNarration({ n: i + 1, total: s.liste.length, titre: texte(a.titre), phrase: texte(a.phrase) })
+  }
+
   const fixerArret = (i: number, depuisY: number) => {
     const s = m.current
     const a = s.liste[i]
@@ -231,9 +246,7 @@ export function PresentationAuto() {
     s.p0 = 0
     const a0 = a.y0()
     const a1 = a.y1 ? a.y1() : a0
-    document.documentElement.dataset.visiteEtape = String(i)
-    focaliser(a.carte ?? null)
-    setNarration({ n: i + 1, total: s.liste.length, titre: texte(a.titre), phrase: texte(a.phrase) })
+    montrer(i)
 
     const dedans = !!a.y1 && depuisY >= Math.min(a0, a1) - 30 && depuisY <= Math.max(a0, a1) + 30
     if (dedans) {
@@ -265,7 +278,7 @@ export function PresentationAuto() {
     // Le temps s'accumule par petits pas : un onglet en arriere-plan ne fait pas « sauter » la visite.
     const dt = Math.min(t - (s.dernierT || t), 64)
     s.dernierT = t
-    s.ecoule += dt
+    s.ecoule += dt * vitesse.current
     const a = s.liste[s.i]
     const a0 = a.y0()
     const a1 = a.y1 ? a.y1() : a0
@@ -398,6 +411,69 @@ export function PresentationAuto() {
     else lancer(window.scrollY)
   }
 
+  /* ------------------- maintenir : avance rapide x2 et retour ------------------- */
+  // Le geste compte : tant que la bulle est tenue, la visite avance a double vitesse ou remonte ;
+  // au relachement elle reprend normalement si elle jouait, sinon elle reste en pause.
+  const debutAvance = () => {
+    if (manoeuvre) return
+    avantLecture.current = etatRef.current === "lecture"
+    vitesse.current = 2
+    setManoeuvre("avance")
+    if (!avantLecture.current) basculer()
+  }
+  const finAvance = () => {
+    if (vitesse.current !== 2) return
+    vitesse.current = 1
+    setManoeuvre(null)
+    if (!avantLecture.current && etatRef.current === "lecture") arreter()
+  }
+
+  const debutRetour = () => {
+    if (manoeuvre) return
+    const s = m.current
+    avantLecture.current = etatRef.current === "lecture"
+    cancelAnimationFrame(s.raf)
+    window.clearTimeout(cacheFin.current)
+    setFin(false)
+    s.termine = false
+    s.liste = ARRETS.filter((a) => a.ok?.() ?? true)
+    if (!s.liste.length) return
+    setManoeuvre("retour")
+    const t0 = performance.now()
+    let dernier = t0
+    let courant = -1
+    const pas = (t: number) => {
+      const dt = Math.min(t - dernier, 64)
+      dernier = t
+      // Elle accelere doucement : un appui bref recule un peu, un appui long remonte loin.
+      const v = 650 + Math.min((t - t0) / 1600, 1) * 1350
+      const y = Math.max(0, window.scrollY - (v * dt) / 1000)
+      poser(y)
+      let idx = 0
+      s.liste.forEach((a, k) => {
+        if (a.y0() <= y + 40) idx = k
+      })
+      if (idx !== courant) {
+        courant = idx
+        montrer(idx)
+        setAvancement((idx + 0.5) / s.liste.length)
+      }
+      if (y > 0) recul.current = requestAnimationFrame(pas)
+    }
+    recul.current = requestAnimationFrame(pas)
+  }
+  const finRetour = () => {
+    cancelAnimationFrame(recul.current)
+    if (manoeuvre !== "retour") return
+    setManoeuvre(null)
+    // Elle repart la ou l'on est arrive ; sinon elle attend en pause, prete a « Reprendre ».
+    if (avantLecture.current) lancer(window.scrollY)
+    else {
+      focaliser(null)
+      changerEtat("pause")
+    }
+  }
+
   /** Revient tout en haut, remet la demo a zero, et recommence la presentation depuis le debut. */
   const recommencer = () => {
     if (etatRef.current === "lecture") {
@@ -444,6 +520,97 @@ export function PresentationAuto() {
     }
   }, [])
 
+  // L'invitation : quand le visiteur arrive de lui-meme sur les projets, un petit message doux lui propose
+  // de lancer la visite a partir de la. Jamais pendant une visite. Fermee d'un geste = plus jamais ;
+  // simplement quittee (il a defile plus loin) = elle peut revenir, trois fois au plus par session.
+  const lu = (cle: string) => {
+    try {
+      return sessionStorage.getItem(cle)
+    } catch {
+      return null
+    }
+  }
+  const ecrire = (cle: string, v: string) => {
+    try {
+      sessionStorage.setItem(cle, v)
+    } catch {}
+  }
+  const plafondInvite = useRef(0)
+  const vueDepuis = useRef(0)
+  const departInvite = useRef(0)
+  const cacherInvite = useCallback(() => {
+    window.clearTimeout(plafondInvite.current)
+    window.clearTimeout(departInvite.current)
+    inviteVue.current = false
+    setInvite(false)
+  }, [])
+  const fermerInvite = useCallback(() => {
+    cacherInvite()
+    ecrire("pa-invite", "1")
+  }, [cacherInvite])
+
+  useEffect(() => {
+    const section = document.getElementById("sec-stations")
+    if (!section || typeof IntersectionObserver === "undefined") return
+    // /?invitation remet les compteurs a zero : pratique pour la revoir sans navigation privee.
+    if (new URLSearchParams(window.location.search).has("invitation")) {
+      try {
+        sessionStorage.removeItem("pa-invite")
+        sessionStorage.removeItem("pa-invite-n")
+      } catch {}
+    }
+    let delai = 0
+    const io = new IntersectionObserver(
+      ([e]) => {
+        window.clearTimeout(delai)
+        if (!e.isIntersecting) {
+          // Il quitte les projets. S'il a file tres vite, elle reste au moins 6 s : il doit pouvoir la lire.
+          if (inviteVue.current) {
+            const reste = 6000 - (performance.now() - vueDepuis.current)
+            if (reste <= 0) cacherInvite()
+            else departInvite.current = window.setTimeout(cacherInvite, reste)
+          }
+          return
+        }
+        window.clearTimeout(departInvite.current)
+        if (inviteVue.current || etatRef.current !== "repos" || m.current.termine) return
+        if (lu("pa-invite") === "1" || Number(lu("pa-invite-n") ?? 0) >= 3) return
+        delai = window.setTimeout(() => {
+          if (etatRef.current !== "repos" || inviteVue.current) return
+          inviteVue.current = true
+          ecrire("pa-invite-n", String(Number(lu("pa-invite-n") ?? 0) + 1))
+          vueDepuis.current = performance.now()
+          setInvite(true)
+          plafondInvite.current = window.setTimeout(cacherInvite, 45000)
+        }, 250)
+      },
+      // Le haut de la section a passe les 40 % bas de l'ecran (sur telephone, la section est bien trop haute pour un seuil de surface).
+      { threshold: 0, rootMargin: "0px 0px -40% 0px" },
+    )
+    io.observe(section)
+    return () => {
+      io.disconnect()
+      window.clearTimeout(delai)
+      window.clearTimeout(plafondInvite.current)
+      window.clearTimeout(departInvite.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Des que la visite demarre (par l'invitation ou par le bouton), elle disparait.
+  useEffect(() => {
+    if (etat === "lecture" && invite) fermerInvite()
+  }, [etat, invite, fermerInvite])
+
+  useEffect(() => {
+    if (!invite) return
+    const surTouche = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") fermerInvite()
+    }
+    window.addEventListener("keydown", surTouche)
+    return () => window.removeEventListener("keydown", surTouche)
+  }, [invite, fermerInvite])
+
   const enCours = etat === "lecture"
   const entame = avancement > 0 && !fin
   const libelle = enCours ? "Arrêter la présentation" : entame ? "Reprendre la présentation" : "Présentation automatique"
@@ -451,8 +618,8 @@ export function PresentationAuto() {
   const C = 2 * Math.PI * R
 
   return (
-    <div className="pa" ref={racine} data-etat={etat} data-fin={fin ? "1" : "0"}>
-      <div className="pa__carte" data-on={narration && (enCours || fin) ? "1" : "0"} role="status" aria-live="polite">
+    <div className="pa" ref={racine} data-etat={etat} data-fin={fin ? "1" : "0"} data-invite={invite ? "1" : "0"} data-manoeuvre={manoeuvre ? "1" : "0"}>
+      <div className="pa__carte" data-on={narration && (enCours || fin || manoeuvre) ? "1" : "0"} role="status" aria-live="polite">
         {narration ? (
           <>
             <p className="pa__etape">
@@ -464,10 +631,75 @@ export function PresentationAuto() {
       </div>
 
       <div className="pa__rang">
-        <button className="pa__recom" onClick={recommencer} aria-label="Recommencer la présentation depuis le début" title="Recommencer">
-          <RotateCcw size={16} />
-        </button>
-        <button className="pa__btn" onClick={basculer} aria-label={libelle} aria-pressed={enCours} data-etat={etat}>
+        <div className="pa__invite" data-on={invite ? "1" : "0"} role="status" aria-hidden={invite ? undefined : true}>
+          <button className="pa__invite-x" onClick={fermerInvite} aria-label="Fermer l'invitation" tabIndex={invite ? 0 : -1}>
+            <X size={14} />
+          </button>
+          <p className="pa__invite-k">Visite guidée</p>
+          <p className="pa__invite-t">Envie que je vous présente les projets ? Je vous guide pas à pas, à partir d&apos;ici.</p>
+          <div className="pa__invite-a">
+            <button className="pa__invite-go" onClick={basculer} tabIndex={invite ? 0 : -1}>
+              <Play size={13} fill="currentColor" /> Lancer la visite
+            </button>
+            <button className="pa__invite-non" onClick={fermerInvite} tabIndex={invite ? 0 : -1}>
+              Plus tard
+            </button>
+          </div>
+        </div>
+        <div className="pa__menu">
+          <button
+            className="pa__pill"
+            data-mode="retour"
+            data-actif={manoeuvre === "retour" ? "1" : "0"}
+            aria-label="Retour arrière : maintenir enfoncé"
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture?.(e.pointerId)
+              debutRetour()
+            }}
+            onPointerUp={finRetour}
+            onPointerCancel={finRetour}
+            onKeyDown={(e) => {
+              if ((e.key === " " || e.key === "Enter") && !e.repeat) {
+                e.preventDefault()
+                debutRetour()
+              }
+            }}
+            onKeyUp={(e) => (e.key === " " || e.key === "Enter") && finRetour()}
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            <Rewind size={14} fill="currentColor" />
+            <span>Retour</span>
+            <small>maintenir</small>
+          </button>
+          <button
+            className="pa__pill"
+            data-mode="avance"
+            data-actif={manoeuvre === "avance" ? "1" : "0"}
+            aria-label="Avance rapide ×2 : maintenir enfoncé"
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture?.(e.pointerId)
+              debutAvance()
+            }}
+            onPointerUp={finAvance}
+            onPointerCancel={finAvance}
+            onKeyDown={(e) => {
+              if ((e.key === " " || e.key === "Enter") && !e.repeat) {
+                e.preventDefault()
+                debutAvance()
+              }
+            }}
+            onKeyUp={(e) => (e.key === " " || e.key === "Enter") && finAvance()}
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            <FastForward size={14} fill="currentColor" />
+            <span>×2</span>
+            <small>maintenir</small>
+          </button>
+          <button className="pa__recom" onClick={recommencer} aria-label="Recommencer la présentation depuis le début" title="Recommencer">
+            <RotateCcw size={16} />
+          </button>
+        </div>
+        <button className="pa__btn" onClick={basculer} aria-label={libelle} title={libelle} aria-pressed={enCours} data-etat={etat}>
           <svg className="pa__anneau" viewBox="0 0 56 56" aria-hidden="true">
             <circle cx="28" cy="28" r={R} className="pa__piste" />
             <circle
@@ -482,9 +714,6 @@ export function PresentationAuto() {
           </svg>
           {enCours ? <Square size={16} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
         </button>
-        <span className="pa__label" aria-hidden="true">
-          {libelle}
-        </span>
       </div>
     </div>
   )
