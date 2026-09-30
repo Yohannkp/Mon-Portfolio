@@ -139,6 +139,7 @@ export function RagPipeline() {
 
       <div className="rag__scroll" ref={root}>
         <div className="rag__sticky">
+          <p className="rag__astuce" aria-hidden="true">Faites glisser le schéma →</p>
           <div className="rag__svgbox">
             <svg
               className="rag__diagram"

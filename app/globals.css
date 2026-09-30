@@ -163,6 +163,7 @@
 .rag__svgbox { width: 100%; max-width: 72rem; margin-inline: auto; padding: 0 1.5rem; }
 .rag__diagram { width: 100%; height: auto; display: block; overflow: visible; }
 .rag__spacer { height: 40vh; }
+.rag__astuce { display: none; }
 
 .rag__arrow { fill: var(--border); }
 .rag__flow { fill: none; stroke: var(--border); stroke-width: 1.5; }
@@ -187,6 +188,12 @@
   .rag__spacer { display: none; }
   .rag__notebox { height: auto; }
   .rag-note { position: static; opacity: 1 !important; transform: none !important; max-width: none; margin-bottom: .9rem; }
+  /* Le schema garde une taille lisible : on le fait glisser plutot que de le reduire a 4 px. */
+  .rag__svgbox { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; padding-bottom: .75rem; }
+  .rag__diagram { min-width: 700px; }
+  .rag-node { opacity: 1 !important; }
+  .rag__astuce { display: block; padding: 0 1.5rem .5rem; font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); }
 }
 @media (prefers-reduced-motion: reduce) {
   .rag-note { opacity: 1 !important; transform: none !important; }

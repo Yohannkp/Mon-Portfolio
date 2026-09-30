@@ -101,6 +101,16 @@ Ce site n'a pas de serveur de courrier. Le formulaire **ne prétend donc pas env
 
 Pour recevoir les messages directement dans une boîte, sans passer par l'application e-mail du visiteur, il faudrait un service d'envoi (Formspree, Web3Forms, Resend…) et sa clé : c'est une décision à part.
 
+## Version mobile
+
+Le site est vérifié de 360 à 768 px de large : aucune page ne déborde à l'horizontale.
+
+- **Schéma RAG :** sous 820 px il garde une taille lisible (700 px) et se fait glisser du doigt, avec une indication au-dessus, plutôt que d'être réduit à quelques pixels. Les étapes s'empilent en cartes.
+- **Présentation automatique :** un petit rond en bas à droite (le texte est aligné à gauche). « Recommencer » n'apparaît que lorsqu'une visite est commencée, puisqu'il n'y a pas de survol au doigt. Le bouton s'efface pendant le défilement manuel.
+- **Projets :** les cartes passent en une colonne, le schéma ou l'image occupe toute la largeur.
+- **Au doigt** (`pointer: coarse`) : les liens texte, « Comment j'ai fait » et les points d'étape des démonstrations gardent leur apparence mais ont une zone tactile de 44 px.
+- **Sans robot** (moins de 1281 px) : la page se lit à l'identique, sans lui.
+
 ## Transitions et interactions
 
 - **Entre les pages :** la page sort en fondu pendant qu'une fine barre indique le chargement, puis la suivante entre en cascade (`components/page-transition.tsx`, styles en fin de `app/globals.css`). Un Ctrl/Cmd+clic, une ancre ou le bouton retour du navigateur gardent leur comportement normal.

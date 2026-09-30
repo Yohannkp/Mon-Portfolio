@@ -141,8 +141,19 @@
   .axe__compte { display: none; }
 }
 
+@media (max-width: 600px) {
+  .cas { padding: 1.3rem 1.1rem; }
+  .cas__visuel, .dos__visuel { max-width: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gl [data-a] { opacity: 1; transform: none; transition: none; }
   .cas__resultat, .cas__comment svg, .dos__visuel img { transition: none; }
   .cas-liste[data-focus="1"] .cas[data-focus="0"] { scale: 1; }
+}
+
+/* Au doigt : les liens et boutons textuels gardent leur apparence, mais leur zone tactile grandit (44 px). */
+@media (pointer: coarse) {
+  .cas__comment, .cas__lien { position: relative; }
+  .cas__comment::before, .cas__lien::before { content: ""; position: absolute; inset: -12px -6px; }
 }
