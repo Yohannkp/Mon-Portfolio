@@ -97,6 +97,8 @@
   0%, 100% { box-shadow: var(--ombre-carte), 0 0 0 4px color-mix(in oklch, var(--accent) 8%, transparent), 0 18px 50px -20px color-mix(in oklch, var(--accent) 45%, transparent); }
   50% { box-shadow: var(--ombre-carte), 0 0 0 8px color-mix(in oklch, var(--accent) 14%, transparent), 0 18px 60px -16px color-mix(in oklch, var(--accent) 70%, transparent); }
 }
+/* Tant que l'invitation est la, le bouton reste visible meme pendant le defilement : c'est ce qu'elle designe. */
+.pa[data-invite="1"][data-defile="1"] .pa__rang { opacity: 1; transform: none; pointer-events: auto; }
 /* Le bouton lui-meme : un anneau qui s'elargit doucement, pour relier la carte a ce qu'elle designe. */
 .pa[data-invite="1"] .pa__btn::before { content: ""; position: absolute; inset: -2px; border-radius: 50%; pointer-events: none;
   border: 2px solid var(--accent); opacity: 0; animation: pa-onde 2.6s ease-out .9s infinite; }

@@ -447,38 +447,61 @@ export function PresentationAuto() {
   }, [])
 
   // L'invitation : quand le visiteur arrive de lui-meme sur les projets, un petit message doux lui propose
-  // de lancer la visite a partir de la. Une seule fois par session, jamais pendant une visite.
-  const fermerInvite = useCallback(() => {
-    setInvite(false)
+  // de lancer la visite a partir de la. Jamais pendant une visite. Fermee d'un geste = plus jamais ;
+  // simplement quittee (il a defile plus loin) = elle peut revenir, trois fois au plus par session.
+  const lu = (cle: string) => {
     try {
-      sessionStorage.setItem("pa-invite", "1")
+      return sessionStorage.getItem(cle)
+    } catch {
+      return null
+    }
+  }
+  const ecrire = (cle: string, v: string) => {
+    try {
+      sessionStorage.setItem(cle, v)
     } catch {}
+  }
+  const plafondInvite = useRef(0)
+  const vueDepuis = useRef(0)
+  const departInvite = useRef(0)
+  const cacherInvite = useCallback(() => {
+    window.clearTimeout(plafondInvite.current)
+    window.clearTimeout(departInvite.current)
+    inviteVue.current = false
+    setInvite(false)
   }, [])
+  const fermerInvite = useCallback(() => {
+    cacherInvite()
+    ecrire("pa-invite", "1")
+  }, [cacherInvite])
 
   useEffect(() => {
     const section = document.getElementById("sec-stations")
     if (!section || typeof IntersectionObserver === "undefined") return
-    try {
-      if (sessionStorage.getItem("pa-invite") === "1") return
-    } catch {}
     let delai = 0
-    let plafond = 0
     const io = new IntersectionObserver(
       ([e]) => {
         window.clearTimeout(delai)
         if (!e.isIntersecting) {
-          // Il quitte les projets : l'invitation n'a plus lieu d'etre.
-          if (inviteVue.current) fermerInvite()
+          // Il quitte les projets. S'il a file tres vite, elle reste au moins 6 s : il doit pouvoir la lire.
+          if (inviteVue.current) {
+            const reste = 6000 - (performance.now() - vueDepuis.current)
+            if (reste <= 0) cacherInvite()
+            else departInvite.current = window.setTimeout(cacherInvite, reste)
+          }
           return
         }
+        window.clearTimeout(departInvite.current)
         if (inviteVue.current || etatRef.current !== "repos" || m.current.termine) return
-        // Il est arrive de lui-meme (le defilement de la visite passe par l'etat « lecture »).
+        if (lu("pa-invite") === "1" || Number(lu("pa-invite-n") ?? 0) >= 3) return
         delai = window.setTimeout(() => {
-          if (etatRef.current !== "repos") return
+          if (etatRef.current !== "repos" || inviteVue.current) return
           inviteVue.current = true
+          ecrire("pa-invite-n", String(Number(lu("pa-invite-n") ?? 0) + 1))
+          vueDepuis.current = performance.now()
           setInvite(true)
-          plafond = window.setTimeout(fermerInvite, 30000)
-        }, 900)
+          plafondInvite.current = window.setTimeout(cacherInvite, 45000)
+        }, 250)
       },
       // Le haut de la section a passe les 40 % bas de l'ecran (sur telephone, la section est bien trop haute pour un seuil de surface).
       { threshold: 0, rootMargin: "0px 0px -40% 0px" },
@@ -487,7 +510,8 @@ export function PresentationAuto() {
     return () => {
       io.disconnect()
       window.clearTimeout(delai)
-      window.clearTimeout(plafond)
+      window.clearTimeout(plafondInvite.current)
+      window.clearTimeout(departInvite.current)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
