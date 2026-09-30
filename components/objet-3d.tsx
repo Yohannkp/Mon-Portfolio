@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { EXPRESSIONS, cheminBouche, nouvelleExpr, versExpr, type Humeur } from "@/components/robot-emotions"
 
 /**
  * L'objet : un cube filaire qui devient un robot, puis accompagne la lecture.
@@ -33,7 +34,6 @@ import { useEffect, useRef } from "react"
  * variables CSS sur trois elements ; le GPU compose le reste.
  */
 
-type Humeur = "neutre" | "concentre" | "content" | "curieux"
 type Point = { x: number; y: number }
 type Bulle = { titre?: string; texte: string; place?: "dessus" | "dessous"; largeur?: number }
 
@@ -138,11 +138,16 @@ function Visage() {
       <div className="obj__antenne" />
       <div className="obj__tete" />
       <div className="obj__visiere">
+        <span className="obj__sourcil obj__sourcil--g" />
+        <span className="obj__sourcil obj__sourcil--d" />
         <div className="obj__yeux">
           <span className="obj__oeil obj__oeil--g" />
           <span className="obj__oeil obj__oeil--d" />
         </div>
       </div>
+      <svg className="obj__bouche" viewBox="-30 -14 60 28" aria-hidden="true">
+        <path d="M-11 0 Q0 2 11 0" />
+      </svg>
       <div className="obj__anneau" />
     </div>
   )
@@ -201,7 +206,14 @@ export function Objet3D() {
       bulleCle: "",
       bulleMin: 0,
       survol: null as Element | null,
+      // Vie du visage : clignements irreguliers, micro-saccades du regard, emotion ponctuelle (evenement), chatouilles.
+      clin: 0,
+      sacc: { x: 0, y: 0, t: 0 },
+      emo: null as { h: Humeur; jusqua: number } | null,
+      pokes: [] as number[],
     }
+    const X = nouvelleExpr()
+    const boucheEl = el.querySelector<SVGPathElement>(".obj__bouche path")
 
     // --- Etat lisse (ce qui est effectivement a l'ecran) --------------------
     const N = {
@@ -695,8 +707,12 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       // Un element interactif survole prend le regard : c'est ce que le visiteur va faire.
       const surv = mem.survol && document.contains(mem.survol) ? mem.survol : null
       const g = regardVers({ x: N.x, y: N.y }, surv ? centre(surv.getBoundingClientRect()) : cible.regard, c.now)
-      N.gx = mix(N.gx, g.x * 9, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
-      N.gy = mix(N.gy, g.y * 6, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
+      // Micro-saccades : l'oeil ne fixe jamais un point parfaitement immobile (+/- 1 px, toutes les quelques centaines de ms).
+      if (!reduit && c.now > mem.sacc.t) {
+        mem.sacc = { x: Math.round((Math.random() * 2.4 - 1.2) * 10) / 10, y: Math.round((Math.random() * 1.6 - 0.8) * 10) / 10, t: c.now + 250 + Math.random() * 550 }
+      }
+      N.gx = mix(N.gx, g.x * 9 + mem.sacc.x, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
+      N.gy = mix(N.gy, g.y * 6 + mem.sacc.y, snap || reduit ? 1 : 1 - Math.exp(-dt / 90))
 
       const bob = reduit ? 0 : Math.sin(c.now / 520) * 4 + N.saut
 
@@ -715,13 +731,47 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       if (el.dataset.devant !== devant) el.dataset.devant = devant
       const gauche = cible.gauche ? "1" : "0"
       if (html.dataset.robotGauche !== gauche) html.dataset.robotGauche = gauche
-      const humeur =
-        el.dataset.anim === "fier"
-          ? "content"
-          : surv && (cible.humeur ?? "neutre") === "neutre"
-            ? "curieux"
-            : (cible.humeur ?? "neutre")
-      if (el.dataset.humeur !== humeur) el.dataset.humeur = humeur
+      // Quelle emotion ? Un evenement ponctuel (pause, fin de visite...) prime, puis la reaction au survol, puis la scene.
+      if (mem.emo && c.now > mem.emo.jusqua) mem.emo = null
+      const anim = el.dataset.anim
+      const humeur: Humeur = mem.emo
+        ? mem.emo.h
+        : anim === "fier"
+          ? "fier"
+          : anim === "avant"
+            ? "surpris"
+            : anim === "tour" || anim === "balance"
+              ? "content"
+              : surv && (cible.humeur ?? "neutre") === "neutre"
+                ? "curieux"
+                : (cible.humeur ?? "neutre")
+      // Les yeux en arc (CSS) pour la joie et la fierte : le « sourire de Duchenne ».
+      const attr = humeur === "fier" ? "content" : humeur
+      if (el.dataset.humeur !== attr) el.dataset.humeur = attr
+
+      // Transition d'un etat a l'autre : amortie (les muscles ont une masse), jamais lineaire.
+      versExpr(X, EXPRESSIONS[humeur], snap || reduit ? 1 : 1 - Math.exp(-dt / 150))
+      // Quand la voix parle, la bouche s'ouvre et se ferme (elle « articule » sans texte : deux oscillations desaccordees).
+      const parle = !reduit && document.documentElement.dataset.robotParle === "1"
+        ? 0.12 + 0.42 * Math.abs(Math.sin(c.now / 68)) * (0.55 + 0.45 * Math.abs(Math.sin(c.now / 213)))
+        : 0
+      el.style.setProperty("--ex", X.ex.toFixed(3))
+      el.style.setProperty("--eyl", X.eyl.toFixed(3))
+      el.style.setProperty("--eyr", X.eyr.toFixed(3))
+      el.style.setProperty("--bt", `${X.bt.toFixed(2)}deg`)
+      el.style.setProperty("--byl", `${X.byl.toFixed(2)}px`)
+      el.style.setProperty("--byr", `${X.byr.toFixed(2)}px`)
+      el.style.setProperty("--bo", X.bo.toFixed(3))
+      boucheEl?.setAttribute("d", cheminBouche(X, parle))
+
+      // Le clignement : un passage rapide a la ligne (~140 ms), a intervalles irreguliers de 2 a 6 s, parfois double.
+      if (!reduit && c.now > mem.clin) {
+        el.dataset.clin = "1"
+        window.setTimeout(() => {
+          delete el.dataset.clin
+        }, 150)
+        mem.clin = c.now + (Math.random() < 0.16 ? 330 : 2000 + Math.random() * 4000)
+      }
 
       // Le fantome : la seconde recherche.
       const f = cible.fantome
@@ -850,6 +900,11 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
         reaction.fin = performance.now() + ms + 250
         el.dataset.anim = nom
         html.dataset.robotAnim = nom
+        // Un visiteur qui le chatouille trop finit par l'agacer : 3 survols en 10 s = colere, 5 = degout.
+        const t = performance.now()
+        mem.pokes = mem.pokes.filter((x) => t - x < 10000).concat(t)
+        if (mem.pokes.length >= 5) mem.emo = { h: "degout", jusqua: t + 1700 }
+        else if (mem.pokes.length >= 3) mem.emo = { h: "colere", jusqua: t + 1500 }
         window.clearTimeout(reaction.t)
         reaction.t = window.setTimeout(finirReaction, ms)
       }
@@ -866,6 +921,12 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       if (tab) mem.clic = { ...centre(tab.getBoundingClientRect()), t: performance.now() }
     }
 
+    // Le reste du site peut faire ressentir quelque chose au robot : window.dispatchEvent(new CustomEvent("robot-emotion", { detail: { humeur, ms } })).
+    const surEmotion = (e: Event) => {
+      const d = (e as CustomEvent<{ humeur: Humeur; ms?: number }>).detail
+      if (d && EXPRESSIONS[d.humeur]) mem.emo = { h: d.humeur, jusqua: performance.now() + (d.ms ?? 1500) }
+    }
+    window.addEventListener("robot-emotion", surEmotion)
     document.addEventListener("visibilitychange", surReveil)
     window.addEventListener("scroll", surDefilement, { passive: true })
     window.addEventListener("resize", surDefilement, { passive: true })
@@ -891,6 +952,7 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       finirReaction()
       window.clearTimeout(mem.bulleMin)
       large.removeEventListener("change", majService)
+      window.removeEventListener("robot-emotion", surEmotion)
       document.removeEventListener("visibilitychange", surReveil)
       window.removeEventListener("scroll", surDefilement)
       window.removeEventListener("resize", surDefilement)

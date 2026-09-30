@@ -188,6 +188,9 @@ function focaliser(i: number | null) {
   cartes.forEach((c, k) => c.setAttribute("data-focus", k === i ? "1" : "0"))
 }
 
+/** Fait ressentir quelque chose au robot (voir robot-emotions.ts). */
+const emotion = (humeur: string, ms = 1500) => window.dispatchEvent(new CustomEvent("robot-emotion", { detail: { humeur, ms } }))
+
 const texte = (v: string | (() => string)) => (typeof v === "function" ? v() : v)
 const borne = (v: number, a: number, b: number) => Math.min(Math.max(v, a), b)
 const facile = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2)
@@ -512,6 +515,8 @@ export function PresentationAuto() {
       // Un defilement que nous n'avons pas fait : on tolere l'ecart d'une image, pas davantage.
       if (Math.abs(window.scrollY - m.current.dernierY) < 160) return
     }
+    // Le visiteur reprend la main : un petit air triste, comme un enfant a qui l'on retire son jeu.
+    emotion("triste", 2200)
     arreter()
   }, [])
 
@@ -540,6 +545,7 @@ export function PresentationAuto() {
     couperSon()
     changerEtat("repos")
     setAvancement(1)
+    emotion("content", 4200)
     setNarration({ n: s.liste.length, total: s.liste.length, titre: "Fin de la visite", phrase: "Merci de votre attention. Vous pouvez la relancer à tout moment." })
     setFin(true)
     window.clearTimeout(cacheFin.current)
@@ -567,6 +573,7 @@ export function PresentationAuto() {
     fixerArret(i, depuisY)
     changerEtat("lecture")
     demarrerSon()
+    emotion("content", 1400)
     ecouter(true)
     cancelAnimationFrame(s.raf)
     s.raf = requestAnimationFrame(boucle)
@@ -588,6 +595,7 @@ export function PresentationAuto() {
   const debutAvance = () => {
     if (manoeuvre) return
     avantLecture.current = etatRef.current === "lecture"
+    emotion("curieux", 900)
     vitesse.current = 2
     passerAuTemps()
     arreterVoix()
@@ -617,6 +625,7 @@ export function PresentationAuto() {
     s.termine = false
     s.liste = ARRETS.filter((a) => a.ok?.() ?? true)
     if (!s.liste.length) return
+    emotion("surpris", 900)
     setManoeuvre("retour")
     const t0 = performance.now()
     let dernier = t0
@@ -766,6 +775,7 @@ export function PresentationAuto() {
         delai = window.setTimeout(() => {
           if (etatRef.current !== "repos" || inviteVue.current) return
           inviteVue.current = true
+          emotion("curieux", 2600)
           ecrire("pa-invite-n", String(Number(lu("pa-invite-n") ?? 0) + 1))
           vueDepuis.current = performance.now()
           setInvite(true)

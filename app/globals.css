@@ -414,17 +414,32 @@ main > section, main > div { position: relative; z-index: 1; }
 .obj__oeil { position: absolute; top: 50%; width: 17px; height: 17px; margin-top: -8.5px;
   border-radius: 50%; background: var(--accent);
   box-shadow: 0 0 18px 4px color-mix(in oklch, var(--accent) 70%, transparent);
-  animation: obj-clin 6.5s infinite; transition: scale .3s ease, height .3s ease, margin-top .3s ease; }
-.obj__oeil--g { left: 24%; }
-.obj__oeil--d { right: 24%; }
+  transition: height .3s ease, margin-top .3s ease; }
+/* La forme des yeux vient du JS (robot-emotions.ts) : largeur commune, hauteur propre a chaque oeil. */
+.obj__oeil--g { left: 24%; scale: var(--ex, 1) var(--eyl, 1); }
+.obj__oeil--d { right: 24%; scale: var(--ex, 1) var(--eyr, 1); }
+/* Le clignement : un passage rapide a la ligne (~140 ms), declenche par le JS a intervalles irreguliers. */
+.obj[data-clin="1"] .obj__oeil { animation: obj-clin2 .15s ease-in-out; }
+@keyframes obj-clin2 { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.08); } }
+/* Le fantome (la seconde recherche) n'a pas de JS de visage : il cligne seul, les yeux un peu ouverts. */
+.obj-fantome .obj__oeil { scale: 1.2; animation: obj-clin 6.5s infinite; }
 @keyframes obj-clin { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
 
-[data-humeur="concentre"] .obj__oeil { scale: 1 .55; }
-[data-humeur="curieux"] .obj__oeil { scale: 1.22; }
+/* Joie et fierte : les yeux deviennent des arcs (le sourire de Duchenne : les yeux participent). */
 [data-humeur="content"] .obj__oeil {
   height: 9px; margin-top: -3px; background: transparent; box-shadow: none;
   border-top: 5px solid var(--accent); border-radius: 50% 50% 0 0 / 100% 100% 0 0;
   filter: drop-shadow(0 0 6px var(--accent)); }
+
+/* Les sourcils : deux traits, penches et deplaces par le JS (tristesse = extremites interieures en haut, colere = vers le bas). */
+.obj__sourcil { position: absolute; top: 13%; width: 24%; height: 3px; border-radius: 3px; background: var(--accent);
+  opacity: var(--bo, .5); box-shadow: 0 0 8px color-mix(in oklch, var(--accent) 80%, transparent); }
+.obj__sourcil--g { left: 19%; transform: translateY(var(--byl, 0px)) rotate(calc(var(--bt, 0deg) * -1)); transform-origin: 85% 50%; }
+.obj__sourcil--d { right: 19%; transform: translateY(var(--byr, 0px)) rotate(var(--bt, 0deg)); transform-origin: 15% 50%; }
+/* La bouche : un seul trace, calcule par le JS (courbure, ouverture, largeur, asymetrie) et anime quand la voix parle. */
+.obj__bouche { position: absolute; left: 50%; top: 68%; width: 60px; height: 28px; margin: 0 0 0 -30px; overflow: visible; pointer-events: none; }
+.obj__bouche path { fill: color-mix(in oklch, var(--accent) 22%, transparent); stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px color-mix(in oklch, var(--accent) 70%, transparent)); }
 
 .obj__antenne { position: absolute; left: 50%; top: -22px; width: 2px; height: 22px;
   margin-left: -1px; background: color-mix(in oklch, var(--accent) 50%, transparent); }
@@ -501,7 +516,7 @@ html[data-robot-anim="avant"] .obj-ombre { opacity: 1; }
 .obj-bulle span { display: block; font-size: .78rem; line-height: 1.45; color: var(--muted-foreground); }
 
 @media (max-width: 1280px) { .obj, .obj-fantome, .obj-bulle, .obj-ombre { display: none; } }
-@media (prefers-reduced-motion: reduce) { .obj__oeil { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .obj__oeil, .obj-fantome .obj__oeil { animation: none; } }
 
 /* Son cercle, en fin de page : l'emplacement ou le robot reste, au-dessus du titre de contact.
    Ouvert seulement quand le robot est en service ; sinon la page se lit sans ce vide. */
