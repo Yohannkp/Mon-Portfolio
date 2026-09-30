@@ -49,6 +49,8 @@ type Sortie = {
   fantome?: { x: number; y: number; regard?: Point | null; force: number; ech: number } | null
   /** Passe devant le contenu : pour se poser dans un emplacement reserve (le guide d'une demonstration). */
   devant?: boolean
+  /** Il est passe dans la marge de gauche (visite automatique) : la legende du rail s'efface pour lui laisser la place. */
+  gauche?: boolean
 }
 
 type Ctx = {
@@ -367,9 +369,13 @@ export function Objet3D() {
       // Pendant la visite, la carte presentee grandit et mord sur la marge : le robot se cale
       // sur son bord reel (le rect suit l'animation), il glisse donc avec elle, sans jamais passer dessous.
       const enFocus = cartes[idx].dataset.focus === "1"
-      const mC = enFocus ? Math.max(0, c.W - r.right) : c.marge
-      const xC = enFocus ? r.right + mC / 2 : c.xM
-      const eC = enFocus ? borne((mC - 34) / 215, 0.3, 0.62) : c.echM
+      // De temps en temps, pendant la visite, il traverse la page jusqu'a la marge de GAUCHE, y reste quelques projets, puis revient.
+      const gauche = enFocus && PROJETS_A_GAUCHE.has(idx) && r.left > 90
+      const mC = enFocus ? Math.max(0, gauche ? r.left - 60 : c.W - r.right) : c.marge
+      const xC = !enFocus ? c.xM : gauche ? (r.left + 36) / 2 : r.right + mC / 2
+      const eC = enFocus ? borne((mC - 34) / (gauche ? 190 : 215), 0.3, 0.62) : c.echM
+      // Pendant la traversee il passe DEVANT le contenu (sinon les cartes le cacheraient), puis se pose.
+      const traverse = enFocus && Math.abs(N.x - xC) > 60
       const largeurBulle = borne(mC - 24, 0, 200)
       return {
         x: xC,
@@ -380,6 +386,8 @@ export function Objet3D() {
         humeur: depuis < 900 ? "content" : "neutre",
         // Trop etroit pour la bulle (ecran a peine plus large que 1281 px) : elle se tait, la visite a deja sa phrase.
         bulle: { titre: code, texte: prouve ? `Démontre : ${prouve}` : "", largeur: largeurBulle },
+        devant: traverse,
+        gauche,
       }
     }
 
@@ -594,7 +602,10 @@ export function Objet3D() {
       "sec-competences": ["data-preuve"],
       "sec-methode": ["data-actif"],
     }
-    const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-preuve", "data-actif"]
+    /** Les projets (0..6) pendant lesquels, dans la visite automatique, le robot va dans la marge de gauche. */
+const PROJETS_A_GAUCHE = new Set([1, 2, 5])
+
+const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-preuve", "data-actif"]
 
     // ======================================================================
     //  CALCUL DE LA CIBLE, PUIS PEINTURE
@@ -702,6 +713,8 @@ export function Objet3D() {
       // Dans le guide d'une demonstration, il passe devant le panneau (qui a un fond).
       const devant = cible.devant ? "1" : "0"
       if (el.dataset.devant !== devant) el.dataset.devant = devant
+      const gauche = cible.gauche ? "1" : "0"
+      if (html.dataset.robotGauche !== gauche) html.dataset.robotGauche = gauche
       const humeur =
         el.dataset.anim === "fier"
           ? "content"
@@ -886,6 +899,7 @@ export function Objet3D() {
       TOUS_ATTRS.forEach((a) => marquer(a, []))
       delete html.dataset.robotActif
       delete html.dataset.robotScene
+      delete html.dataset.robotGauche
       delete (window as unknown as { __robot?: unknown }).__robot
     }
   }, [])
