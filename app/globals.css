@@ -360,6 +360,7 @@ html[data-robot-rage="1"] .obj-bulle { opacity: 0; }
 .obj__bras { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; opacity: min(1, calc(var(--bk, 0) * 3)); }
 .obj:not([data-rage]) .obj__bras { display: none; }
 .b-os { fill: color-mix(in oklch, var(--accent) 32%, var(--card)); stroke: color-mix(in oklch, var(--accent) 72%, oklch(0.2 0.02 255)); stroke-width: 1.6; stroke-linejoin: round; }
+.b-lueur { fill: none; stroke: oklch(1 0 0 / .28); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .b-art { fill: color-mix(in oklch, var(--accent) 52%, var(--card)); stroke: color-mix(in oklch, var(--accent) 72%, oklch(0.2 0.02 255)); stroke-width: 1.6; }
 .b-main { fill: color-mix(in oklch, var(--accent) 38%, var(--card)); stroke: color-mix(in oklch, var(--accent) 72%, oklch(0.2 0.02 255)); stroke-width: 1.6; stroke-linejoin: round; }
 /* La section designee s'illumine : un voile lumineux, un contour et une pulsation. */

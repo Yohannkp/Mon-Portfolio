@@ -50,7 +50,15 @@ Il réagit aussi à ce que fait le visiteur : son regard suit la souris et se po
 
 Si le visiteur défile **à la main** et traverse la section des simulations d'un trait (moins d'une seconde et demie, sans y avoir joué), le robot se fâche : visage furieux, tout rouge (`hue-rotate` piloté par `--rage`), il se balance, **descend pour prendre de l'élan**, puis **s'élance vers le haut en s'accélérant, la page tirée derrière lui, et cogne le plafond de l'écran** (anneau d'impact, l'écran tremble, il s'écrase puis rebondit). La page finit d'arriver aux simulations, il se calme (fier), le rouge s'efface et il regagne sa place dans le guide.
 
-**Il se fait pousser des bras** pendant la colère : des membres effilés dont le coude se plie tout seul (cinématique inverse à deux os), chaque main suivant sa cible par un ressort amorti (elle dépasse, revient, et traîne un peu derrière le mouvement du robot). Poings qui battent pendant qu'il s'énerve, bras en arrière quand il descend, dressés quand il s'élance. Après le choc il **se rend devant la section** (à droite du titre, plus grand), **tend les deux bras vers la démonstration et la désigne tour à tour de l'index** pendant qu'elle brille (contour, voile lumineux, pulsation), puis rabaisse les bras et **regagne sa place habituelle**.
+**Il se fait pousser des bras** pendant la colère. Chaque bras est **un seul tube souple** (une courbe qui passe par l'épaule, le coude et la main, plus fin au poignet, avec un reflet), pas deux bâtons articulés : rien ne « casse » au coude. Le coude se place tout seul (cinématique inverse à deux os) et chaque main suit sa cible par un ressort. Chaque phase a son propre profil de mouvement, d'après la cinématique des émotions :
+
+- **colère** : bras tendus, coudes verrouillés, qui fouettent l'air (ressort raide, peu amorti), poings serrés ;
+- **élan** : bras en arrière, puis dressés avec **dépassement** (overshoot) et rebond élastique ;
+- **choc** : « snap » (quasi instantané) et **paumes ouvertes**, doigts écartés, comme un « stop ! » de surprise ;
+- **montrer** : les deux bras se tendent vers la démonstration, l'**index** se déplie, ils la désignent tour à tour avec un léger rebond, pendant qu'elle brille ;
+- **retour** : geste lourd, très amorti, bras qui pendent, puis il regagne sa place.
+
+Une **respiration** (sinus sur l'épaule) l'empêche d'être figé : rapide et saccadée dans la colère, lente ensuite. Le robot se rend devant la section (à droite du titre, plus grand) pour la désigner avant de retourner à son emplacement habituel.
 
 **Le défilement est verrouillé pendant tout le trajet** (`html[data-scroll-verrou] { overflow: hidden }`, avec `scrollbar-gutter: stable` pour que la page ne saute pas quand la barre disparaît), puis rendu au moment où il désigne la section (le geste continue). Toute la chorégraphie est une fonction du temps (fluide de bout en bout). Une seule fois par visite de la page (rechargée, elle peut revenir) ; jamais pendant la présentation automatique, sur téléphone ou si les animations sont réduites.
 

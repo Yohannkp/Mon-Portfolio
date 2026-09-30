@@ -138,22 +138,23 @@ const ARM = { L1: 70, L2: 72 }
 
 /**
  * Dessine un bras : epaule fixe, main donnee, coude calcule (cinematique inverse a deux os, coude vers l'exterieur et le bas).
- * `k` (0..1) fait « pousser » le bras ; `bd` (0..1) tend l'index (poing serre a 0).
+ * Le bras n'est PAS fait de deux batons : c'est un seul tube souple, une courbe qui passe par l'epaule, le coude et la main,
+ * dont la largeur diminue vers le poignet. Aucune articulation visible, donc rien qui « casse » quand le coude bouge.
+ * `k` (0..1) fait « pousser » le bras ; `bd` (0..1) tend l'index ; `ouv` (0..1) ouvre la main a plat (le poing serre a 0).
  */
-function dessinerBras(el: HTMLElement, cote: 1 | -1, h: { x: number; y: number }, k: number, bd: number) {
+function dessinerBras(el: HTMLElement, cote: 1 | -1, h: { x: number; y: number }, k: number, bd: number, ouv: number, resp: number) {
   const g = el.querySelector(`.obj__bras-${cote === 1 ? "d" : "g"}`)
   if (!g) return
   const $ = (sel: string) => g.querySelector<SVGElement>(sel)!
+  const kk = Math.max(k, 0.05)
   const L1 = ARM.L1 * Math.max(k, 0.02)
   const L2 = ARM.L2 * Math.max(k, 0.02)
   const sx = EPAULE_X * cote
-  const sy = EPAULE_Y
+  const sy = EPAULE_Y + resp
   let dx = h.x * cote - sx
   let dy = h.y - sy
   let d = Math.hypot(dx, dy) || 1
-  const dmax = L1 + L2 - 0.5
-  const dmin = Math.abs(L1 - L2) + 0.5
-  const dc = Math.min(dmax, Math.max(dmin, d))
+  const dc = Math.min(L1 + L2 - 0.5, Math.max(Math.abs(L1 - L2) + 0.5, d))
   const ux = dx / d
   const uy = dy / d
   dx = ux * dc
@@ -167,53 +168,92 @@ function dessinerBras(el: HTMLElement, cote: 1 | -1, h: { x: number; y: number }
   const e = note(c1) > note(c2) ? c1 : c2
   const hx = sx + dx
   const hy = sy + dy
+  const f = (v: number) => v.toFixed(1)
   const set = (sel: string, attr: string, v: string) => $(sel).setAttribute(attr, v)
-  // Un membre effile : deux disques de rayons differents reunis par leurs tangentes.
-  const l = (x1: number, y1: number, r1: number, x2: number, y2: number, r2: number) => {
-    const vx = x2 - x1
-    const vy = y2 - y1
-    const n = Math.hypot(vx, vy) || 1
-    const nx = -vy / n
-    const ny = vx / n
-    const f = (v: number) => v.toFixed(1)
-    return `M${f(x1 + nx * r1)} ${f(y1 + ny * r1)} L${f(x2 + nx * r2)} ${f(y2 + ny * r2)} A${f(r2)} ${f(r2)} 0 0 0 ${f(x2 - nx * r2)} ${f(y2 - ny * r2)} L${f(x1 - nx * r1)} ${f(y1 - ny * r1)} A${f(r1)} ${f(r1)} 0 0 0 ${f(x1 + nx * r1)} ${f(y1 + ny * r1)}Z`
+
+  // Le tube : une courbe de Bezier quadratique qui passe exactement par le coude en son milieu.
+  const cx = 2 * e.x - (sx + hx) / 2
+  const cy = 2 * e.y - (sy + hy) / 2
+  const N = 14
+  const pts: { x: number; y: number; nx: number; ny: number; w: number }[] = []
+  for (let i = 0; i <= N; i++) {
+    const t = i / N
+    const u = 1 - t
+    const x = u * u * sx + 2 * u * t * cx + t * t * hx
+    const y = u * u * sy + 2 * u * t * cy + t * t * hy
+    let tx = 2 * u * (cx - sx) + 2 * t * (hx - cx)
+    let ty = 2 * u * (cy - sy) + 2 * t * (hy - cy)
+    const tn = Math.hypot(tx, ty) || 1
+    tx /= tn
+    ty /= tn
+    // Un peu plus large a l'epaule et au coude (le muscle), fin au poignet.
+    const w = (10 - 4.4 * t + 1.2 * Math.sin(Math.PI * t)) * kk
+    pts.push({ x, y, nx: -ty, ny: tx, w })
   }
-  const kk = Math.max(k, 0.05)
-  set(".b-haut", "d", l(sx, sy, 10 * kk, e.x, e.y, 7.8 * kk))
-  set(".b-avant", "d", l(e.x, e.y, 7.8 * kk, hx, hy, 6 * kk))
-  set(".b-epaule", "cx", sx.toFixed(1))
-  set(".b-epaule", "cy", sy.toFixed(1))
-  set(".b-coude", "cx", e.x.toFixed(1))
-  set(".b-coude", "cy", e.y.toFixed(1))
-  // La main : direction de l'avant-bras ; paume ronde, index qui se deplie dans l'axe, pouce sur le cote.
+  const gauche = pts.map((p) => `${f(p.x + p.nx * p.w)} ${f(p.y + p.ny * p.w)}`)
+  const droite = pts.map((p) => `${f(p.x - p.nx * p.w)} ${f(p.y - p.ny * p.w)}`).reverse()
+  const dernier = pts[N]
+  const premier = pts[0]
+  set(
+    ".b-bras",
+    "d",
+    `M${gauche.join(" L")} A${f(dernier.w)} ${f(dernier.w)} 0 0 0 ${droite[0]} L${droite.join(" L")} A${f(premier.w)} ${f(premier.w)} 0 0 0 ${gauche[0]}Z`,
+  )
+  // Un reflet le long du bras : il donne le volume (la lumiere vient d'en haut a gauche).
+  set(".b-lueur", "d", `M${pts.map((p) => `${f(p.x + p.nx * p.w * 0.35)} ${f(p.y + p.ny * p.w * 0.35)}`).join(" L")}`)
+  set(".b-epaule", "cx", f(sx))
+  set(".b-epaule", "cy", f(sy))
+
+  // La main : direction de l'avant-bras. Poing = sphere dense ; paume ouverte = plan (doigts ecartes) ; index tendu pour montrer.
   let fx = hx - e.x
   let fy = hy - e.y
   const fn = Math.hypot(fx, fy) || 1
   fx /= fn
   fy /= fn
-  const pr = 12 + 2 * (1 - bd)
+  const pr = (11 + 2.5 * (1 - ouv) * (1 - bd) - 1 * ouv) * kk
   const px = hx + fx * 4
   const py = hy + fy * 4
-  set(".b-paume", "cx", px.toFixed(1))
-  set(".b-paume", "cy", py.toFixed(1))
-  set(".b-paume", "r", (pr * Math.max(k, 0.05)).toFixed(1))
-  const il = 30 * bd * k
-  const ix = px + fx * (pr * 0.6)
-  const iy = py + fy * (pr * 0.6)
-  set(".b-index", "d", il > 1 ? l(ix, iy, 4.6, ix + fx * il, iy + fy * il, 3.8) : "")
-  set(".b-pouce", "cx", (px - fy * cote * 10 - fx * 1).toFixed(1))
-  set(".b-pouce", "cy", (py + fx * cote * 10 - fy * 1).toFixed(1))
+  set(".b-paume", "cx", f(px))
+  set(".b-paume", "cy", f(py))
+  set(".b-paume", "r", f(pr))
+  const doigt = (sel: string, ang: number, long: number, larg: number) => {
+    if (long < 1.5) return set(sel, "d", "")
+    const cs = Math.cos(ang * cote)
+    const sn = Math.sin(ang * cote)
+    const dx2 = fx * cs - fy * sn
+    const dy2 = fx * sn + fy * cs
+    const x1 = px + dx2 * pr * 0.55
+    const y1 = py + dy2 * pr * 0.55
+    const x2 = x1 + dx2 * long
+    const y2 = y1 + dy2 * long
+    const nx = -dy2
+    const ny = dx2
+    set(
+      sel,
+      "d",
+      `M${f(x1 + nx * larg)} ${f(y1 + ny * larg)} L${f(x2 + nx * larg * 0.8)} ${f(y2 + ny * larg * 0.8)} A${f(larg * 0.8)} ${f(larg * 0.8)} 0 0 0 ${f(x2 - nx * larg * 0.8)} ${f(y2 - ny * larg * 0.8)} L${f(x1 - nx * larg)} ${f(y1 - ny * larg)}Z`,
+    )
+  }
+  const ecart = ouv * (1 - bd)
+  doigt(".b-index", -0.5 * ecart, Math.max(31 * bd, 19 * ouv) * kk, 4.4 * kk)
+  doigt(".b-doigt-1", -0.12 * ecart, 20 * ecart * kk, 4.2 * kk)
+  doigt(".b-doigt-2", 0.28 * ecart, 19 * ecart * kk, 4.1 * kk)
+  doigt(".b-doigt-3", 0.66 * ecart, 15 * ecart * kk, 3.8 * kk)
+  set(".b-pouce", "cx", f(px - fy * cote * (10 + 2 * ouv) - fx * 1))
+  set(".b-pouce", "cy", f(py + fx * cote * (10 + 2 * ouv) - fy * 1))
 }
 
 /** Les bras, qui ne servent qu'a la colere. Les os, les articulations et la main sont dessines par le JS a chaque image (cinematique inverse). */
 function Bras() {
   const cote = (c: "g" | "d") => (
     <g className={`obj__bras-${c}`}>
-      <path className="b-os b-haut" />
-      <path className="b-os b-avant" />
+      <path className="b-os b-bras" />
+      <path className="b-lueur" />
       <circle className="b-art b-epaule" r="11" />
-      <circle className="b-art b-coude" r="8.5" />
       <path className="b-main b-index" />
+      <path className="b-main b-doigt b-doigt-1" />
+      <path className="b-main b-doigt b-doigt-2" />
+      <path className="b-main b-doigt b-doigt-3" />
       <circle className="b-main b-paume" />
       <circle className="b-main b-pouce" r="5.5" />
     </g>
@@ -1117,63 +1157,88 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       }
 
       // ---- Les bras ----------------------------------------------------------------------------------
-      // Chaque main est tiree vers une cible par un ressort (elle depasse, revient : c'est ce qui la rend vivante) ;
-      // le coude se place tout seul (cinematique inverse a deux os). Le mouvement du robot est un peu « en retard » sur les mains.
+      // Chaque phase a SON profil de mouvement (raideur / amortissement du ressort), comme le veut le langage du corps :
+      //   colere      : bras droits et verrouilles, qui frappent l'air (raide, peu d'amortissement)
+      //   elan        : bras en arriere, puis dresses avec DEPASSEMENT (overshoot) et retour elastique
+      //   choc        : « snap » : les mains s'ouvrent d'un coup, paumes en avant (surprise, sans adoucissement)
+      //   montrer     : ouvert, expansif, avec un leger rebond, index tendu
+      //   retour      : mouvement LOURD, tres amorti (l'energie retombe), bras qui pendent
+      // Une respiration (sinus sur l'epaule) fait que le corps n'est jamais fige : rapide et saccadee dans la colere, lente ensuite.
       const sec = tt >= T2 ? q("#sec-demos") : null
       if (sec && sec.dataset.robotMontre !== "1") sec.dataset.robotMontre = "1"
       const bk = ease(borne((tt - 250) / 550, 0, 1)) * (1 - ease(borne((tt - (T4 - 500)) / 450, 0, 1)))
-      const bd = tt < TC ? ease(borne((tt - T2 - 200) / (TC - T2 - 200), 0, 1)) : 1 - ease(borne((tt - TH) / 500, 0, 1))
+      const bd = ease(borne((tt - T3) / 350, 0, 1)) * (1 - ease(borne((tt - TH) / 400, 0, 1)))
+      // Paume ouverte : au choc (« stop ! » de surprise), elle se referme en l'index tendu quand il montre.
+      const ouv = tt < TC ? 0 : tt < T3 ? 1 : 1 - ease(borne((tt - T3) / 350, 0, 1))
       const s = Math.max(dt, 1) / 1000
       const lagX = borne(-((R.dx - BR.pdx) / s) * 0.02, -40, 40)
       const lagY = borne(-((R.dy - BR.pdy) / s) * 0.02, -45, 45)
       BR.pdx = R.dx
       BR.pdy = R.dy
+      const calme = ease(borne((tt - T3) / 900, 0, 1))
+      const resp = (1 - calme) * (2.4 * Math.sin(tt / 62) + 1.2 * Math.sin(tt / 27 + 1)) + calme * 1.6 * Math.sin(tt / 420)
+      const REACH = ARM.L1 + ARM.L2 - 4
       for (const cote of [1, -1] as const) {
         const h = cote === 1 ? BR.d : BR.g
         const tl = tt - (cote === 1 ? 0 : 70) // la main gauche est un peu decalee : le geste n'est pas symetrique
         let tx: number, ty: number
+        let raideur: number, zeta: number
         if (tl < T1) {
+          // Bras tendus, coudes verrouilles, qui fouettent l'air vers l'exterieur.
           const w = tl / 78 + (cote === 1 ? 0 : 1.7)
-          tx = 132 + 12 * Math.sin(w)
-          ty = 58 + 30 * Math.sin(w + 1.3)
+          const ang = ((58 + 16 * Math.sin(w)) * Math.PI) / 180 // depuis la verticale basse, vers l'exterieur
+          tx = EPAULE_X + REACH * Math.sin(ang)
+          ty = EPAULE_Y + REACH * Math.cos(ang)
+          raideur = 320
+          zeta = 0.55
         } else if (tl < T2) {
           const e = ease(borne((tl - T1) / (T2 - T1), 0, 1))
-          tx = mix(132, 122, e)
-          ty = mix(60, 128, e)
+          tx = mix(EPAULE_X + REACH * 0.85, 118, e)
+          ty = mix(EPAULE_Y + REACH * 0.52, 132, e)
+          raideur = 170
+          zeta = 0.7
         } else if (tl < TC) {
           const e = ease(borne((tl - T2) / (TC - T2), 0, 1))
-          tx = mix(122, 64, e)
-          ty = mix(128, -98, e)
+          tx = mix(118, 62, e)
+          ty = mix(132, -100, e)
+          raideur = 150
+          zeta = 0.32 // peu amorti : il depasse en haut puis rebondit
         } else if (tl < T3) {
-          tx = 66
-          ty = -96 + 44 * (1 - Math.exp(-(tl - TC) / 230))
+          // Le « snap » de la surprise : quasi instantane, sans adoucissement.
+          tx = 92
+          ty = -78 + 34 * (1 - Math.exp(-(tl - TC) / 200))
+          raideur = 900
+          zeta = 0.75
         } else if (tl < TH) {
           // Les deux bras se tendent vers la section, puis la montrent tour a tour (petits coups vers l'avant).
           const g = ease(borne((tl - T3) / (TG - T3), 0, 1))
           const jab = tl > TG ? 0.07 * Math.sin((tl - TG) / 190 + (cote === 1 ? 0 : Math.PI)) : 0
-          const reach = ARM.L1 + ARM.L2 - 4
-          const px = EPAULE_X * cote + BR.dirx * reach * (1 + jab)
-          const py = EPAULE_Y + BR.diry * reach * (1 + jab)
-          tx = mix(66, px * cote, g)
-          ty = mix(-52, py, g)
+          const px = EPAULE_X * cote + BR.dirx * REACH * (1 + jab)
+          const py = EPAULE_Y + BR.diry * REACH * (1 + jab)
+          tx = mix(92, px * cote, g)
+          ty = mix(-44, py, g)
+          raideur = 210
+          zeta = 0.45 // un leger rebond a l'arrivee : l'enthousiasme
         } else {
+          // L'energie retombe : geste lourd, tres amorti, les bras pendent.
           const e = ease(borne((tl - TH) / (T4 - TH - 200), 0, 1))
-          const reach = ARM.L1 + ARM.L2 - 4
-          tx = mix((EPAULE_X * cote + BR.dirx * reach) * cote, 122, e)
-          ty = mix(EPAULE_Y + BR.diry * reach, 96, e)
+          tx = mix((EPAULE_X * cote + BR.dirx * REACH) * cote, 104, e)
+          ty = mix(EPAULE_Y + BR.diry * REACH, 118, e)
+          raideur = 70
+          zeta = 0.95
         }
         tx += lagX * cote
         ty += lagY
         // Ressort amorti (integre par petits pas pour rester stable)
-        const raideur = 200, amort = 2 * 0.4 * Math.sqrt(raideur)
-        for (let i = 0, n = Math.max(1, Math.ceil(s / 0.008)); i < n; i++) {
+        const amort = 2 * zeta * Math.sqrt(raideur)
+        for (let i = 0, n = Math.max(1, Math.ceil(s / 0.006)); i < n; i++) {
           const h8 = s / n
           h.vx += ((tx - h.x) * raideur - amort * h.vx) * h8
           h.vy += ((ty - h.y) * raideur - amort * h.vy) * h8
           h.x += h.vx * h8
           h.y += h.vy * h8
         }
-        dessinerBras(el, cote, h, bk, bd)
+        dessinerBras(el, cote, h, bk, bd, ouv, resp)
       }
       el.style.setProperty("--bk", bk.toFixed(3))
       el.style.setProperty("--rk", R.rk.toFixed(3))
