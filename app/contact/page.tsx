@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { ContactForm } from "@/components/contact-form"
-import { Github, Linkedin, Mail, MapPin } from "lucide-react"
-import { EMAIL } from "@/lib/contact"
+import { Download, Github, Linkedin, Mail, MapPin } from "lucide-react"
+import { CV_URL, EMAIL } from "@/lib/contact"
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -101,6 +101,14 @@ export default function ContactPage() {
               Je cherche un stage de 4 à 6 mois à partir d&apos;avril 2027, en MLOps ou en data
               engineering. Ouvert aux propositions partout en France, au Luxembourg et en Belgique, en priorité en région parisienne.
             </p>
+            <a
+              href={CV_URL}
+              download
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent underline-offset-4 hover:underline"
+            >
+              <Download className="h-4 w-4" />
+              Télécharger mon CV (PDF)
+            </a>
           </div>
         </div>
       </div>

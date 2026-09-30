@@ -2,9 +2,10 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Download } from "lucide-react"
 import type { EasingParam } from "animejs"
 import { Button } from "@/components/ui/button"
+import { CV_URL } from "@/lib/contact"
 
 const TITRE_1 = "MLOps & Machine Learning Engineering"
 const TITRE_2 = "J'affine des modèles, je les mets en production, et je sais prouver qu'ils marchent."
@@ -106,6 +107,12 @@ export function Hero() {
             </Button>
             <Button asChild variant="outline" size="lg" className="gap-2 bg-transparent">
               <Link href="/contact">Me contacter</Link>
+            </Button>
+            <Button asChild variant="ghost" size="lg" className="gap-2">
+              <a href={CV_URL} download>
+                <Download className="h-4 w-4" />
+                Télécharger mon CV
+              </a>
             </Button>
           </div>
         </div>

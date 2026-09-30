@@ -1,6 +1,9 @@
 /** Les coordonnees, a un seul endroit : le formulaire, la page Contact et le pied de page s'en servent. */
 export const EMAIL = "yendiyohann@gmail.com"
 
+/** Le CV public : la version MLOps, sans numéro de téléphone (le numéro reste dans le CV envoyé aux recruteurs). */
+export const CV_URL = "/cv/CV_Yendi_Yohann_MLOps.pdf"
+
 /**
  * Le lien mailto d'un message : sujet et corps deja remplis.
  * Ce site n'a pas de serveur qui envoie du courrier : le formulaire prepare le message dans

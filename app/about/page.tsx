@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, Heart, Zap, Eye } from "lucide-react"
+import { ArrowRight, Download, Heart, Zap, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { CV_URL } from "@/lib/contact"
 import { Badge } from "@/components/ui/badge"
 
 export const metadata: Metadata = {
@@ -94,7 +95,12 @@ export default function AboutPage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
-            {/* CV download removed */}
+            <Button asChild variant="outline" className="gap-2 bg-transparent">
+              <a href={CV_URL} download>
+                <Download className="h-4 w-4" />
+                Télécharger mon CV
+              </a>
+            </Button>
           </div>
         </div>
 
