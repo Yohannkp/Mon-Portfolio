@@ -64,6 +64,48 @@
   .pa__recom { left: auto; right: calc(100% + 8px); width: 36px; height: 36px; transform: none; opacity: 0; pointer-events: none; }
   .pa[data-etat="lecture"] .pa__recom, .pa[data-etat="pause"] .pa__recom, .pa[data-fin="1"] .pa__recom { opacity: 1; pointer-events: auto; }
 }
+
+/* ---------- L'invitation : douce, mais impossible a rater ---------------------------------------
+   Une carte qui monte doucement au-dessus du bouton, avec sa petite pointe, et un anneau qui respire
+   autour du bouton tant qu'elle est la. Elle ne prend jamais le focus et se ferme d'un geste. */
+.pa__invite { position: absolute; left: 0; bottom: calc(100% + 18px); width: min(330px, calc(100vw - 32px)); padding: 1rem 1.1rem 1rem;
+  border: 1px solid color-mix(in oklch, var(--accent) 45%, var(--bord-doux)); border-radius: var(--r-carte);
+  background: color-mix(in oklch, var(--card) 90%, var(--accent) 10%); backdrop-filter: blur(14px);
+  box-shadow: var(--ombre-carte), 0 0 0 4px color-mix(in oklch, var(--accent) 9%, transparent), 0 18px 50px -20px color-mix(in oklch, var(--accent) 55%, transparent);
+  opacity: 0; transform: translateY(12px) scale(.97); pointer-events: none; transform-origin: 28px 100%;
+  transition: opacity .7s ease, transform .8s cubic-bezier(.2, .8, .2, 1); }
+.pa__invite[data-on="1"] { opacity: 1; transform: none; pointer-events: auto; animation: pa-respire 3.6s ease-in-out .9s infinite; }
+.pa__invite::after { content: ""; position: absolute; left: 22px; bottom: -7px; width: 12px; height: 12px; rotate: 45deg;
+  border-right: 1px solid color-mix(in oklch, var(--accent) 45%, var(--bord-doux)); border-bottom: 1px solid color-mix(in oklch, var(--accent) 45%, var(--bord-doux));
+  background: color-mix(in oklch, var(--card) 90%, var(--accent) 10%); }
+.pa__invite-k { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px; font-weight: 500; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--accent); }
+.pa__invite-t { margin-top: .4rem; padding-right: 1rem; font-size: .92rem; line-height: 1.55; color: var(--foreground); }
+.pa__invite-a { display: flex; align-items: center; gap: .9rem; margin-top: .85rem; }
+.pa__invite-go { display: inline-flex; align-items: center; gap: .45rem; padding: .5rem .95rem; cursor: pointer; border: 0; border-radius: 999px;
+  font-size: .82rem; font-weight: 500; color: var(--background); background: var(--accent);
+  transition: transform .2s cubic-bezier(.2, .7, .2, 1), box-shadow .25s ease; }
+.pa__invite-go:hover { transform: translateY(-1px); box-shadow: 0 8px 22px -8px var(--accent); }
+.pa__invite-go:active { transform: scale(.96); }
+.pa__invite-non { padding: .3rem .2rem; cursor: pointer; border: 0; background: none; font-size: .8rem; color: var(--muted-foreground); transition: color .2s; }
+.pa__invite-non:hover { color: var(--foreground); }
+.pa__invite-x { position: absolute; right: .55rem; top: .55rem; display: grid; place-items: center; width: 24px; height: 24px; padding: 0; cursor: pointer;
+  border: 0; border-radius: 50%; background: none; color: var(--muted-foreground); transition: color .2s, background .2s; }
+.pa__invite-x:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 8%, transparent); }
+.pa__invite button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@keyframes pa-respire {
+  0%, 100% { box-shadow: var(--ombre-carte), 0 0 0 4px color-mix(in oklch, var(--accent) 8%, transparent), 0 18px 50px -20px color-mix(in oklch, var(--accent) 45%, transparent); }
+  50% { box-shadow: var(--ombre-carte), 0 0 0 8px color-mix(in oklch, var(--accent) 14%, transparent), 0 18px 60px -16px color-mix(in oklch, var(--accent) 70%, transparent); }
+}
+/* Le bouton lui-meme : un anneau qui s'elargit doucement, pour relier la carte a ce qu'elle designe. */
+.pa[data-invite="1"] .pa__btn::before { content: ""; position: absolute; inset: -2px; border-radius: 50%; pointer-events: none;
+  border: 2px solid var(--accent); opacity: 0; animation: pa-onde 2.6s ease-out .9s infinite; }
+@keyframes pa-onde { 0% { transform: scale(1); opacity: .55; } 100% { transform: scale(1.7); opacity: 0; } }
+@media (max-width: 720px) {
+  .pa__invite { left: auto; right: 0; transform-origin: calc(100% - 24px) 100%; }
+  .pa__invite::after { left: auto; right: 18px; }
+}
 @media (prefers-reduced-motion: reduce) {
+  .pa__invite[data-on="1"], .pa[data-invite="1"] .pa__btn::before { animation: none; }
   .pa__carte, .pa__btn, .pa__recom, .pa__label, .pa__progres { transition: none; }
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Play, RotateCcw, Square } from "lucide-react"
+import { Play, RotateCcw, Square, X } from "lucide-react"
 import { DOSSIERS, NB_PHARES_MOT, PHARES } from "@/lib/dossiers"
 
 /**
@@ -206,6 +206,8 @@ export function PresentationAuto() {
   const cacheFin = useRef(0)
   const racine = useRef<HTMLDivElement>(null)
   const derniereMaj = useRef(0)
+  const [invite, setInvite] = useState(false)
+  const inviteVue = useRef(false)
 
   const changerEtat = useCallback((e: Etat) => {
     etatRef.current = e
@@ -444,6 +446,66 @@ export function PresentationAuto() {
     }
   }, [])
 
+  // L'invitation : quand le visiteur arrive de lui-meme sur les projets, un petit message doux lui propose
+  // de lancer la visite a partir de la. Une seule fois par session, jamais pendant une visite.
+  const fermerInvite = useCallback(() => {
+    setInvite(false)
+    try {
+      sessionStorage.setItem("pa-invite", "1")
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    const section = document.getElementById("sec-stations")
+    if (!section || typeof IntersectionObserver === "undefined") return
+    try {
+      if (sessionStorage.getItem("pa-invite") === "1") return
+    } catch {}
+    let delai = 0
+    let plafond = 0
+    const io = new IntersectionObserver(
+      ([e]) => {
+        window.clearTimeout(delai)
+        if (!e.isIntersecting) {
+          // Il quitte les projets : l'invitation n'a plus lieu d'etre.
+          if (inviteVue.current) fermerInvite()
+          return
+        }
+        if (inviteVue.current || etatRef.current !== "repos" || m.current.termine) return
+        // Il est arrive de lui-meme (le defilement de la visite passe par l'etat « lecture »).
+        delai = window.setTimeout(() => {
+          if (etatRef.current !== "repos") return
+          inviteVue.current = true
+          setInvite(true)
+          plafond = window.setTimeout(fermerInvite, 30000)
+        }, 900)
+      },
+      // Le haut de la section a passe les 40 % bas de l'ecran (sur telephone, la section est bien trop haute pour un seuil de surface).
+      { threshold: 0, rootMargin: "0px 0px -40% 0px" },
+    )
+    io.observe(section)
+    return () => {
+      io.disconnect()
+      window.clearTimeout(delai)
+      window.clearTimeout(plafond)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Des que la visite demarre (par l'invitation ou par le bouton), elle disparait.
+  useEffect(() => {
+    if (etat === "lecture" && invite) fermerInvite()
+  }, [etat, invite, fermerInvite])
+
+  useEffect(() => {
+    if (!invite) return
+    const surTouche = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") fermerInvite()
+    }
+    window.addEventListener("keydown", surTouche)
+    return () => window.removeEventListener("keydown", surTouche)
+  }, [invite, fermerInvite])
+
   const enCours = etat === "lecture"
   const entame = avancement > 0 && !fin
   const libelle = enCours ? "Arrêter la présentation" : entame ? "Reprendre la présentation" : "Présentation automatique"
@@ -451,7 +513,7 @@ export function PresentationAuto() {
   const C = 2 * Math.PI * R
 
   return (
-    <div className="pa" ref={racine} data-etat={etat} data-fin={fin ? "1" : "0"}>
+    <div className="pa" ref={racine} data-etat={etat} data-fin={fin ? "1" : "0"} data-invite={invite ? "1" : "0"}>
       <div className="pa__carte" data-on={narration && (enCours || fin) ? "1" : "0"} role="status" aria-live="polite">
         {narration ? (
           <>
@@ -464,6 +526,21 @@ export function PresentationAuto() {
       </div>
 
       <div className="pa__rang">
+        <div className="pa__invite" data-on={invite ? "1" : "0"} role="status" aria-hidden={invite ? undefined : true}>
+          <button className="pa__invite-x" onClick={fermerInvite} aria-label="Fermer l'invitation" tabIndex={invite ? 0 : -1}>
+            <X size={14} />
+          </button>
+          <p className="pa__invite-k">Visite guidée</p>
+          <p className="pa__invite-t">Envie que je vous présente les projets ? Je vous guide pas à pas, à partir d&apos;ici.</p>
+          <div className="pa__invite-a">
+            <button className="pa__invite-go" onClick={basculer} tabIndex={invite ? 0 : -1}>
+              <Play size={13} fill="currentColor" /> Lancer la visite
+            </button>
+            <button className="pa__invite-non" onClick={fermerInvite} tabIndex={invite ? 0 : -1}>
+              Plus tard
+            </button>
+          </div>
+        </div>
         <button className="pa__recom" onClick={recommencer} aria-label="Recommencer la présentation depuis le début" title="Recommencer">
           <RotateCcw size={16} />
         </button>
