@@ -677,4 +677,5 @@ html[data-nav] main > :nth-child(n+5) { animation-delay: .24s !important; }
 .lien-evitement { position: fixed; left: 12px; top: 8px; z-index: 100; padding: .5rem .9rem; border-radius: 8px;
   background: var(--accent); color: var(--background); font-size: .85rem; font-weight: 600;
   transform: translateY(-160%); transition: transform .2s ease; }
-.lien-evitement:focus { transform: none; outline: 2px solid var(--foreground); outline-offset: 2px; }
+/* La position cachee est aussi en ligne (layout.tsx) : meme si la feuille de style tarde, le lien reste invisible. */
+.lien-evitement:focus { transform: none !important; outline: 2px solid var(--foreground); outline-offset: 2px; }

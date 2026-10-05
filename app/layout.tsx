@@ -89,7 +89,7 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <body className={`${_inter.variable} ${_geistMono.variable} font-sans antialiased`}>
         {/* Premier element focalisable : au clavier, on peut sauter l'en-tete. */}
-        <a href="#contenu" className="lien-evitement">
+        <a href="#contenu" className="lien-evitement" style={{ position: 'fixed', left: 12, top: 8, transform: 'translateY(-200%)' }}>
           Aller au contenu
         </a>
         <ThemeProvider
