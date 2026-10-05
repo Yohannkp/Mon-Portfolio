@@ -7,6 +7,7 @@ import { Counters } from "@/components/sections/counters"
 import { Stations } from "@/components/sections/stations"
 import { AboutPreview } from "@/components/sections/about-preview"
 import { Skills } from "@/components/sections/skills"
+import { Formations } from "@/components/sections/formations"
 import { Process } from "@/components/sections/process"
 import { CurrentlyLearning } from "@/components/sections/currently-learning"
 import { ContactCTA } from "@/components/sections/contact-cta"
@@ -26,6 +27,7 @@ export function Accueil({ telecommande = false }: { telecommande?: boolean }) {
       <Demos />
       <AboutPreview />
       <Skills />
+      <Formations />
       <Process />
       <CurrentlyLearning />
       <ContactCTA />

@@ -49,7 +49,7 @@ export function Skills() {
                 {category.skills.map((s) => {
                   const nom = typeof s === "string" ? s : t(s.fr, s.en)
                   return typeof s !== "string" && s.preuve ? (
-                    <Link key={s.fr} href="/projects#mesure" title={t("Voir la preuve : Ventes en supermarché", "See the proof: Supermarket sales")}>
+                    <Link key={s.fr} href="/#sec-formations" title={t("Voir la formation et la preuve : Ventes en supermarché", "See the training and the proof: Supermarket sales")}>
                       <Badge className="border-accent/50 bg-accent/15 text-accent hover:bg-accent/25">{nom} ↗</Badge>
                     </Link>
                   ) : (

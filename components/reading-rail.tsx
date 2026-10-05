@@ -16,6 +16,7 @@ const ETAPES: Record<string, [string, string]> = {
   "sec-demos": ["Inférence", "Inference"],
   "sec-apropos": ["Contexte", "Context"],
   "sec-competences": ["Preuves", "Evidence"],
+  "sec-formations": ["Formation", "Training"],
   "sec-methode": ["Méthode", "Method"],
   "sec-veille": ["Veille", "Watch"],
   "sec-contact": ["Déploiement", "Deployment"],
