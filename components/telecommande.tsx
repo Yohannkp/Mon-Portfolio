@@ -122,6 +122,10 @@ function construire(): Etape[] {
   if (formSql) {
     ajoute({ cle: "formation-sql", section: tr("Formation", "Training"), titre: tr("Formation SQL de 30 heures", "30-hour SQL training"), y: () => centreY(formSql) - 0.45 * H() })
   }
+  const formPython = q("#sec-formations .formation-python")
+  if (formPython) {
+    ajoute({ cle: "formation-python", section: tr("Formation", "Training"), titre: tr("Python et machine learning", "Python and machine learning"), y: () => centreY(formPython) - 0.45 * H() })
+  }
   const certifs = q("#sec-formations .formation-badges")
   if (certifs) {
     ajoute({ cle: "certifications", section: tr("Formation", "Training"), titre: tr("Certifications vérifiables", "Verifiable certifications"), y: () => centreY(certifs) - 0.5 * H() })

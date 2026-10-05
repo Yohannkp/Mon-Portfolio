@@ -220,14 +220,14 @@ const ARRETS: Arret[] = [
     titre: () => tr("Formation", "Training"),
     phrase: () =>
       tr(
-        "Un cours de SQL de 30 heures et des certifications vérifiables sur Credly.",
-        "A 30-hour SQL course and certifications you can verify on Credly.",
+        "Un cours de SQL de 30 heures, une formation Python et machine learning, et des certifications vérifiables sur Credly.",
+        "A 30-hour SQL course, a Python and machine-learning course, and certifications you can verify on Credly.",
       ),
     ok: existe("#sec-formations .formation-sql"),
     // Du cours de SQL jusqu'aux certifications : on balaie lentement, une phrase pour chaque moitie.
     y0: () => centreY(q("#sec-formations .formation-sql")) - 0.42 * H(),
     y1: () => Math.max(centreY(q("#sec-formations .formation-sql")) - 0.42 * H(), centreY(qa("#sec-formations .badge-carte").slice(-1)[0]) - 0.55 * H()),
-    duree: 11000,
+    duree: 13000,
     beats: () => [
       tr(
         "Je me forme aussi en continu : un cours de SQL de trente heures, des premières requêtes jusqu'aux jointures, aux fonctions de fenêtrage et aux CTE.",
@@ -238,11 +238,15 @@ const ARRETS: Arret[] = [
         "It goes all the way to indexes and execution plans, and ends with a data-warehouse project. The practice is the supermarket sales project.",
       ),
       tr(
+        "À côté des certifications, j'ai suivi une formation Python et machine learning de trente vidéos : NumPy, Pandas, Matplotlib, SciPy et Scikit-learn.",
+        "Alongside the certifications, I followed a thirty-video Python and machine-learning course: NumPy, Pandas, Matplotlib, SciPy and Scikit-learn.",
+      ),
+      tr(
         "Et des certifications vérifiables sur Credly : bases de données et SQL, analyse de données IBM, analyse de données avancée Google, et Python pour la data.",
         "And certifications you can verify on Credly: databases and SQL, IBM data analysis, Google advanced data analytics, and Python for data.",
       ),
     ],
-    debuts: [0, 0.2, 0.42, 1],
+    debuts: [0, 0.2, 0.42, 0.6, 1],
   },
   {
     cle: "methode",
