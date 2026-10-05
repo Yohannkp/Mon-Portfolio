@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { Reveal } from "@/components/reveal"
 import { Badge } from "@/components/ui/badge"
 
 const skillCategories = [
@@ -27,30 +27,18 @@ export function Skills() {
   return (
     <section id="sec-competences" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
+        <Reveal y={20} duration={0.5}>
           <span className="sec__kicker">
             Compétences
           </span>
           <h2 className="sec__h2">
             Technologies maîtrisées
           </h2>
-        </motion.div>
+        </Reveal>
 
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {skillCategories.map((category, categoryIndex) => (
-            <motion.div
-              key={category.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: categoryIndex * 0.1 }}
-              className="carte carte--3d"
-            >
+            <Reveal key={category.name} y={20} duration={0.5} delay={categoryIndex * 0.1} className="carte carte--3d">
               <h3 className="carte__etiquette">
                 {category.name}
               </h3>
@@ -67,7 +55,7 @@ export function Skills() {
                   ),
                 )}
               </div>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>

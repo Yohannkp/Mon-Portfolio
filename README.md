@@ -158,6 +158,18 @@ Le site est vérifié de 360 à 768 px de large : aucune page ne déborde à l'h
 - **Menu :** la pastille du menu glisse d'un lien à l'autre.
 - **Mouvement réduit :** avec `prefers-reduced-motion`, la navigation est immédiate et les effets de survol sont coupés.
 
+## Performances (sans retirer une seule animation)
+
+Mesures faites sur le site compilé (Chromium, défilement de toute la page à vitesse constante) ; le gain est surtout dans ce que le navigateur n'a plus à recalculer à chaque image :
+
+- **Le robot n'invalide plus le style de tout son sous-arbre.** Position, taille, opacité, rotation du cube, bob, regard et inclinaison sont écrits directement sur l'élément concerné (`style.transform`), au lieu de variables CSS héritées : une variable héritée qui change oblige le navigateur à recalculer le style de tous les descendants, à chaque image. Les variables qui restent (expression du visage) ne sont réécrites que si leur valeur change. Résultat : environ 40 % de temps de recalcul de style en moins pendant le défilement.
+- **Au repos, le robot passe à une image sur deux** (ni défilement, ni souris, ni visite, ni voix, ni réaction en cours) : il ne fait alors que tourner et respirer très lentement. Les durées étant mesurées en temps réel, le mouvement est identique.
+- **La jauge de lecture** n'agit plus que par `transform` (`scaleY`), sans mise en page ni peinture ; la hauteur défilable n'est plus relue à chaque image.
+- **Moins de JavaScript au démarrage** : 276 Ko → 235 Ko compressés sur l'accueil. Le robot, la visite automatique (voix, musique) et la télécommande sont chargés juste après le premier rendu (`next/dynamic`) ; `framer-motion` ne sert plus qu'à la pastille du menu et se charge à la demande ; les apparitions au défilement (`components/reveal.tsx`) sont en CSS pur (une animation qui s'arrête d'elle-même, donc le survol et l'inclinaison 3D des cartes reprennent la main).
+- **En-tête** : flou d'arrière-plan réduit (12 px au lieu de 16), un des plus gros coûts de peinture d'une barre collante.
+
+Côté référencement et accessibilité : données structurées (`Person`), URL canonique par page, lien « Aller au contenu » pour le clavier.
+
 ## Stack
 
 - [Next.js 16](https://nextjs.org/) (App Router) et React 19

@@ -3,11 +3,14 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { motion } from "framer-motion"
+import { LazyMotion, m } from "framer-motion"
 import { Menu, X, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+
+// Charge a la demande : la pastille animee du menu n'est pas necessaire au premier affichage.
+const chargerAnimations = () => import("@/components/motion-features").then((r) => r.default)
 
 const navigation = [
   { name: "Accueil", href: "/" },
@@ -33,16 +36,11 @@ export function Header() {
   }, [pathname])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg">
+    <LazyMotion features={chargerAnimations}>
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/90 backdrop-blur-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2">
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-lg font-semibold tracking-tight"
-          >
-            Yendi Yohann
-          </motion.div>
+          <div className="h-entree text-lg font-semibold tracking-tight">Yendi Yohann</div>
         </Link>
 
         {/* Desktop navigation */}
@@ -62,7 +60,7 @@ export function Header() {
               >
                 {item.name}
                 {isActive && (
-                  <motion.div
+                  <m.div
                     layoutId="activeNav"
                     className="absolute inset-0 rounded-lg bg-secondary"
                     style={{ zIndex: -1 }}
@@ -111,12 +109,7 @@ export function Header() {
 
       {/* Mobile navigation */}
       {mobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="border-t border-border/40 bg-background md:hidden"
-        >
+        <div className="h-menu border-t border-border/40 bg-background md:hidden">
           <div className="space-y-1 px-6 py-4">
             {navigation.map((item) => {
               const isActive = pathname === item.href
@@ -137,8 +130,9 @@ export function Header() {
               )
             })}
           </div>
-        </motion.div>
+        </div>
       )}
     </header>
+    </LazyMotion>
   )
 }

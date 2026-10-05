@@ -705,14 +705,15 @@ export function PresentationAuto() {
     let t = 0
     // Encore sur l'accroche ? Sous 1280px, le bouton attend qu'on l'ait quittee (voir la feuille de style).
     const majHaut = () => {
-      if (racine.current) racine.current.dataset.haut = window.scrollY < window.innerHeight * 0.6 ? "1" : "0"
+      const v = window.scrollY < window.innerHeight * 0.6 ? "1" : "0"
+      if (racine.current && racine.current.dataset.haut !== v) racine.current.dataset.haut = v
     }
     majHaut()
     const surScroll = () => {
       majHaut()
       const el = racine.current
       if (!el || etatRef.current === "lecture") return
-      el.dataset.defile = "1"
+      if (el.dataset.defile !== "1") el.dataset.defile = "1"
       window.clearTimeout(t)
       t = window.setTimeout(() => delete el.dataset.defile, 1100)
     }

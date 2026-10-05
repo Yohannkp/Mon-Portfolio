@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { Reveal } from "@/components/reveal"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -10,13 +10,7 @@ export function AboutPreview() {
   return (
     <section id="sec-apropos" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="grid gap-12 md:grid-cols-2 md:items-center"
-        >
+        <Reveal y={20} duration={0.5} className="grid gap-12 md:grid-cols-2 md:items-center">
           {/* Image */}
           <div className="relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-2xl bg-secondary">
             <Image
@@ -62,7 +56,7 @@ De l'affinage du modèle à son déploiement.
               </Button>
             </div>
           </div>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   )

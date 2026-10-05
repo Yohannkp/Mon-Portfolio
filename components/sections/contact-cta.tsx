@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { Reveal } from "@/components/reveal"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -9,13 +9,7 @@ export function ContactCTA() {
   return (
     <section id="sec-contact" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col items-center text-center"
-        >
+        <Reveal y={20} duration={0.5} className="flex flex-col items-center text-center">
           {/* Reserve pour le robot, seulement quand il est en service (voir globals.css). */}
           <div data-scene-robot aria-hidden="true" />
           <h2 className="sec__h2">
@@ -31,7 +25,7 @@ export function ContactCTA() {
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   )

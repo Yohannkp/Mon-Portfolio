@@ -34,14 +34,25 @@ export function ReadingRail() {
 
   useEffect(() => {
     let raf = 0
+    // Hauteur defilable, mesuree une fois (et quand la page change de taille) : la relire a chaque image force un calcul de mise en page.
+    let max = document.documentElement.scrollHeight - window.innerHeight
+    const mesurer = () => {
+      max = document.documentElement.scrollHeight - window.innerHeight
+      onScroll()
+    }
+    let pct = ""
     const update = () => {
       raf = 0
-      const max = document.documentElement.scrollHeight - window.innerHeight
       const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0
       const top = p * window.innerHeight
-      if (fillRef.current) fillRef.current.style.height = `${top}px`
-      if (nodeRef.current) nodeRef.current.style.transform = `translateY(${top}px)`
-      if (pctRef.current) pctRef.current.textContent = `${String(Math.round(p * 100)).padStart(2, "0")}%`
+      // Uniquement des transformations (gerees par le compositeur) : la jauge ne declenche ni mise en page ni peinture.
+      if (fillRef.current) fillRef.current.style.transform = `scaleY(${p.toFixed(4)})`
+      if (nodeRef.current) nodeRef.current.style.transform = `translateY(${top.toFixed(1)}px)`
+      const texte = `${String(Math.round(p * 100)).padStart(2, "0")}%`
+      if (pctRef.current && texte !== pct) {
+        pct = texte
+        pctRef.current.textContent = texte
+      }
       const scene = document.documentElement.dataset.robotScene
       if (etapeRef.current) {
         const i = scene ? CLES.indexOf(scene) : -1
@@ -54,14 +65,17 @@ export function ReadingRail() {
     }
     update()
     window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll)
+    window.addEventListener("resize", mesurer)
+    const taille = typeof ResizeObserver !== "undefined" ? new ResizeObserver(mesurer) : null
+    taille?.observe(document.body)
     // Le robot annonce sa scene apres le premier rendu : on relit alors l'etape.
     const obs = new MutationObserver(onScroll)
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-robot-scene"] })
     return () => {
       obs.disconnect()
+      taille?.disconnect()
       window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
+      window.removeEventListener("resize", mesurer)
       if (raf) cancelAnimationFrame(raf)
     }
   }, [])

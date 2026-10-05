@@ -345,9 +345,44 @@ export function Objet3D() {
       sacc: { x: 0, y: 0, t: 0 },
       emo: null as { h: Humeur; jusqua: number } | null,
       pokes: [] as number[],
+      dBouche: "",
+      dernierScroll: 0,
+      tf: "",
+      op: "",
+      ftf: "",
+      fop: "",
     }
     const X = nouvelleExpr()
+    /**
+     * Ecrit une variable CSS seulement si sa valeur a change : une ecriture identique n'est pas gratuite (elle invalide le style
+     * de tout le sous-arbre du robot), et la plupart des variables ne bougent pas d'une image a l'autre (expression stable, fantome inactif...).
+     */
+    const memoVars = (cible: HTMLElement) => {
+      const m = new Map<string, string>()
+      return (nom: string, v: string) => {
+        if (m.get(nom) === v) return
+        m.set(nom, v)
+        cible.style.setProperty(nom, v)
+      }
+    }
+    const vEl = memoVars(el)
+    const vFan = memoVars(fan)
+    const vBul = memoVars(bul)
     const boucheEl = el.querySelector<SVGPathElement>(".obj__bouche path")
+    const scene = el.querySelector<HTMLElement>(".obj__scene")
+    const bot = el.querySelector<HTMLElement>(".obj__bot")
+    const anneau = el.querySelector<HTMLElement>(".obj__anneau")
+    const yeux = el.querySelector<HTMLElement>(".obj__yeux")
+    const dernieres = new WeakMap<HTMLElement, Record<string, string>>()
+    /** Ecrit une propriete de style en ligne seulement si elle a change. */
+    const pose = (cible: HTMLElement | null, prop: "transform" | "rotate", v: string) => {
+      if (!cible) return
+      const m = dernieres.get(cible) ?? {}
+      if (m[prop] === v) return
+      m[prop] = v
+      dernieres.set(cible, m)
+      cible.style[prop] = v
+    }
 
     // --- La colere : le visiteur file devant les simulations -------------------------------------------
     // Une fois par visite : le robot se fache, devient tout rouge, se balance, descend pour prendre de l'elan,
@@ -862,18 +897,32 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
 
       const bob = reduit ? 0 : Math.sin(c.now / 520) * 4 + N.saut
 
-      el.style.setProperty("--tx", `${N.x.toFixed(1)}px`)
-      el.style.setProperty("--ty", `${N.y.toFixed(1)}px`)
-      el.style.setProperty("--ech", N.ech.toFixed(3))
-      el.style.setProperty("--op", N.op.toFixed(3))
-      el.style.setProperty("--mut", N.mut.toFixed(4))
-      el.style.setProperty("--ry", `${N.angle.toFixed(2)}deg`)
-      el.style.setProperty("--bob", `${bob.toFixed(2)}px`)
-      el.style.setProperty("--gx", `${N.gx.toFixed(2)}px`)
-      el.style.setProperty("--gy", `${N.gy.toFixed(2)}px`)
-      el.style.setProperty("--incl", `${N.incl.toFixed(2)}deg`)
+      vEl("--mut", N.mut.toFixed(4))
+      // Ce qui bouge a chaque image (rotation du cube, bob, regard, inclinaison) est ecrit directement sur l'element concerne :
+      // pas de variable heritee, donc aucun recalcul de style pour le reste du robot.
+      const ry = N.angle.toFixed(2)
+      pose(scene, "transform", `rotateX(-20deg) rotateY(${ry}deg)`)
+      pose(bot, "transform", `rotateY(${(-N.angle).toFixed(2)}deg) rotateX(20deg) translateY(${bob.toFixed(2)}px) scale(${(0.6 + N.mut * 0.4).toFixed(3)})`)
+      pose(bot, "rotate", `${N.incl.toFixed(2)}deg`)
+      pose(anneau, "transform", `rotateX(72deg) rotateZ(${(N.angle * 0.6).toFixed(2)}deg)`)
+      pose(yeux, "transform", `translate(${N.gx.toFixed(2)}px, ${N.gy.toFixed(2)}px)`)
       // Dans le guide d'une demonstration, il passe devant le panneau (qui a un fond).
       if (R.etat === "joue") jouerRage(c, dt)
+      // Position, taille et opacite : ecrites DIRECTEMENT sur l'element (pas en variables CSS). Une variable heritee qui change
+      // oblige le navigateur a recalculer le style de tout le sous-arbre du robot a chaque image ; une propriete directe, non.
+      const joue = R.etat === "joue"
+      const tf = joue
+        ? `translate3d(${(N.x + R.dx).toFixed(1)}px, ${(N.y + R.dy).toFixed(1)}px, 0) scale(${(N.ech * R.rk).toFixed(3)}) rotate(${R.rot.toFixed(2)}deg) scale(${(1 + R.sq * 0.16).toFixed(3)}, ${(1 - R.sq * 0.26).toFixed(3)})`
+        : `translate3d(${N.x.toFixed(1)}px, ${N.y.toFixed(1)}px, 0) scale(${N.ech.toFixed(3)})`
+      if (tf !== mem.tf) {
+        mem.tf = tf
+        el.style.transform = tf
+      }
+      const op = N.op.toFixed(3)
+      if (op !== mem.op) {
+        mem.op = op
+        el.style.opacity = op
+      }
       const devant = cible.devant || R.etat === "joue" ? "1" : "0"
       if (el.dataset.devant !== devant) el.dataset.devant = devant
       const gauche = cible.gauche ? "1" : "0"
@@ -902,14 +951,18 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       const parle = !reduit && document.documentElement.dataset.robotParle === "1"
         ? 0.12 + 0.42 * Math.abs(Math.sin(c.now / 68)) * (0.55 + 0.45 * Math.abs(Math.sin(c.now / 213)))
         : 0
-      el.style.setProperty("--ex", X.ex.toFixed(3))
-      el.style.setProperty("--eyl", X.eyl.toFixed(3))
-      el.style.setProperty("--eyr", X.eyr.toFixed(3))
-      el.style.setProperty("--bt", `${X.bt.toFixed(2)}deg`)
-      el.style.setProperty("--byl", `${X.byl.toFixed(2)}px`)
-      el.style.setProperty("--byr", `${X.byr.toFixed(2)}px`)
-      el.style.setProperty("--bo", X.bo.toFixed(3))
-      boucheEl?.setAttribute("d", cheminBouche(X, parle))
+      vEl("--ex", X.ex.toFixed(3))
+      vEl("--eyl", X.eyl.toFixed(3))
+      vEl("--eyr", X.eyr.toFixed(3))
+      vEl("--bt", `${X.bt.toFixed(2)}deg`)
+      vEl("--byl", `${X.byl.toFixed(2)}px`)
+      vEl("--byr", `${X.byr.toFixed(2)}px`)
+      vEl("--bo", X.bo.toFixed(3))
+      const dBouche = cheminBouche(X, parle)
+      if (dBouche !== mem.dBouche) {
+        mem.dBouche = dBouche
+        boucheEl?.setAttribute("d", dBouche)
+      }
 
       // Le clignement : un passage rapide a la ligne (~140 ms), a intervalles irreguliers de 2 a 6 s, parfois double.
       if (!reduit && c.now > mem.clin) {
@@ -932,13 +985,19 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
         N.fgx = mix(N.fgx, fg.x * 9, k)
         N.fgy = mix(N.fgy, fg.y * 6, k)
       }
-      fan.style.setProperty("--tx", `${N.fx.toFixed(1)}px`)
-      fan.style.setProperty("--ty", `${N.fy.toFixed(1)}px`)
-      fan.style.setProperty("--ech", N.fech.toFixed(3))
-      fan.style.setProperty("--fo", (N.fo * 0.9).toFixed(3))
-      fan.style.setProperty("--gx", `${N.fgx.toFixed(2)}px`)
-      fan.style.setProperty("--gy", `${N.fgy.toFixed(2)}px`)
-      fan.style.setProperty("--bob", `${(reduit ? 0 : Math.sin(c.now / 520 + 1.7) * 4).toFixed(2)}px`)
+      const ftf = `translate3d(${N.fx.toFixed(1)}px, ${N.fy.toFixed(1)}px, 0) scale(${N.fech.toFixed(3)})`
+      if (ftf !== mem.ftf) {
+        mem.ftf = ftf
+        fan.style.transform = ftf
+      }
+      const fop = (N.fo * 0.9).toFixed(3)
+      if (fop !== mem.fop) {
+        mem.fop = fop
+        fan.style.opacity = fop
+      }
+      vFan("--gx", `${N.fgx.toFixed(2)}px`)
+      vFan("--gy", `${N.fgy.toFixed(2)}px`)
+      if (N.fo > 0.01) vFan("--bob", `${(reduit ? 0 : Math.sin(c.now / 520 + 1.7) * 4).toFixed(2)}px`)
       if (fan.dataset.humeur !== "curieux") fan.dataset.humeur = "curieux"
 
       // La bulle : un calque a part, au-dessus du contenu, posee dans la marge.
@@ -965,13 +1024,13 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
         const hauteur = bul.offsetHeight || 70
         const placeDessus = N.y - 113 * N.ech - 10 - hauteur >= c.haut
         const dessous = b.place === "dessous" || !placeDessus
-        bul.style.setProperty("--bw", `${largeur}px`)
-        bul.style.setProperty("--bx", `${borne(N.x, largeur / 2 + 8, c.W - largeur / 2 - 8).toFixed(1)}px`)
-        bul.style.setProperty(
+        vBul("--bw", `${largeur}px`)
+        vBul("--bx", `${borne(N.x, largeur / 2 + 8, c.W - largeur / 2 - 8).toFixed(1)}px`)
+        vBul(
           "--by",
           `${(dessous ? N.y + 96 * N.ech + 10 : N.y - 113 * N.ech - 10).toFixed(1)}px`,
         )
-        bul.style.setProperty("--bdy", dessous ? "0%" : "-100%")
+        vBul("--bdy", dessous ? "0%" : "-100%")
       }
     }
 
@@ -993,9 +1052,25 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       const c = calculer(now)
       peindre(c, dt, false)
     }
+    // Au repos (ni defilement, ni souris, ni visite, ni voix, ni reaction en cours), le robot ne fait que tourner et respirer tres
+    // lentement : une image sur deux suffit, on ne le voit pas, et le processeur (la batterie) respire. Les durees etant mesurees
+    // en temps reel (dt), rien ne change au mouvement.
+    let parite = false
+    const auRepos = (now: number) =>
+      now - mem.dernierScroll > 1500 &&
+      now - mem.souris.t > 1500 &&
+      R.etat !== "joue" &&
+      !mem.survol &&
+      !el.dataset.anim &&
+      html.dataset.visite !== "1" &&
+      html.dataset.robotParle !== "1"
     const boucle = (now: number) => {
-      image(now)
       rafId = requestAnimationFrame(boucle)
+      if (auRepos(now)) {
+        parite = !parite
+        if (parite) return
+      }
+      image(now)
     }
 
     const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
@@ -1010,7 +1085,7 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
       verrou(false)
       delete html.dataset.robotRage
       delete el.dataset.rage
-      for (const v of ["--rx", "--rdy", "--rrot", "--rage", "--rsq", "--rk", "--bk"]) el.style.removeProperty(v)
+      for (const v of ["--rage", "--bk"]) el.style.removeProperty(v)
       delete q("#sec-demos")?.dataset.robotMontre
     }
     const lancerRage = (top: number) => {
@@ -1027,11 +1102,13 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
     }
     /** Le visiteur vient de traverser toute la section des simulations d'un trait : trop vite pour l'avoir vue. */
     const detecterFuite = () => {
-      const sec = q("#sec-demos")
       const mid = window.scrollY + window.innerHeight * 0.5
       const prev = fuite.prevMid
       fuite.prevMid = mid
-      if (!sec || rageJouee || R.etat === "joue" || reduit || html.dataset.visite === "1" || N.mut < 0.7) return
+      // Les verifications peu couteuses d'abord : la plupart du temps (colere deja jouee, visite en cours...) on ne mesure rien.
+      if (rageJouee || R.etat === "joue" || reduit || html.dataset.visite === "1" || N.mut < 0.7) return
+      const sec = q("#sec-demos")
+      if (!sec) return
       const now = performance.now()
       const r = sec.getBoundingClientRect()
       const top = r.top + window.scrollY
@@ -1241,15 +1318,11 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
         dessinerBras(el, cote, h, bk, bd, ouv, resp)
       }
       el.style.setProperty("--bk", bk.toFixed(3))
-      el.style.setProperty("--rk", R.rk.toFixed(3))
-      el.style.setProperty("--rx", `${R.dx.toFixed(2)}px`)
-      el.style.setProperty("--rdy", `${R.dy.toFixed(2)}px`)
-      el.style.setProperty("--rrot", `${R.rot.toFixed(2)}deg`)
       el.style.setProperty("--rage", R.rage.toFixed(3))
-      el.style.setProperty("--rsq", R.sq.toFixed(3))
     }
 
     const surDefilement = () => {
+      mem.dernierScroll = performance.now()
       const y = window.scrollY
       N.dyBrut += borne(y - N.dernierY, -90, 90)
       N.brut += Math.min(Math.abs(y - N.dernierY), 90) // plafonne : un saut d'ancre ne doit pas faire exploser l'objet
