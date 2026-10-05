@@ -230,15 +230,19 @@ const ARRETS: Arret[] = [
     duree: 11000,
     beats: () => [
       tr(
-        "Je me forme aussi en continu : un cours de SQL de trente heures, dont la mise en pratique est le projet sur les ventes de supermarché.",
-        "I keep training too: a thirty-hour SQL course, put into practice in the supermarket sales project.",
+        "Je me forme aussi en continu : un cours de SQL de trente heures, des premières requêtes jusqu'aux jointures, aux fonctions de fenêtrage et aux CTE.",
+        "I keep training too: a thirty-hour SQL course, from the first queries to joins, window functions and CTEs.",
+      ),
+      tr(
+        "Il va jusqu'aux index et aux plans d'exécution, et se termine par un projet d'entrepôt de données. La mise en pratique, c'est le projet sur les ventes de supermarché.",
+        "It goes all the way to indexes and execution plans, and ends with a data-warehouse project. The practice is the supermarket sales project.",
       ),
       tr(
         "Et des certifications vérifiables sur Credly : bases de données et SQL, analyse de données IBM, analyse de données avancée Google, et Python pour la data.",
         "And certifications you can verify on Credly: databases and SQL, IBM data analysis, Google advanced data analytics, and Python for data.",
       ),
     ],
-    debuts: [0, 0.42, 1],
+    debuts: [0, 0.2, 0.42, 1],
   },
   {
     cle: "methode",

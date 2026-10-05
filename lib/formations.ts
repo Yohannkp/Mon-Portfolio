@@ -58,11 +58,72 @@ export const BADGES: Badge[] = [
   },
 ]
 
-/** La formation SQL suivie en video. `apprentissages` : ce qui en a ete retenu (liste vide : la rubrique n'est pas affichee). */
+/** Un point du programme : ce que le cours couvre, et que l'on a donc appris. [francais, anglais] pour chaque texte. */
+export type Apprentissage = { titre: [string, string]; detail: [string, string] }
+
+/**
+ * La formation SQL suivie en video : « SQL Full Course for Beginners (30 Hours) », de Data with Baraa (gratuit, mars 2025).
+ * Les apprentissages reprennent la table des matieres de la video (ses chapitres), regroupee par theme : rien qui n'y figure pas.
+ * La video est creditee et liee : c'est le travail de son auteur.
+ */
 export const FORMATION_SQL = {
   heures: 30,
+  titre: "SQL Full Course for Beginners (30 Hours)",
+  chaine: "Data with Baraa",
+  chaineUrl: "https://www.youtube.com/@DataWithBaraa",
+  date: "2025-03-27",
   video: "https://www.youtube.com/watch?v=SSKVgrwhzus",
   /** Le projet qui met ce cours en pratique : l'ancre de sa ligne sur /projects. */
   projet: "supermarket-sales-analysis",
-  apprentissages: [] as [string, string][],
+  apprentissages: [
+    {
+      titre: ["Les bases du langage", "The language basics"],
+      detail: [
+        "SELECT, filtrage des données, et les commandes DDL et DML pour créer et modifier tables et données.",
+        "SELECT, filtering, and the DDL and DML commands to create and modify tables and data.",
+      ],
+    },
+    {
+      titre: ["Jointures et opérateurs ensemblistes", "Joins and set operators"],
+      detail: [
+        "Jointures de base et avancées, puis les opérateurs ensemblistes pour combiner des résultats.",
+        "Basic and advanced joins, then set operators to combine results.",
+      ],
+    },
+    {
+      titre: ["Fonctions et logique", "Functions and logic"],
+      detail: [
+        "Fonctions de texte, de nombres et de dates, gestion des NULL, CASE et fonctions d'agrégation.",
+        "String, numeric and date functions, NULL handling, CASE and aggregate functions.",
+      ],
+    },
+    {
+      titre: ["Fonctions de fenêtrage", "Window functions"],
+      detail: [
+        "Le plus gros morceau du cours, près de quatre heures : agrégats, classements et valeurs sur fenêtre.",
+        "The biggest part of the course, nearly four hours: window aggregates, rankings and value functions.",
+      ],
+    },
+    {
+      titre: ["SQL avancé", "Advanced SQL"],
+      detail: [
+        "Sous-requêtes, CTE, vues, tables temporaires, procédures stockées et triggers.",
+        "Subqueries, CTEs, views, temporary tables, stored procedures and triggers.",
+      ],
+    },
+    {
+      titre: ["Performance", "Performance"],
+      detail: [
+        "Index, plans d'exécution, partitions et une trentaine de conseils d'optimisation.",
+        "Indexes, execution plans, partitions and thirty optimisation tips.",
+      ],
+    },
+    {
+      titre: ["Trois projets pour finir", "Three projects to finish"],
+      detail: [
+        "Un entrepôt de données (couches Bronze, Silver, Gold), une analyse exploratoire et une analyse de données avancée.",
+        "A data warehouse (Bronze, Silver, Gold layers), an exploratory analysis and an advanced data analysis.",
+      ],
+    },
+  ] as Apprentissage[],
 }

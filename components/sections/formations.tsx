@@ -63,22 +63,22 @@ export function Formations() {
           <div className="formation-sql__corps">
             <p className="formation-sql__etiquette">SQL</p>
             <h3 className="formation-sql__titre">{t("Formation SQL de 30 heures", "30-hour SQL training")}</h3>
+            <p className="formation-sql__source">
+              <a href={FORMATION_SQL.video} target="_blank" rel="noopener noreferrer">
+                {FORMATION_SQL.titre}
+              </a>{" "}
+              {t("par", "by")}{" "}
+              <a href={FORMATION_SQL.chaineUrl} target="_blank" rel="noopener noreferrer">
+                {FORMATION_SQL.chaine}
+              </a>{" "}
+              · {t("gratuit", "free")} · {mois(FORMATION_SQL.date)}
+            </p>
             <p className="formation-sql__texte">
               {t(
-                "Un cours vidéo complet, suivi de bout en bout pour maîtriser le SQL en profondeur. La mise en pratique est dans un projet : 878 000 lignes de vente analysées avec des requêtes SQL analytiques.",
-                "A complete video course, followed from start to finish to master SQL in depth. The practice is in a project: 878,000 sales lines analysed with analytical SQL queries.",
+                "Un cours vidéo complet, suivi de bout en bout : des premières requêtes jusqu'à l'optimisation et à un entrepôt de données. La mise en pratique est dans un projet : 878 000 lignes de vente analysées avec des requêtes SQL analytiques.",
+                "A complete video course, followed from start to finish: from the first queries to optimisation and a data warehouse. The practice is in a project: 878,000 sales lines analysed with analytical SQL queries.",
               )}
             </p>
-            {FORMATION_SQL.apprentissages.length > 0 ? (
-              <div className="formation-sql__appris">
-                <p>{t("Ce que j'y ai appris", "What I learned")}</p>
-                <ul>
-                  {FORMATION_SQL.apprentissages.map((a) => (
-                    <li key={a[0]}>{t(a[0], a[1])}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild className="gap-2">
                 <a href={FORMATION_SQL.video} target="_blank" rel="noopener noreferrer">
@@ -93,6 +93,17 @@ export function Formations() {
                 </Link>
               </Button>
             </div>
+          </div>
+          <div className="formation-sql__appris">
+            <p>{t("Ce que j'y ai appris", "What I learned")}</p>
+            <ul>
+              {FORMATION_SQL.apprentissages.map((a) => (
+                <li key={a.titre[0]}>
+                  <b>{t(a.titre[0], a.titre[1])}</b>
+                  <span>{t(a.detail[0], a.detail[1])}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </Reveal>
 
