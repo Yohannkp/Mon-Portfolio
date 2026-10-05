@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { EXPRESSIONS, cheminBouche, nouvelleExpr, versExpr, type Humeur } from "@/components/robot-emotions"
+import { t as tr } from "@/lib/langue"
 
 /**
  * L'objet : un cube filaire qui devient un robot, puis accompagne la lecture.
@@ -112,11 +113,11 @@ function etapeRag(t: number) {
 const HUMEUR_RAG: Record<number, Humeur> = { 1: "concentre", 2: "curieux", 3: "concentre", 4: "concentre", 5: "content" }
 
 /* --- Competences : la preuve de chaque famille, tiree du site lui-meme --- */
-const PREUVES = [
-  { badge: "Go", texte: "Backend d'un moteur de traitement de données en production — stage 2026" },
-  { badge: "Fine-tuning LoRA / QLoRA", texte: "Affinage de Qwen2-0.5B dans Mina-Translator" },
-  { badge: "Docker", texte: "Compose, images et conteneurs — stage, et RAG-Local" },
-  { badge: "ETL", texte: "Moteur de traitement de données — stage 2026" },
+const PREUVES: { badge: string; texte: [string, string] }[] = [
+  { badge: "Go", texte: ["Backend d'un moteur de traitement de données en production — stage 2026", "Backend of a data-processing engine in production — 2026 internship"] },
+  { badge: "Fine-tuning LoRA / QLoRA", texte: ["Affinage de Qwen2-0.5B dans Mina-Translator", "Fine-tuning of Qwen2-0.5B in Mina-Translator"] },
+  { badge: "Docker", texte: ["Compose, images et conteneurs — stage, et RAG-Local", "Compose, images and containers — internship, and RAG-Local"] },
+  { badge: "ETL", texte: ["Moteur de traitement de données — stage 2026", "Data-processing engine — 2026 internship"] },
 ]
 
 const IDS = [
@@ -575,7 +576,7 @@ export function Objet3D() {
         regard: versLien && lien ? centre(lien.getBoundingClientRect()) : { x: r.left + r.width * 0.32, y: r.top + r.height * 0.4 },
         humeur: depuis < 900 ? "content" : "neutre",
         // Trop etroit pour la bulle (ecran a peine plus large que 1281 px) : elle se tait, la visite a deja sa phrase.
-        bulle: { titre: code, texte: prouve ? `Démontre : ${prouve}` : "", largeur: largeurBulle },
+        bulle: { titre: code, texte: prouve ? tr(`Démontre : ${prouve}`, `Demonstrates: ${prouve}`) : "", largeur: largeurBulle },
         devant: traverse,
         gauche,
       }
@@ -665,7 +666,7 @@ export function Objet3D() {
         x: c.xM, y: borne(p.y, c.H * 0.25, c.H * 0.75), ech: c.echM, op: 0.95,
         regard: p,
         humeur: lu === phrases.length ? "content" : recent ? "concentre" : "neutre",
-        bulle: { texte: lu === phrases.length ? "Disponibilité" : "Ma méthode" },
+        bulle: { texte: lu === phrases.length ? tr("Disponibilité", "Availability") : tr("Ma méthode", "My method") },
       }
     }
 
@@ -695,7 +696,7 @@ export function Objet3D() {
         x, y, ech, op: 1,
         regard: { x, y: rects[Math.min(k, n - 1)].top + rects[0].height * 0.5 },
         humeur: arrive ? "content" : "neutre",
-        bulle: badge && preuve ? { titre: preuve.badge, texte: preuve.texte, place: "dessous", largeur: 232 } : null,
+        bulle: badge && preuve ? { titre: preuve.badge, texte: tr(preuve.texte[0], preuve.texte[1]), place: "dessous", largeur: 232 } : null,
       }
     }
 

@@ -4,23 +4,26 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LazyMotion, m } from "framer-motion"
-import { Menu, X, Moon, Sun } from "lucide-react"
+import { Menu, X, Moon, Sun, Languages } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { changerLangue, useLangue, useT } from "@/lib/langue"
 
 // Charge a la demande : la pastille animee du menu n'est pas necessaire au premier affichage.
 const chargerAnimations = () => import("@/components/motion-features").then((r) => r.default)
 
 const navigation = [
-  { name: "Accueil", href: "/" },
-  { name: "Projets", href: "/projects" },
-  { name: "À propos", href: "/about" },
-  { name: "Contact", href: "/contact" },
+  { fr: "Accueil", en: "Home", href: "/" },
+  { fr: "Projets", en: "Projects", href: "/projects" },
+  { fr: "À propos", en: "About", href: "/about" },
+  { fr: "Contact", en: "Contact", href: "/contact" },
 ]
 
 export function Header() {
   const pathname = usePathname()
+  const langue = useLangue()
+  const t = useT()
   const { theme, setTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
@@ -49,7 +52,7 @@ export function Header() {
             const isActive = pathname === item.href
             return (
               <Link
-                key={item.name}
+                key={item.href}
                 href={item.href}
                 className={cn(
                   "relative px-4 py-2 text-sm font-medium transition-colors",
@@ -58,7 +61,7 @@ export function Header() {
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                {item.name}
+                {t(item.fr, item.en)}
                 {isActive && (
                   <m.div
                     layoutId="activeNav"
@@ -73,6 +76,22 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Langue : FR <-> EN. Le bouton affiche la langue vers laquelle on bascule. */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => changerLangue(langue === "fr" ? "en" : "fr")}
+            className="h-9 gap-1.5 px-2.5 font-mono text-xs"
+            aria-label={t("Switch to English", "Passer en français")}
+            title={t("Switch to English", "Passer en français")}
+            lang={langue === "fr" ? "en" : "fr"}
+          >
+            <Languages className="h-4 w-4" />
+            <span className={langue === "fr" ? "text-foreground" : "text-muted-foreground"}>FR</span>
+            <span className="text-muted-foreground/50">/</span>
+            <span className={langue === "en" ? "text-foreground" : "text-muted-foreground"}>EN</span>
+          </Button>
+
           {/* Theme toggle */}
           {mounted && (
             <Button
@@ -86,7 +105,7 @@ export function Header() {
               ) : (
                 <Moon className="h-4 w-4" />
               )}
-              <span className="sr-only">Toggle theme</span>
+              <span className="sr-only">{t("Changer de thème", "Toggle theme")}</span>
             </Button>
           )}
 
@@ -102,7 +121,7 @@ export function Header() {
             ) : (
               <Menu className="h-4 w-4" />
             )}
-            <span className="sr-only">Toggle menu</span>
+            <span className="sr-only">{t("Ouvrir le menu", "Toggle menu")}</span>
           </Button>
         </div>
       </nav>
@@ -115,7 +134,7 @@ export function Header() {
               const isActive = pathname === item.href
               return (
                 <Link
-                  key={item.name}
+                  key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
@@ -125,7 +144,7 @@ export function Header() {
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   )}
                 >
-                  {item.name}
+                  {t(item.fr, item.en)}
                 </Link>
               )
             })}

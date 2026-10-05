@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react"
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from "lucide-react"
+import { useT } from "@/lib/langue"
 
 /**
  * Le moteur des visites guidées.
@@ -31,6 +32,18 @@ export type Etape = {
   /** Temps de lecture supplementaire, en ms, quand l'etape montre beaucoup de choses. */
   attente?: number
 }
+
+/** Une etape ecrite dans les deux langues : [francais, anglais]. */
+export type EtapeT = {
+  titre: [string, string]
+  texte: [string, string]
+  humeur?: Humeur
+  attente?: number
+}
+
+/** Les etapes dans la langue demandee. */
+export const versEtapes = (defs: EtapeT[], en: boolean): Etape[] =>
+  defs.map((d) => ({ titre: d.titre[en ? 1 : 0], texte: d.texte[en ? 1 : 0], humeur: d.humeur, attente: d.attente }))
 
 const reduitMouvement = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -127,6 +140,7 @@ export function GuideShell({
   etapes: Etape[]
   scene: Scene
 }) {
+  const t = useT()
   const racine = useRef<HTMLDivElement>(null)
   const [etape, setEtape] = useState(0)
   const [auto, setAuto] = useState(true)
@@ -200,16 +214,18 @@ export function GuideShell({
       onKeyDown={surTouche}
     >
       <div className="demo__bar">
-        <span className="demo__titre">Visite guidée · {nom}</span>
+        <span className="demo__titre">
+          {t("Visite guidée", "Guided tour")} · {nom}
+        </span>
         <span className="demo__sim">{sim}</span>
       </div>
 
       <div className="gd__corps">
-        <aside className="gd__guide" aria-label="Le guide">
+        <aside className="gd__guide" aria-label={t("Le guide", "The guide")}>
           {/* Le robot vient se poser ici (voir objet-3d.tsx) : cet espace reste vide dans la page. */}
           <div className="gd__slot" data-guide-slot aria-hidden="true" />
           <p className="gd__compteur">
-            Étape {etape + 1} / {n}
+            {t("Étape", "Step")} {etape + 1} / {n}
           </p>
           <h4 className="gd__titre">{e.titre}</h4>
           <p className="gd__texte" aria-hidden="true">
@@ -228,13 +244,13 @@ export function GuideShell({
             />
           </div>
 
-          <div className="gd__points" role="tablist" aria-label="Étapes">
+          <div className="gd__points" role="tablist" aria-label={t("Étapes", "Steps")}>
             {etapes.map((s, i) => (
               <button
                 key={s.titre}
                 role="tab"
                 aria-selected={i === etape}
-                aria-label={`Étape ${i + 1} : ${s.titre}`}
+                aria-label={`${t("Étape", "Step")} ${i + 1} : ${s.titre}`}
                 data-etat={i < etape ? "fait" : i === etape ? "actif" : "a-venir"}
                 onClick={() => aller(i)}
               />
@@ -242,24 +258,24 @@ export function GuideShell({
           </div>
 
           <div className="gd__actions">
-            <button className="gd__btn" onClick={() => aller(etape - 1)} disabled={etape === 0} aria-label="Étape précédente">
+            <button className="gd__btn" onClick={() => aller(etape - 1)} disabled={etape === 0} aria-label={t("Étape précédente", "Previous step")}>
               <ChevronLeft size={15} />
             </button>
             <button
               className="gd__btn"
               onClick={() => (demarre ? setAuto((a) => !a) : setDemarre(true))}
-              aria-label={auto ? "Mettre en pause" : "Reprendre"}
+              aria-label={auto ? t("Mettre en pause", "Pause") : t("Reprendre", "Resume")}
               aria-pressed={!auto}
             >
               {auto ? <Pause size={14} /> : <Play size={14} />}
             </button>
             {dernier ? (
               <button className="gd__btn gd__btn--plein" onClick={() => aller(0)}>
-                <RotateCcw size={14} /> Rejouer
+                <RotateCcw size={14} /> {t("Rejouer", "Replay")}
               </button>
             ) : (
               <button className="gd__btn gd__btn--plein" onClick={() => aller(etape + 1)}>
-                Suivant <ChevronRight size={15} />
+                {t("Suivant", "Next")} <ChevronRight size={15} />
               </button>
             )}
           </div>

@@ -7,6 +7,7 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Tilt3D } from '@/components/tilt-3d'
 import { PageTransition } from '@/components/page-transition'
+import { LangueSync } from '@/components/langue-sync'
 import { SITE_URL } from '@/lib/site'
 import './globals.css'
 import './demo-guide.css'
@@ -106,6 +107,7 @@ export default function RootLayout({
           </div>
           <Tilt3D />
           <PageTransition />
+          <LangueSync />
         </ThemeProvider>
         <script
           type="application/ld+json"

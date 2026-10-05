@@ -1,13 +1,16 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { AXES, dossiersParAxe } from "@/lib/dossiers"
+import { useDossiers } from "@/lib/dossiers-langue"
+import { useT } from "@/lib/langue"
 
 /**
  * Le sommaire collant de /projects : quatre axes, celui qu'on lit est marque.
  * Remplace le mur de filtres techniques : on choisit ce qu'on veut verifier, pas une techno.
  */
 export function NavAxes() {
+  const { AXES, dossiersParAxe } = useDossiers()
+  const t = useT()
   const [actif, setActif] = useState<string>(AXES[0].id)
 
   useEffect(() => {
@@ -23,10 +26,10 @@ export function NavAxes() {
     )
     sections.forEach((s) => io.observe(s))
     return () => io.disconnect()
-  }, [])
+  }, [AXES])
 
   return (
-    <nav className="axes-nav" aria-label="Les axes">
+    <nav className="axes-nav" aria-label={t("Les axes", "The themes")}>
       {AXES.map((a) => (
         <a key={a.id} href={`#${a.id}`} data-actif={actif === a.id ? "1" : "0"} onClick={() => setActif(a.id)}>
           {a.titre} <span>{dossiersParAxe(a.id).length}</span>

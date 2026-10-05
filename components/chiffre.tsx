@@ -7,12 +7,16 @@ import { useEffect, useState } from "react"
  * il monte de 0 a sa valeur quand le projet apparait ; sinon il s'affiche tel quel.
  * Le texte final est TOUJOURS celui de la donnee : l'animation ne fait que l'atteindre.
  */
-const MOTIF = /^(\+?)(\d+(?:,\d+)?)(.*)$/
+const MOTIF = /^(\+?)(\d+(?:[.,]\d+)?)(.*)$/
 
 export function Chiffre({ valeur, actif }: { valeur: string; actif: boolean }) {
   const m = valeur.match(MOTIF)
-  const cible = m ? parseFloat(m[2].replace(",", ".")) : 0
-  const decimales = m && m[2].includes(",") ? m[2].split(",")[1].length : 0
+  // « 0,88 » en francais, « 0.88 » en anglais : le separateur de la valeur est celui qu'on affiche.
+  // « 878,000 » (anglais) : la virgule separe les milliers, ce n'est pas une decimale.
+  const milliers = !!m && /^\d{1,3}(,\d{3})+$/.test(m[2])
+  const sep = m && m[2].includes(".") ? "." : ","
+  const cible = m ? (milliers ? Number(m[2].replace(/,/g, "")) : parseFloat(m[2].replace(",", "."))) : 0
+  const decimales = m && !milliers && /[.,]/.test(m[2]) ? m[2].split(/[.,]/)[1].length : 0
   const [n, setN] = useState(m ? 0 : cible)
 
   useEffect(() => {
@@ -38,7 +42,7 @@ export function Chiffre({ valeur, actif }: { valeur: string; actif: boolean }) {
   }, [actif, valeur])
 
   if (!m) return <>{valeur}</>
-  const texte = n.toFixed(decimales).replace(".", ",")
+  const texte = milliers ? Math.round(n).toLocaleString("en-US") : n.toFixed(decimales).replace(".", sep)
   return (
     <>
       <span className="sr-only">{valeur}</span>

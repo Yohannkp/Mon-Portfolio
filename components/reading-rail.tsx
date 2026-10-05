@@ -1,23 +1,24 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { langueActive, surLangue } from "@/lib/langue"
 
 /**
  * Le trajet d'un modele, de la donnee au deploiement. Le robot publie sa scene
  * (data-robot-scene sur <html>) ; le rail la traduit en etape.
  * Sans robot (ecran etroit, JS en echec), l'attribut est absent : on n'affiche que le pourcentage.
  */
-const ETAPES: Record<string, string> = {
-  hero: "Données",
-  "sec-rag": "Recherche",
-  "sec-chiffres": "Mesures",
-  "sec-stations": "Projets",
-  "sec-demos": "Inférence",
-  "sec-apropos": "Contexte",
-  "sec-competences": "Preuves",
-  "sec-methode": "Méthode",
-  "sec-veille": "Veille",
-  "sec-contact": "Déploiement",
+const ETAPES: Record<string, [string, string]> = {
+  hero: ["Données", "Data"],
+  "sec-rag": ["Recherche", "Retrieval"],
+  "sec-chiffres": ["Mesures", "Metrics"],
+  "sec-stations": ["Projets", "Projects"],
+  "sec-demos": ["Inférence", "Inference"],
+  "sec-apropos": ["Contexte", "Context"],
+  "sec-competences": ["Preuves", "Evidence"],
+  "sec-methode": ["Méthode", "Method"],
+  "sec-veille": ["Veille", "Watch"],
+  "sec-contact": ["Déploiement", "Deployment"],
 }
 const CLES = Object.keys(ETAPES)
 
@@ -56,7 +57,7 @@ export function ReadingRail() {
       const scene = document.documentElement.dataset.robotScene
       if (etapeRef.current) {
         const i = scene ? CLES.indexOf(scene) : -1
-        const texte = i >= 0 ? `${String(i + 1).padStart(2, "0")} · ${ETAPES[scene!]}` : ""
+        const texte = i >= 0 ? `${String(i + 1).padStart(2, "0")} · ${ETAPES[scene!][langueActive() === "en" ? 1 : 0]}` : ""
         if (etapeRef.current.textContent !== texte) etapeRef.current.textContent = texte
       }
     }
@@ -66,6 +67,7 @@ export function ReadingRail() {
     update()
     window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("resize", mesurer)
+    const horsLangue = surLangue(onScroll)
     const taille = typeof ResizeObserver !== "undefined" ? new ResizeObserver(mesurer) : null
     taille?.observe(document.body)
     // Le robot annonce sa scene apres le premier rendu : on relit alors l'etape.
@@ -73,6 +75,7 @@ export function ReadingRail() {
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-robot-scene"] })
     return () => {
       obs.disconnect()
+      horsLangue()
       taille?.disconnect()
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", mesurer)

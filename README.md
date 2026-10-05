@@ -141,6 +141,17 @@ Pour recevoir les messages directement dans une boîte, sans passer par l'applic
 
 Le mode clair n'est pas un blanc pur : fond gris-bleu doux (≈ `#ecedf1`), cartes un cran plus claires, texte bleu-gris plutôt que noir, bleu d'accent plus profond pour rester lisible, et un fond qui ne s'assombrit que légèrement quand le robot se met en avant. La couleur de la barre du navigateur (mobile) suit aussi le thème.
 
+## Version anglaise
+
+Un bouton **FR / EN** dans l'en-tête (et `?lang=en` dans l'adresse, pratique pour partager un lien) traduit **tout le site** : pages, sections, étapes des démonstrations, bulles du robot, phrases de la visite automatique et de la télécommande, titre de l'onglet. Le choix est retenu dans le navigateur et fixe l'attribut `lang` de la page.
+
+- **Le français reste dans le code, l'anglais juste à côté** : `<T fr="…" en="…" />` en JSX (utilisable aussi dans les composants serveur), `const t = useT(); t("…", "…")` dans un composant, `t("…", "…")` (de `lib/langue.ts`) hors de React. Aucune clé à chercher dans un dictionnaire.
+- **Les données** gardent leur version française (`lib/dossiers.ts`, `lib/projects.ts`) ; les versions anglaises sont des surcharges (`lib/dossiers-en.ts`, `lib/projects-en.ts`) : seuls les textes changent, jamais un chiffre, une pile technique ou un lien. Seule la typographie suit la langue (0,88 → 0.88, 878 000 → 878,000).
+- **La voix de la visite** change de langue avec le site : elle choisit la meilleure voix anglaise disponible sur l'appareil (voix « naturelles » en priorité), comme pour le français.
+- Changer de langue **en pleine visite** met à jour la phrase affichée et relit la phrase en cours dans la nouvelle langue.
+- Le serveur produit toujours le français (le site reste entièrement statique) ; l'anglais s'applique dès le premier rendu du navigateur. Les métadonnées de recherche (titre, description) restent en français ; le titre de l'onglet, lui, est traduit.
+- Le CV téléchargeable n'existe qu'en français : le bouton le dit (« in French »).
+
 ## Version mobile
 
 Le site est vérifié de 360 à 768 px de large : aucune page ne déborde à l'horizontale.
