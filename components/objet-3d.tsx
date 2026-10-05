@@ -673,7 +673,7 @@ export function Objet3D() {
 
     /** FORMATION — il reste dans la marge, au niveau de la carte (cours de SQL, puis chaque certification) qu'on est en train de lire. */
     const formations = (c: Ctx): Sortie => {
-      const cartes = qa("#sec-formations .formation-sql, #sec-formations .badge-carte")
+      const cartes = qa("#sec-formations .formation, #sec-formations .badge-carte")
       if (!cartes.length) return marge(c, c.H * 0.5)
       let r = cartes[0].getBoundingClientRect()
       let ecart = Infinity
