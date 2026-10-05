@@ -127,6 +127,7 @@ const IDS = [
   "sec-demos",
   "sec-apropos",
   "sec-competences",
+  "sec-formations",
   "sec-methode",
   "sec-veille",
   "sec-contact",
@@ -670,6 +671,23 @@ export function Objet3D() {
       }
     }
 
+    /** FORMATION — il reste dans la marge, au niveau de la carte (cours de SQL, puis chaque certification) qu'on est en train de lire. */
+    const formations = (c: Ctx): Sortie => {
+      const cartes = qa("#sec-formations .formation-sql, #sec-formations .badge-carte")
+      if (!cartes.length) return marge(c, c.H * 0.5)
+      let r = cartes[0].getBoundingClientRect()
+      let ecart = Infinity
+      for (const k of cartes) {
+        const kr = k.getBoundingClientRect()
+        const d = Math.abs(centre(kr).y - c.H * 0.52)
+        if (d < ecart) {
+          ecart = d
+          r = kr
+        }
+      }
+      return { x: c.xM, y: borne(centre(r).y, c.H * 0.3, c.H * 0.7), ech: c.echM, op: 0.95, regard: centre(r), humeur: "content" }
+    }
+
     /** COMPETENCES — il s'arrete sous chaque carte, sur le badge dont il a la preuve. */
     const competences = (c: Ctx): Sortie => {
       const cartes = qa("#sec-competences .carte")
@@ -780,6 +798,7 @@ export function Objet3D() {
       "sec-demos": demos,
       "sec-apropos": apropos,
       "sec-competences": competences,
+      "sec-formations": formations,
       "sec-methode": methode,
       "sec-veille": veille,
       "sec-contact": contact,

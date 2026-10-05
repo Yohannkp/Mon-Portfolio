@@ -216,6 +216,31 @@ const ARRETS: Arret[] = [
     ...rangee("#sec-competences .carte", 0.94, 0.42, 8500),
   },
   {
+    cle: "formations",
+    titre: () => tr("Formation", "Training"),
+    phrase: () =>
+      tr(
+        "Un cours de SQL de 30 heures et des certifications vérifiables sur Credly.",
+        "A 30-hour SQL course and certifications you can verify on Credly.",
+      ),
+    ok: existe("#sec-formations .formation-sql"),
+    // Du cours de SQL jusqu'aux certifications : on balaie lentement, une phrase pour chaque moitie.
+    y0: () => centreY(q("#sec-formations .formation-sql")) - 0.42 * H(),
+    y1: () => Math.max(centreY(q("#sec-formations .formation-sql")) - 0.42 * H(), centreY(qa("#sec-formations .badge-carte").slice(-1)[0]) - 0.55 * H()),
+    duree: 11000,
+    beats: () => [
+      tr(
+        "Je me forme aussi en continu : un cours de SQL de trente heures, dont la mise en pratique est le projet sur les ventes de supermarché.",
+        "I keep training too: a thirty-hour SQL course, put into practice in the supermarket sales project.",
+      ),
+      tr(
+        "Et des certifications vérifiables sur Credly : bases de données et SQL, analyse de données IBM, analyse de données avancée Google, et Python pour la data.",
+        "And certifications you can verify on Credly: databases and SQL, IBM data analysis, Google advanced data analytics, and Python for data.",
+      ),
+    ],
+    debuts: [0, 0.42, 1],
+  },
+  {
     cle: "methode",
     titre: () => tr("Méthode", "Method"),
     phrase: () =>

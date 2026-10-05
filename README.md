@@ -141,6 +141,15 @@ Pour recevoir les messages directement dans une boîte, sans passer par l'applic
 
 Le mode clair n'est pas un blanc pur : fond gris-bleu doux (≈ `#ecedf1`), cartes un cran plus claires, texte bleu-gris plutôt que noir, bleu d'accent plus profond pour rester lisible, et un fond qui ne s'assombrit que légèrement quand le robot se met en avant. La couleur de la barre du navigateur (mobile) suit aussi le thème.
 
+## Formation et certifications
+
+Une section de l'accueil (`#sec-formations`, juste après les compétences) montre qu'on s'est formé, puis le prouve :
+
+- **Le cours de SQL de 30 heures** : le chiffre en grand, le lien vers la vidéo, et le lien vers le projet qui le met en pratique (*Ventes en supermarché*). Une rubrique « Ce que j'y ai appris » s'affiche dès que `FORMATION_SQL.apprentissages` (`lib/formations.ts`) contient des lignes : elle est vide tant que le contenu de la vidéo n'a pas été relu.
+- **Quatre certifications Credly** choisies pour viser MLOps et data engineering (bases de données et SQL, IBM Data Analyst, Google Advanced Data Analytics, Python pour la data), avec l'image du badge, l'émetteur, la date, la compétence en une ligne et un lien **« Vérifier sur Credly »** vers la page du badge, qui est la preuve. Un lien mène aux 11 badges du profil.
+- **Dans la visite automatique** (un arrêt « Formation » avec voix, une phrase pour le cours puis une pour les certifications) **et dans la télécommande** (deux étapes : le cours, puis les certifications). Le robot reste dans la marge, au niveau de la carte lue ; la jauge indique « Formation ».
+- Tout est bilingue. Les badges sont des données (`lib/formations.ts`), rien n'est écrit en dur dans le composant. Les images viennent de Credly (si l'une ne se charge pas, une pastille avec l'initiale la remplace).
+
 ## Version anglaise
 
 Un bouton **FR / EN** dans l'en-tête (et `?lang=en` dans l'adresse, pratique pour partager un lien) traduit **tout le site** : pages, sections, étapes des démonstrations, bulles du robot, phrases de la visite automatique et de la télécommande, titre de l'onglet. Le choix est retenu dans le navigateur et fixe l'attribut `lang` de la page.

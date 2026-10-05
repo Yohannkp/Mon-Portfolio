@@ -679,3 +679,32 @@ html[data-nav] main > :nth-child(n+5) { animation-delay: .24s !important; }
   transform: translateY(-160%); transition: transform .2s ease; }
 /* La position cachee est aussi en ligne (layout.tsx) : meme si la feuille de style tarde, le lien reste invisible. */
 .lien-evitement:focus { transform: none !important; outline: 2px solid var(--foreground); outline-offset: 2px; }
+
+/* ---------- Formation : le cours de SQL et les certifications Credly ---------- */
+.formation-sql { display: grid; grid-template-columns: 1fr; gap: 1.5rem; padding: 1.75rem; }
+@media (min-width: 720px) { .formation-sql { grid-template-columns: 170px 1fr; align-items: center; gap: 2.5rem; padding: 2.25rem; } }
+.formation-sql__heures { display: flex; align-items: baseline; gap: .6rem; }
+@media (min-width: 720px) { .formation-sql__heures { flex-direction: column; align-items: flex-start; gap: .1rem; } }
+.formation-sql__heures b { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: clamp(3rem, 7vw, 4.6rem); line-height: 1;
+  font-weight: 600; letter-spacing: -.04em; color: var(--accent); }
+.formation-sql__heures span { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-foreground); }
+.formation-sql__etiquette { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+.formation-sql__titre { margin-top: .35rem; font-size: 1.35rem; font-weight: 600; letter-spacing: -.01em; }
+.formation-sql__texte { margin-top: .6rem; max-width: 62ch; line-height: 1.65; color: var(--muted-foreground); }
+.formation-sql__appris { margin-top: 1.1rem; }
+.formation-sql__appris > p { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); }
+.formation-sql__appris ul { margin-top: .6rem; display: grid; gap: .45rem; }
+.formation-sql__appris li { position: relative; padding-left: 1.1rem; line-height: 1.55; color: var(--foreground); }
+.formation-sql__appris li::before { content: ""; position: absolute; left: 0; top: .55em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.formation-badges__titre { display: flex; align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 600; color: var(--foreground); }
+.formation-badges__titre svg { color: var(--accent); }
+.badge-carte { display: flex; gap: 1.1rem; align-items: flex-start; }
+.badge-carte__image { flex: none; width: 88px; height: 88px; display: grid; place-items: center; }
+.badge-carte__image img { width: 100%; height: 100%; object-fit: contain; }
+.badge-carte__repli { width: 72px; height: 72px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--bord-doux);
+  background: var(--secondary); color: var(--accent); font-weight: 600; font-size: 1.6rem; }
+.badge-carte__corps h4 { font-weight: 600; line-height: 1.3; }
+.badge-carte__meta { margin-top: .25rem; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; letter-spacing: .06em; color: var(--muted-foreground); }
+.badge-carte__competence { margin-top: .55rem; font-size: .9rem; line-height: 1.55; color: var(--muted-foreground); }
+.badge-carte__lien { margin-top: .8rem; display: inline-flex; align-items: center; gap: .35rem; font-size: .82rem; font-weight: 500; color: var(--accent); text-underline-offset: 4px; }
+.badge-carte__lien:hover { text-decoration: underline; }

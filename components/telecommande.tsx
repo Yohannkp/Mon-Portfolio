@@ -118,6 +118,15 @@ function construire(): Etape[] {
   const comp = qa("#sec-competences .carte")
   if (comp.length) ajoute({ cle: "competences", section: tr("Compétences", "Skills"), titre: tr("Technologies maîtrisées", "Technologies I master"), y: () => centreY(comp[0]) - 0.45 * H() })
 
+  const formSql = q("#sec-formations .formation-sql")
+  if (formSql) {
+    ajoute({ cle: "formation-sql", section: tr("Formation", "Training"), titre: tr("Formation SQL de 30 heures", "30-hour SQL training"), y: () => centreY(formSql) - 0.45 * H() })
+  }
+  const certifs = q("#sec-formations .formation-badges")
+  if (certifs) {
+    ajoute({ cle: "certifications", section: tr("Formation", "Training"), titre: tr("Certifications vérifiables", "Verifiable certifications"), y: () => centreY(certifs) - 0.5 * H() })
+  }
+
   const etapesMethode = qa("#sec-methode div.rounded-full")
   if (etapesMethode.length) ajoute({ cle: "methode", section: tr("Méthode", "Method"), titre: tr("Comment je travaille", "How I work"), y: () => centreY(etapesMethode[0]) - 0.44 * H() })
 
