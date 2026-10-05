@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, ExternalLink, PlayCircle, ShieldCheck } from "lucide-react"
 import { Reveal } from "@/components/reveal"
 import { Button } from "@/components/ui/button"
-import { BADGES, CREDLY_PROFIL, FORMATION_SQL, NB_BADGES_CREDLY, badgeUrl, type Badge } from "@/lib/formations"
+import { BADGES, CREDLY_PROFIL, FORMATION_PYTHON, FORMATION_SQL, NB_BADGES_CREDLY, badgeUrl, type Badge } from "@/lib/formations"
 import { useLangue, useT } from "@/lib/langue"
 
 /** L'image d'un badge, chargee depuis Credly ; si elle ne vient pas, une pastille avec l'initiale prend sa place. */
@@ -34,6 +35,33 @@ function ImageBadge({ b }: { b: Badge }) {
   )
 }
 
+/** L'apercu d'une video YouTube : sa vignette et un bouton lecture, qui mene a la video (pas de lecteur integre, donc rien a charger). */
+function ApercuVideo({ id, href, titre }: { id: string; href: string; titre: string }) {
+  const [qualite, setQualite] = useState<"maxresdefault" | "hqdefault">("maxresdefault")
+  const [echec, setEchec] = useState(false)
+  return (
+    <a className="apercu-video" href={href} target="_blank" rel="noopener noreferrer" aria-label={titre}>
+      {!echec && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`https://i.ytimg.com/vi/${id}/${qualite}.jpg`}
+          alt=""
+          width={1280}
+          height={720}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => (qualite === "maxresdefault" ? setQualite("hqdefault") : setEchec(true))}
+        />
+      )}
+      <span className="apercu-video__lecture" aria-hidden="true">
+        <PlayCircle className="h-7 w-7" />
+      </span>
+      <span className="apercu-video__legende">YouTube</span>
+    </a>
+  )
+}
+
 export function Formations() {
   const t = useT()
   const langue = useLangue()
@@ -48,8 +76,8 @@ export function Formations() {
           <h2 className="sec__h2">{t("Se former, puis le prouver", "Learn, then prove it")}</h2>
           <p className="sec__lede">
             {t(
-              "Un cours de SQL de 30 heures, des certifications vérifiables sur Credly, et des projets qui mettent tout cela en pratique.",
-              "A 30-hour SQL course, certifications you can verify on Credly, and projects that put it all into practice.",
+              "Un cours de SQL de 30 heures, une formation Python et machine learning, des certifications vérifiables sur Credly, et des projets qui mettent tout cela en pratique.",
+              "A 30-hour SQL course, a Python and machine-learning course, certifications you can verify on Credly, and projects that put it all into practice.",
             )}
           </p>
         </Reveal>
@@ -94,6 +122,22 @@ export function Formations() {
               </Button>
             </div>
           </div>
+          <div className="formation-sql__media">
+            <ApercuVideo id={FORMATION_SQL.videoId} href={FORMATION_SQL.video} titre={t("Voir la vidéo du cours de SQL sur YouTube", "Watch the SQL course video on YouTube")} />
+            <figure className="formation-sql__photo">
+              <Image
+                src="/formation/sql-notes.jpg"
+                alt={t(
+                  "Mes notes manuscrites sur les fonctions SQL, prises sur une tablette pendant le cours",
+                  "My handwritten notes on SQL functions, taken on a tablet during the course",
+                )}
+                width={944}
+                height={1008}
+                sizes="(min-width: 720px) 260px, 90vw"
+              />
+              <figcaption>{t("Mes notes de cours, à la main : les fonctions SQL.", "My handwritten course notes: SQL functions.")}</figcaption>
+            </figure>
+          </div>
           <div className="formation-sql__appris">
             <p>{t("Ce que j'y ai appris", "What I learned")}</p>
             <ul>
@@ -104,6 +148,50 @@ export function Formations() {
                 </li>
               ))}
             </ul>
+          </div>
+        </Reveal>
+
+        {/* La formation Python / machine learning, suivie a cote des certifications. */}
+        <Reveal y={20} duration={0.5} className="formation-sql formation-python carte mt-8">
+          <div className="formation-sql__heures" aria-hidden="true">
+            <b>{FORMATION_PYTHON.nombreVideos}</b>
+            <span>{t("vidéos", "videos")}</span>
+          </div>
+          <div className="formation-sql__corps">
+            <p className="formation-sql__etiquette">Python · Machine Learning</p>
+            <h3 className="formation-sql__titre">{t("Formation Python et machine learning", "Python and machine-learning training")}</h3>
+            <p className="formation-sql__source">
+              <a href={FORMATION_PYTHON.video} target="_blank" rel="noopener noreferrer">
+                {FORMATION_PYTHON.titre}
+              </a>{" "}
+              {t("par", "by")}{" "}
+              <a href={FORMATION_PYTHON.chaineUrl} target="_blank" rel="noopener noreferrer">
+                {FORMATION_PYTHON.chaine}
+              </a>{" "}
+              ({FORMATION_PYTHON.auteur}) · {t("gratuit", "free")} · {mois(FORMATION_PYTHON.date)}
+            </p>
+            <p className="formation-sql__texte">
+              {t(
+                "Suivie à côté des certifications Coursera pour apprendre la data science : une série de trente vidéos qui prend en main les bibliothèques de référence de Python pour la donnée et le machine learning.",
+                "Followed alongside the Coursera certifications to learn data science: a series of thirty videos covering Python's core libraries for data and machine learning.",
+              )}
+            </p>
+            <ul className="formation-python__libs" aria-label={t("Bibliothèques abordées", "Libraries covered")}>
+              {FORMATION_PYTHON.bibliotheques.map((l) => (
+                <li key={l}>{l}</li>
+              ))}
+            </ul>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild className="gap-2">
+                <a href={FORMATION_PYTHON.video} target="_blank" rel="noopener noreferrer">
+                  <PlayCircle className="h-4 w-4" />
+                  {t("Voir la formation", "Watch the course")}
+                </a>
+              </Button>
+            </div>
+          </div>
+          <div className="formation-sql__media formation-python__media">
+            <ApercuVideo id={FORMATION_PYTHON.videoId} href={FORMATION_PYTHON.video} titre={t("Voir la première vidéo de la formation Python sur YouTube", "Watch the first video of the Python course on YouTube")} />
           </div>
         </Reveal>
 

@@ -694,6 +694,19 @@ html[data-nav] main > :nth-child(n+5) { animation-delay: .24s !important; }
 .formation-sql__source { margin-top: .35rem; font-size: .85rem; color: var(--muted-foreground); }
 .formation-sql__source a { color: var(--foreground); text-underline-offset: 4px; }
 .formation-sql__source a:hover { text-decoration: underline; color: var(--accent); }
+.formation-sql__media { grid-column: 1 / -1; display: grid; gap: 1.25rem; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 720px) { .formation-sql__media { grid-template-columns: 1fr 260px; } .formation-python__media { grid-template-columns: minmax(0, 520px); } }
+.apercu-video { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius, .75rem); border: 1px solid var(--bord-doux); background: var(--muted); }
+.apercu-video img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+.apercu-video:hover img { transform: scale(1.03); }
+.apercu-video__lecture { position: absolute; inset: 0; margin: auto; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: rgb(0 0 0 / .62); backdrop-filter: blur(4px); transition: background .2s, transform .2s; }
+.apercu-video:hover .apercu-video__lecture, .apercu-video:focus-visible .apercu-video__lecture { background: var(--accent); transform: scale(1.08); }
+.apercu-video__legende { position: absolute; left: .6rem; bottom: .5rem; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 4px rgb(0 0 0 / .7); }
+.formation-sql__photo { margin: 0; }
+.formation-sql__photo img { width: 100%; height: auto; border-radius: var(--radius, .75rem); border: 1px solid var(--bord-doux); display: block; }
+.formation-sql__photo figcaption { margin-top: .5rem; font-size: .8rem; color: var(--muted-foreground); }
+.formation-python__libs { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; padding: 0; }
+.formation-python__libs li { padding: .25rem .7rem; border: 1px solid var(--bord-doux); border-radius: 999px; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 12px; color: var(--foreground); }
 .formation-sql__appris { grid-column: 1 / -1; margin-top: .75rem; padding-top: 1.5rem; border-top: 1px solid var(--bord-doux); }
 .formation-sql__appris > p { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); }
 .formation-sql__appris ul { margin-top: 1rem; display: grid; gap: 1.1rem 2rem; grid-template-columns: 1fr; }

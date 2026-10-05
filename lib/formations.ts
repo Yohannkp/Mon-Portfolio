@@ -73,6 +73,7 @@ export const FORMATION_SQL = {
   chaineUrl: "https://www.youtube.com/@DataWithBaraa",
   date: "2025-03-27",
   video: "https://www.youtube.com/watch?v=SSKVgrwhzus",
+  videoId: "SSKVgrwhzus",
   /** Le projet qui met ce cours en pratique : l'ancre de sa ligne sur /projects. */
   projet: "supermarket-sales-analysis",
   apprentissages: [
@@ -126,4 +127,21 @@ export const FORMATION_SQL = {
       ],
     },
   ] as Apprentissage[],
+}
+
+/**
+ * La formation Python / machine learning suivie en parallele des certifications : « FORMATION PYTHON MACHINE LEARNING »
+ * de Machine Learnia (Guillaume Saint-Cirgue), 30 videos gratuites, premiere en septembre 2019.
+ * Les bibliotheques viennent de la description de la playlist : rien d'autre n'est affirme.
+ */
+export const FORMATION_PYTHON = {
+  nombreVideos: 30,
+  titre: "Formation Python Machine Learning",
+  chaine: "Machine Learnia",
+  chaineUrl: "https://www.youtube.com/@MachineLearnia",
+  auteur: "Guillaume Saint-Cirgue",
+  date: "2019-09-03",
+  video: "https://www.youtube.com/watch?v=82KLS2C_gNQ&list=PLO_fdPEVlfKqMDNmCFzQISI2H_nJcEDJq",
+  videoId: "82KLS2C_gNQ",
+  bibliotheques: ["NumPy", "Pandas", "Matplotlib", "SciPy", "Scikit-learn", "Seaborn", "H5py"],
 }
