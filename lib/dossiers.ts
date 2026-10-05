@@ -203,11 +203,14 @@ export const DOSSIERS: Dossier[] = [
     role: "rétention des salariés",
     axe: "mesure",
     enjeu: "Identifier les salariés à risque de départ, et ce qui les retient avant qu'ils démissionnent.",
-    resultat: "Un Random Forest sous Scikit-learn, comparé à une régression logistique et à un arbre de décision, qui retrouve 90 % des départs réels et met en évidence les facteurs de rétention les plus explicatifs, restitué dans un tableau de bord Power BI.",
-    chiffre: { valeur: "0,94", unite: "d'AUC sur le jeu de test" },
-    prouve: ["Interpréter un modèle"],
-    stack: ["Random Forest", "Scikit-learn", "Power BI"],
+    resultat:
+      "14 999 employés, 20 % de doublons retirés, puis trois modèles comparés. Le taux de satisfaction est écarté du modèle final pour éviter une fuite : la forêt aléatoire retrouve 90 % des départs réels sans lui. Le tout est livré jusqu'au bout : tableau de bord Power BI, API FastAPI déployée sur Railway et application Streamlit pour tester un profil.",
+    chiffre: { valeur: "0,94", unite: "d'AUC sur le jeu de test, sans le taux de satisfaction" },
+    prouve: ["Interpréter un modèle", "Éviter la fuite de données", "Livrer de bout en bout"],
+    stack: ["Random Forest", "Scikit-learn", "FastAPI", "Streamlit", "Power BI"],
     depot: "https://github.com/Yohannkp/Projet-Salifort-Motors.",
+    demo: "https://projet-salifort-motors-app.streamlit.app/",
+    phare: { rang: 8, titre: "Un modèle sans fuite, livré jusqu'au bout", question: "Sait-il mener une analyse RH jusqu'à un outil utilisable ?" },
     image: "/projects/Prédiction du départ des Employés avec le Machine Learning.png",
   },
   {

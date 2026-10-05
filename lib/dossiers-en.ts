@@ -110,9 +110,10 @@ export const DOSSIERS_EN: Record<string, Surcharge> = {
     role: "employee retention",
     enjeu: "Identify employees at risk of leaving, and what keeps them, before they resign.",
     resultat:
-      "A Random Forest in Scikit-learn, compared with a logistic regression and a decision tree, which recovers 90% of the actual departures and highlights the most explanatory retention factors, delivered in a Power BI dashboard.",
-    chiffre: { valeur: "0.94", unite: "AUC on the test set" },
-    prouve: ["Interpreting a model"],
+      "14,999 employees, 20% duplicates removed, then three models compared. The satisfaction score is left out of the final model to avoid leakage: the random forest still recovers 90% of actual departures without it. Delivered end to end: a Power BI dashboard, a FastAPI API deployed on Railway and a Streamlit app to test a profile.",
+    chiffre: { valeur: "0.94", unite: "AUC on the test set, without the satisfaction score" },
+    prouve: ["Interpreting a model", "Avoiding data leakage", "Delivering end to end"],
+    phare: { rang: 8, titre: "A leak-free model, delivered end to end", question: "Can they take an HR analysis all the way to a usable tool?" },
   },
   "supermarket-sales-analysis": {
     nom: "Supermarket sales",
