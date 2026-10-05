@@ -193,7 +193,7 @@ export function Formations() {
                     )}
                     width={944}
                     height={1008}
-                    sizes="(min-width: 1024px) 340px, 90vw"
+                    sizes="(min-width: 1024px) 480px, 90vw"
                   />
                   <figcaption>{t("Mes notes de cours, à la main : les fonctions SQL.", "My handwritten course notes: SQL functions.")}</figcaption>
                 </figure>
