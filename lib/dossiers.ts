@@ -319,6 +319,6 @@ export const dossiersParAxe = (axe: Axe) => DOSSIERS.filter((d) => d.axe === axe
 export const PREUVES = DOSSIERS.filter((d) => d.chiffre)
 
 /** Le nombre de projets phares, en toutes lettres (« Sept projets, sept preuves »). */
-const MOTS = ["zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix"]
+export const MOTS = ["zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix"]
 export const NB_PHARES = PHARES.length
 export const NB_PHARES_MOT = MOTS[PHARES.length] ?? String(PHARES.length)

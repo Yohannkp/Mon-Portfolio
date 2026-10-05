@@ -7,6 +7,7 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Tilt3D } from '@/components/tilt-3d'
 import { PageTransition } from '@/components/page-transition'
+import { LangueSync } from '@/components/langue-sync'
 import { SITE_URL } from '@/lib/site'
 import './globals.css'
 import './demo-guide.css'
@@ -19,6 +20,7 @@ const _geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  alternates: { canonical: './' },
   title: {
     default: 'Yendi Yohann | MLOps & Machine Learning Engineering',
     template: '%s | Yendi Yohann',
@@ -64,6 +66,20 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
+/** Donnees structurees : ce que les moteurs de recherche lisent pour presenter la personne (rien qui ne soit deja ecrit sur le site). */
+const DONNEES_STRUCTUREES = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Yendi Yohann',
+  url: SITE_URL,
+  image: `${SITE_URL}/avatar.jpg`,
+  jobTitle: 'Élève ingénieur Big Data & IA',
+  description: "J'affine des modèles, je les mets en production et je sais prouver qu'ils marchent.",
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'ECE Paris' },
+  knowsAbout: ['MLOps', 'Machine learning engineering', 'Data engineering', 'Python', 'SQL', 'Go', 'Docker', 'PyTorch', 'FastAPI'],
+  sameAs: ['https://github.com/Yohannkp', 'https://www.linkedin.com/in/yohannkp/'],
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -72,6 +88,10 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${_inter.variable} ${_geistMono.variable} font-sans antialiased`}>
+        {/* Premier element focalisable : au clavier, on peut sauter l'en-tete. */}
+        <a href="#contenu" className="lien-evitement">
+          Aller au contenu
+        </a>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -80,12 +100,19 @@ export default function RootLayout({
         >
           <div className="flex min-h-screen flex-col">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main id="contenu" className="flex-1">
+              {children}
+            </main>
             <Footer />
           </div>
           <Tilt3D />
           <PageTransition />
+          <LangueSync />
         </ThemeProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(DONNEES_STRUCTUREES).replace(/</g, '\\u003c') }}
+        />
         <Analytics />
       </body>
     </html>

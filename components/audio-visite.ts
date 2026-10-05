@@ -7,29 +7,39 @@
  *  - la MUSIQUE est fabriquee en direct (Web Audio) : un nappe d'accords doux avec de la reverberation,
  *    et quelques notes cristallines qui passent de temps en temps. Pas de fichier, pas de droit d'auteur.
  *
+ * La voix suit la langue du site : francais, ou anglais quand le visiteur a choisi EN.
+ *
  * Le navigateur n'autorise le son qu'apres un geste : tout demarre donc depuis le clic sur ▶.
  * Quand la voix parle, la musique baisse d'elle-meme (ducking) puis remonte.
  */
 
 /* ----------------------------------------------------------------------------------------- voix */
 
-let voixChoisie: SpeechSynthesisVoice | null = null
+import { langueActive, type Langue } from "@/lib/langue"
+
+const voixChoisies: Partial<Record<Langue, SpeechSynthesisVoice | null>> = {}
 let enCours: SpeechSynthesisUtterance | null = null // garde une reference : certains navigateurs ramassent l'enonce sinon
 let jeton = 0
 
 export const voixDisponible = () => typeof window !== "undefined" && "speechSynthesis" in window
 
-/** Les voix francaises, de la plus agreable a la moins agreable (les voix reseau / neuronales d'abord). */
-function choisirVoix(): SpeechSynthesisVoice | null {
+/** Les voix de la langue, de la plus agreable a la moins agreable (les voix reseau / neuronales d'abord). */
+function choisirVoix(l: Langue): SpeechSynthesisVoice | null {
   if (!voixDisponible()) return null
-  const voix = window.speechSynthesis.getVoices().filter((v) => /^fr(-|_|$)/i.test(v.lang))
+  const motif = l === "en" ? /^en(-|_|$)/i : /^fr(-|_|$)/i
+  const voix = window.speechSynthesis.getVoices().filter((v) => motif.test(v.lang))
   if (!voix.length) return null
   const note = (v: SpeechSynthesisVoice) => {
     let s = 0
     if (/natural|neural|online|premium|enhanced|am[eé]lior/i.test(v.name)) s += 6
     if (/google/i.test(v.name)) s += 4
-    if (/thomas|am[eé]lie|audrey|denise|henri|hortense|julie|paul|marie|vivienne|remy/i.test(v.name)) s += 3
-    if (/^fr[-_]FR$/i.test(v.lang)) s += 2
+    if (l === "en") {
+      if (/aria|jenny|guy|davis|libby|ryan|sonia|samantha|daniel|serena|karen|moira|alex|zira|mark/i.test(v.name)) s += 3
+      if (/^en[-_](US|GB)$/i.test(v.lang)) s += 2
+    } else {
+      if (/thomas|am[eé]lie|audrey|denise|henri|hortense|julie|paul|marie|vivienne|remy/i.test(v.name)) s += 3
+      if (/^fr[-_]FR$/i.test(v.lang)) s += 2
+    }
     if (/compact|espeak|robot/i.test(v.name)) s -= 5
     if (!v.localService) s += 1
     return s
@@ -39,13 +49,15 @@ function choisirVoix(): SpeechSynthesisVoice | null {
 
 /** Ce que dit la voix : la meme phrase que celle affichee, mais lisible a haute voix. */
 export function nettoyer(t: string) {
+  const en = langueActive() === "en"
   return t
     .replace(/[·—–]/g, ",")
-    .replace(/→/g, " vers ")
+    .replace(/→/g, en ? " to " : " vers ")
     .replace(/_/g, " ")
     .replace(/\+(\d)/g, "plus $1")
     .replace(/(\d)\s?Md\b/g, "$1 milliards")
-    .replace(/\b1\s?:\s?1\b/g, "un pour un")
+    .replace(/(\d)\s?B\b/g, en ? "$1 billion" : "$1 B")
+    .replace(/\b1\s?:\s?1\b/g, en ? "one to one" : "un pour un")
     .replace(/\s+/g, " ")
     .trim()
 }
@@ -98,9 +110,10 @@ export function parler(texte: string, onFin?: () => void) {
   const dire = () => {
     if (moi !== jeton) return
     const u = new SpeechSynthesisUtterance(propre)
-    voixChoisie = voixChoisie ?? choisirVoix()
-    if (voixChoisie) u.voice = voixChoisie
-    u.lang = voixChoisie?.lang ?? "fr-FR"
+    const l = langueActive()
+    const voix = (voixChoisies[l] = voixChoisies[l] ?? choisirVoix(l))
+    if (voix) u.voice = voix
+    u.lang = voix?.lang ?? (l === "en" ? "en-US" : "fr-FR")
     u.rate = 0.97
     u.pitch = 1
     u.volume = 1
@@ -146,7 +159,8 @@ export function taire() {
 export function preparerVoix() {
   if (!voixDisponible()) return () => {}
   const maj = () => {
-    voixChoisie = choisirVoix()
+    voixChoisies.fr = choisirVoix("fr")
+    voixChoisies.en = choisirVoix("en")
   }
   maj()
   window.speechSynthesis.addEventListener?.("voiceschanged", maj)

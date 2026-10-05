@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { NB_PHARES_MOT, PHARES } from "@/lib/dossiers"
+import { dossiersActifs } from "@/lib/dossiers-langue"
+import { surLangue, t as tr, useT } from "@/lib/langue"
 
 /**
  * La telecommande de /presentation : « Precedent » et « Suivant » passent d'etape en etape, dans l'ordre de la page,
@@ -57,37 +58,39 @@ function construire(): Etape[] {
   const etapes: Etape[] = []
   const ajoute = (e: Etape) => etapes.push(e)
 
-  ajoute({ cle: "accueil", section: "Accueil", titre: "Bienvenue", y: () => 0 })
+  ajoute({ cle: "accueil", section: tr("Accueil", "Home"), titre: tr("Bienvenue", "Welcome"), y: () => 0 })
 
   const rag = q(".rag__scroll")
   if (rag) {
     const a0 = () => haut(rag) - 0.3 * H()
     const a1 = () => haut(rag) + rag.getBoundingClientRect().height - H()
-    ajoute({ cle: "rag", section: "Le fil conducteur", titre: "Le chemin d'une question", y: a0 })
+    ajoute({ cle: "rag", section: tr("Le fil conducteur", "The common thread"), titre: tr("Le chemin d'une question", "The path of a question"), y: a0 })
     const notes = qa(".rag-note b")
     RAG_ETAPES.forEach((p, i) => {
-      ajoute({ cle: `rag-${i}`, section: "Le fil conducteur", titre: texte(notes[i]) || `Étape ${i + 1}`, y: () => a0() + p * (a1() - a0()) })
+      ajoute({ cle: `rag-${i}`, section: tr("Le fil conducteur", "The common thread"), titre: texte(notes[i]) || `${tr("Étape", "Step")} ${i + 1}`, y: () => a0() + p * (a1() - a0()) })
     })
   }
 
   const compteurs = q(".compteurs")
-  if (compteurs) ajoute({ cle: "chiffres", section: "En chiffres", titre: "Quelques repères", y: () => centreY(compteurs) - 0.45 * H() })
+  if (compteurs) ajoute({ cle: "chiffres", section: tr("En chiffres", "By the numbers"), titre: tr("Quelques repères", "A few landmarks"), y: () => centreY(compteurs) - 0.45 * H() })
 
   const stations = q("#sec-stations")
   if (stations) {
-    ajoute({ cle: "projets", section: "Projets", titre: `${NB_PHARES_MOT.charAt(0).toUpperCase()}${NB_PHARES_MOT.slice(1)} projets, ${NB_PHARES_MOT} preuves`, y: () => haut(stations) + 20 })
+    const { NB_PHARES_MOT: mot, PHARES } = dossiersActifs()
+    const Mot = `${mot.charAt(0).toUpperCase()}${mot.slice(1)}`
+    ajoute({ cle: "projets", section: tr("Projets", "Projects"), titre: tr(`${Mot} projets, ${mot} preuves`, `${Mot} projects, ${mot} proofs`), y: () => haut(stations) + 20 })
     qa("#sec-stations .cas").forEach((carte, i) => {
       ajoute({
         cle: `projet-${i}`,
-        section: "Projets",
-        titre: texte(carte.querySelector(".cas__code b")) || PHARES[i]?.nom || `Projet ${i + 1}`,
+        section: tr("Projets", "Projects"),
+        titre: texte(carte.querySelector(".cas__code b")) || PHARES[i]?.nom || `${tr("Projet", "Project")} ${i + 1}`,
         // La ligne de lecture du robot est a 52 % de la hauteur : la carte s'y centre.
         y: () => centreY(carte) - 0.52 * H(),
         carte: i,
       })
     })
     const suite = q(".cas-suite")
-    if (suite) ajoute({ cle: "reste", section: "Projets", titre: "Et le reste", y: () => centreY(suite) - 0.5 * H() })
+    if (suite) ajoute({ cle: "reste", section: tr("Projets", "Projects"), titre: tr("Et le reste", "And the rest"), y: () => centreY(suite) - 0.5 * H() })
   }
 
   const demo = q("#sec-demos .demo")
@@ -95,7 +98,7 @@ function construire(): Etape[] {
     qa("#sec-demos .onglet").forEach((onglet, i) => {
       ajoute({
         cle: `demo-${i}`,
-        section: "Démonstrations",
+        section: tr("Démonstrations", "Demonstrations"),
         titre: texte(onglet),
         y: () => haut(q("#sec-demos .demo")) - 110,
         avant: () => {
@@ -110,24 +113,25 @@ function construire(): Etape[] {
   }
 
   const apropos = q("#sec-apropos")
-  if (apropos) ajoute({ cle: "apropos", section: "À propos", titre: "De l'affinage au déploiement", y: () => haut(apropos) - 60 })
+  if (apropos) ajoute({ cle: "apropos", section: tr("À propos", "About"), titre: tr("De l'affinage au déploiement", "From fine-tuning to deployment"), y: () => haut(apropos) - 60 })
 
   const comp = qa("#sec-competences .carte")
-  if (comp.length) ajoute({ cle: "competences", section: "Compétences", titre: "Technologies maîtrisées", y: () => centreY(comp[0]) - 0.45 * H() })
+  if (comp.length) ajoute({ cle: "competences", section: tr("Compétences", "Skills"), titre: tr("Technologies maîtrisées", "Technologies I master"), y: () => centreY(comp[0]) - 0.45 * H() })
 
   const etapesMethode = qa("#sec-methode div.rounded-full")
-  if (etapesMethode.length) ajoute({ cle: "methode", section: "Méthode", titre: "Comment je travaille", y: () => centreY(etapesMethode[0]) - 0.44 * H() })
+  if (etapesMethode.length) ajoute({ cle: "methode", section: tr("Méthode", "Method"), titre: tr("Comment je travaille", "How I work"), y: () => centreY(etapesMethode[0]) - 0.44 * H() })
 
   const veille = qa("#sec-veille .carte")
   if (veille.length) {
-    ajoute({ cle: "veille", section: "En ce moment", titre: "Ce que j'apprends", y: () => (centreY(veille[0]) + centreY(veille[veille.length - 1])) / 2 - 0.5 * H() })
+    ajoute({ cle: "veille", section: tr("En ce moment", "Right now"), titre: tr("Ce que j'apprends", "What I'm learning"), y: () => (centreY(veille[0]) + centreY(veille[veille.length - 1])) / 2 - 0.5 * H() })
   }
 
-  ajoute({ cle: "contact", section: "Contact", titre: "Travaillons ensemble", y: () => maxY() })
+  ajoute({ cle: "contact", section: "Contact", titre: tr("Travaillons ensemble", "Let's work together"), y: () => maxY() })
   return etapes
 }
 
 export function Telecommande() {
+  const t = useT()
   const [n, setN] = useState(0)
   const [i, setI] = useState(0)
   const [peutReculer, setPeutReculer] = useState(false)
@@ -236,6 +240,7 @@ export function Telecommande() {
         precedent()
       }
     }
+    const horsLangue = surLangue(maj) // les titres suivent la langue, tout de suite
     window.addEventListener("scroll", surScroll, { passive: true })
     window.addEventListener("resize", surScroll)
     window.addEventListener("wheel", surUtilisateur, { passive: true })
@@ -247,6 +252,7 @@ export function Telecommande() {
       cancelAnimationFrame(anim.current)
       cancelAnimationFrame(raf)
       window.clearTimeout(t)
+      horsLangue()
       window.removeEventListener("scroll", surScroll)
       window.removeEventListener("resize", surScroll)
       window.removeEventListener("wheel", surUtilisateur)
@@ -259,10 +265,10 @@ export function Telecommande() {
   }, [maj, suivant, precedent])
 
   return (
-    <div className="tc" role="group" aria-label="Télécommande de présentation">
-      <button className="tc__btn" onClick={precedent} disabled={!peutReculer} aria-label="Étape précédente">
+    <div className="tc" role="group" aria-label={t("Télécommande de présentation", "Presentation remote")}>
+      <button className="tc__btn" onClick={precedent} disabled={!peutReculer} aria-label={t("Étape précédente", "Previous step")}>
         <ChevronLeft size={18} />
-        <span>Précédent</span>
+        <span>{t("Précédent", "Previous")}</span>
       </button>
       <div className="tc__etat" aria-live="polite">
         <span className="tc__n">
@@ -273,8 +279,8 @@ export function Telecommande() {
           {titre.titre && titre.titre !== titre.section ? <> · {titre.titre}</> : null}
         </span>
       </div>
-      <button className="tc__btn tc__btn--plein" onClick={suivant} disabled={n > 0 && i >= n - 1} aria-label="Étape suivante">
-        <span>Suivant</span>
+      <button className="tc__btn tc__btn--plein" onClick={suivant} disabled={n > 0 && i >= n - 1} aria-label={t("Étape suivante", "Next step")}>
+        <span>{t("Suivant", "Next")}</span>
         <ChevronRight size={18} />
       </button>
     </div>

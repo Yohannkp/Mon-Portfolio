@@ -135,10 +135,10 @@
 
 .rail { position: fixed; left: 26px; top: 0; bottom: 0; width: 20px; z-index: 40; pointer-events: none; }
 .rail__track { position: absolute; left: 9px; top: 0; bottom: 0; width: 2px; background: var(--border); }
-.rail__fill { position: absolute; left: 9px; top: 0; width: 2px; height: 0;
+.rail__fill { position: absolute; left: 9px; top: 0; bottom: 0; width: 2px; transform-origin: 50% 0; transform: scaleY(0); will-change: transform;
   background: linear-gradient(180deg, color-mix(in oklch, var(--accent) 35%, transparent), var(--accent));
   box-shadow: 0 0 14px color-mix(in oklch, var(--accent) 55%, transparent); }
-.rail__node { position: absolute; left: 3px; top: 0; width: 14px; height: 14px; border-radius: 50%;
+.rail__node { position: absolute; left: 3px; top: 0; will-change: transform; width: 14px; height: 14px; border-radius: 50%;
   background: var(--background); border: 2px solid var(--accent);
   box-shadow: 0 0 0 5px color-mix(in oklch, var(--accent) 12%, transparent),
               0 0 22px color-mix(in oklch, var(--accent) 65%, transparent); }
@@ -349,10 +349,10 @@ main > section, main > div { position: relative; z-index: 1; }
 .obj, .obj-fantome {
   position: fixed; left: 0; top: 0; z-index: 0; pointer-events: none;
   width: 340px; height: 340px; margin: -170px 0 0 -170px;
-  transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--ech, 1));
+  transform: translate3d(0, 0, 0);
 }
-.obj { opacity: var(--op, .62); transition: opacity .4s ease;
-  transform: translate3d(calc(var(--tx, 0px) + var(--rx, 0px)), calc(var(--ty, 0px) + var(--rdy, 0px)), 0) scale(calc(var(--ech, 1) * var(--rk, 1))) rotate(var(--rrot, 0deg)) scale(calc(1 + var(--rsq, 0) * .16), calc(1 - var(--rsq, 0) * .26)); }
+/* Position, taille et opacite viennent du JS (style direct, sans variable heritee : voir objet-3d.tsx). */
+.obj { opacity: .62; transition: opacity .4s ease; }
 /* La colere : tout le robot vire au rouge (la teinte bleue tourne vers le rouge, la saturation monte), piloté par --rage (0..1). */
 .obj[data-rage] { filter: hue-rotate(calc(var(--rage, 0) * 172deg)) saturate(calc(1 + var(--rage, 0) * 1.3)) brightness(calc(1 + var(--rage, 0) * .08)); }
 html[data-robot-rage="1"] .obj-bulle { opacity: 0; }
@@ -530,7 +530,7 @@ html[data-robot-anim="avant"] .obj-ombre { opacity: 1; }
 }
 
 /* ---------- le fantome : la seconde recherche, en parallele ------------- */
-.obj-fantome { --mut: 1; --ry: 0deg; opacity: var(--fo, 0); }
+.obj-fantome { --mut: 1; --ry: 0deg; opacity: 0; }
 .obj-fantome .obj__bot { opacity: 1; }
 
 /* ---------- la bulle : dans un calque a part, au-dessus du contenu ------- */
@@ -562,6 +562,7 @@ html[data-robot-anim="avant"] .obj-ombre { opacity: 1; }
 [data-scene-robot]::after { content: "Disponible · avril 2027"; position: absolute; left: 0; right: 0; bottom: 4px;
   text-align: center; font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted-foreground); }
+html:lang(en) [data-scene-robot]::after { content: "Available · April 2027"; }
 
 
 /* ==========================================================================
@@ -657,3 +658,23 @@ html[data-nav] main > :nth-child(n+5) { animation-delay: .24s !important; }
   [data-slot="button"]:not(:disabled):active { transform: none; }
   .onglet:hover, .onglet:active { transform: none; }
 }
+
+/* Apparition au defilement (composant Reveal) : fondu + glissement, uniquement opacity et transform. C'est une ANIMATION (et non
+   une transition) qui s'arrete d'elle-meme : une fois finie, l'element retrouve ses propres regles (survol, inclinaison 3D...). */
+.rv[data-vu="0"] { opacity: 0; }
+.rv[data-vu="1"] { animation: rv-in var(--rv-d, .5s) cubic-bezier(.42, 0, .58, 1) var(--rv-delay, 0s) backwards; }
+@keyframes rv-in { from { opacity: 0; transform: translate3d(0, var(--rv-y, 20px), 0); } }
+@media (prefers-reduced-motion: reduce) { .rv[data-vu="0"] { opacity: 1; } .rv[data-vu="1"] { animation: none; } }
+
+/* Entrees de l'en-tete (logo, menu mobile) : en CSS, pour ne pas dependre d'une bibliotheque chargee apres coup. */
+.h-entree { animation: h-entree .4s ease both; }
+.h-menu { animation: h-menu .3s ease both; }
+@keyframes h-entree { from { opacity: 0; transform: translateX(-10px); } }
+@keyframes h-menu { from { opacity: 0; transform: translateY(-10px); } }
+@media (prefers-reduced-motion: reduce) { .h-entree, .h-menu { animation: none; } }
+
+/* Lien d'evitement : invisible, sauf quand le clavier lui donne le focus. */
+.lien-evitement { position: fixed; left: 12px; top: 8px; z-index: 100; padding: .5rem .9rem; border-radius: 8px;
+  background: var(--accent); color: var(--background); font-size: .85rem; font-weight: 600;
+  transform: translateY(-160%); transition: transform .2s ease; }
+.lien-evitement:focus { transform: none; outline: 2px solid var(--foreground); outline-offset: 2px; }

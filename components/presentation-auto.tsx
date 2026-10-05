@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { FastForward, Play, Rewind, RotateCcw, Square, Volume2, VolumeX, X } from "lucide-react"
 import { creerAmbiance, dureeEstimee, parler, preparerVoix, progression, taire, voixDisponible, type Ambiance } from "@/components/audio-visite"
-import { DOSSIERS, NB_PHARES_MOT, PHARES } from "@/lib/dossiers"
+import { PHARES } from "@/lib/dossiers"
+import { dossiersActifs } from "@/lib/dossiers-langue"
+import { surLangue, t as tr, useT } from "@/lib/langue"
 
 /**
  * La presentation automatique : une visite de l'accueil qui defile toute seule.
@@ -62,10 +64,20 @@ const rangee = (s: string, de: number, a: number, duree: number) => ({
   duree,
 })
 
-const CARTES = PHARES.map((d, i): Arret => ({
-  cle: `projet-${d.slug}`,
-  titre: `Projet ${i + 1} sur ${PHARES.length} · ${d.nom}`,
-  phrase: `${d.phare!.question} ${d.chiffre ? `Preuve : ${d.chiffre.valeur} ${d.chiffre.unite}.` : ""}`.trim(),
+const CARTES = PHARES.map((d0, i): Arret => ({
+  cle: `projet-${d0.slug}`,
+  // Le texte est calcule au moment de le dire : il suit la langue du visiteur, meme changee en cours de visite.
+  titre: () => {
+    const d = dossiersActifs().PHARES[i]
+    return tr(`Projet ${i + 1} sur ${PHARES.length} · ${d.nom}`, `Project ${i + 1} of ${PHARES.length} · ${d.nom}`)
+  },
+  phrase: () => {
+    const d = dossiersActifs().PHARES[i]
+    return tr(
+      `${d.phare!.question} ${d.chiffre ? `Preuve : ${d.chiffre.valeur} ${d.chiffre.unite}.` : ""}`.trim(),
+      `${d.phare!.question} ${d.chiffre ? `Proof: ${d.chiffre.valeur} ${d.chiffre.unite}.` : ""}`.trim(),
+    )
+  },
   carte: i,
   ok: () => qa("#sec-stations .cas").length > i,
   // La ligne de lecture du robot est a 52 % de la hauteur : la carte s'y centre.
@@ -76,15 +88,23 @@ const CARTES = PHARES.map((d, i): Arret => ({
 const ARRETS: Arret[] = [
   {
     cle: "accueil",
-    titre: "Bienvenue",
-    phrase: "Je vous fais visiter ce portfolio pas à pas. Vous n'avez rien à faire : le robot vous guide.",
+    titre: () => tr("Bienvenue", "Welcome"),
+    phrase: () =>
+      tr(
+        "Je vous fais visiter ce portfolio pas à pas. Vous n'avez rien à faire : le robot vous guide.",
+        "I'll show you around this portfolio step by step. You don't have to do anything: the robot guides you.",
+      ),
     y0: () => 0,
     duree: 4800,
   },
   {
     cle: "rag",
-    titre: "Le fil conducteur",
-    phrase: "Une requête traverse un pipeline RAG : recherche hybride, fusion, reranking, puis une réponse citée.",
+    titre: () => tr("Le fil conducteur", "The common thread"),
+    phrase: () =>
+      tr(
+        "Une requête traverse un pipeline RAG : recherche hybride, fusion, reranking, puis une réponse citée.",
+        "A query goes through a RAG pipeline: hybrid search, fusion, reranking, then a cited answer.",
+      ),
     ok: existe(".rag__scroll"),
     // Le schema est pilote par le defilement : on le balaie lentement, de l'introduction a la fin de l'epinglage.
     y0: () => haut(q(".rag__scroll")) - 0.3 * H(),
@@ -93,25 +113,51 @@ const ARRETS: Arret[] = [
     // Avec la voix, une phrase par etape du schema : le defilement suit la voix, et chaque note apparait quand on en parle.
     // Les `debuts` sont les positions (0..1 du balayage) ou chaque note du schema apparait (mesurees sur la page).
     beats: () => [
-      "Une requête traverse un pipeline RAG : recherche hybride, fusion, reranking, puis une réponse citée.",
-      "Étape un, la réécriture : la question est reformulée pour devenir autonome, sinon la recherche ne retrouve rien.",
-      "Étape deux, deux recherches : une vectorielle pour le sens, une BM25 pour les mots exacts.",
-      "Étape trois, la fusion RRF : aucun poids à deviner, c'est le rang qui compte, pas le score.",
-      "Étape quatre, le reranking : un cross-encoder ne garde que les six meilleurs candidats, sur le processeur.",
-      "Étape cinq, la réponse : générée en streaming, avec des citations qui ouvrent la page exacte du PDF. S'il ne sait pas, il le dit.",
+      tr(
+        "Une requête traverse un pipeline RAG : recherche hybride, fusion, reranking, puis une réponse citée.",
+        "A query goes through a RAG pipeline: hybrid search, fusion, reranking, then a cited answer.",
+      ),
+      tr(
+        "Étape un, la réécriture : la question est reformulée pour devenir autonome, sinon la recherche ne retrouve rien.",
+        "Step one, rewriting: the question is reformulated to stand on its own, otherwise the search finds nothing.",
+      ),
+      tr(
+        "Étape deux, deux recherches : une vectorielle pour le sens, une BM25 pour les mots exacts.",
+        "Step two, two searches: a vector one for meaning, and a BM25 one for exact words.",
+      ),
+      tr(
+        "Étape trois, la fusion RRF : aucun poids à deviner, c'est le rang qui compte, pas le score.",
+        "Step three, RRF fusion: no weights to guess, it's the rank that counts, not the score.",
+      ),
+      tr(
+        "Étape quatre, le reranking : un cross-encoder ne garde que les six meilleurs candidats, sur le processeur.",
+        "Step four, reranking: a cross-encoder keeps only the six best candidates, on the processor.",
+      ),
+      tr(
+        "Étape cinq, la réponse : générée en streaming, avec des citations qui ouvrent la page exacte du PDF. S'il ne sait pas, il le dit.",
+        "Step five, the answer: generated by streaming, with citations that open the exact page of the PDF. If it doesn't know, it says so.",
+      ),
     ],
     debuts: [0, 0.27, 0.44, 0.6, 0.75, 0.89, 1],
   },
   {
     cle: "chiffres",
-    titre: "En chiffres",
-    phrase: "Quelques repères sur le parcours, avant d'entrer dans les projets.",
+    titre: () => tr("En chiffres", "By the numbers"),
+    phrase: () =>
+      tr("Quelques repères sur le parcours, avant d'entrer dans les projets.", "A few landmarks on the journey, before getting into the projects."),
     ...rangee(".compteurs", 0.9, 0.4, 6000),
   },
   {
     cle: "projets",
-    titre: "Projets",
-    phrase: `${NB_PHARES_MOT.charAt(0).toUpperCase() + NB_PHARES_MOT.slice(1)} projets, ${NB_PHARES_MOT} preuves : chacun répond à une question qu'un recruteur se pose.`,
+    titre: () => tr("Projets", "Projects"),
+    phrase: () => {
+      const mot = dossiersActifs().NB_PHARES_MOT
+      const Mot = mot.charAt(0).toUpperCase() + mot.slice(1)
+      return tr(
+        `${Mot} projets, ${mot} preuves : chacun répond à une question qu'un recruteur se pose.`,
+        `${Mot} projects, ${mot} proofs: each one answers a question a recruiter asks.`,
+      )
+    },
     ok: existe("#sec-stations"),
     y0: () => haut(q("#sec-stations")) + 20,
     duree: 3400,
@@ -119,16 +165,26 @@ const ARRETS: Arret[] = [
   ...CARTES,
   {
     cle: "autres-projets",
-    titre: "Et le reste",
-    phrase: `${DOSSIERS.length} projets au total, classés par ce qu'ils démontrent : mettre en production, entraîner, mesurer, construire.`,
+    titre: () => tr("Et le reste", "And the rest"),
+    phrase: () => {
+      const n = dossiersActifs().DOSSIERS.length
+      return tr(
+        `${n} projets au total, classés par ce qu'ils démontrent : mettre en production, entraîner, mesurer, construire.`,
+        `${n} projects in total, ranked by what they demonstrate: putting into production, training, measuring, building.`,
+      )
+    },
     ok: existe(".cas-suite"),
     y0: () => centreY(q(".cas-suite")) - 0.5 * H(),
     duree: 3600,
   },
   {
     cle: "demos",
-    titre: "Démonstrations",
-    phrase: "Le robot guide une simulation, étape par étape. Je le laisse aller jusqu'au bout : trois autres scénarios vous attendent ensuite.",
+    titre: () => tr("Démonstrations", "Demonstrations"),
+    phrase: () =>
+      tr(
+        "Le robot guide une simulation, étape par étape. Je le laisse aller jusqu'au bout : trois autres scénarios vous attendent ensuite.",
+        "The robot guides a simulation, step by step. I let it run to the end: three other scenarios await you afterwards.",
+      ),
     ok: existe("#sec-demos .demo"),
     y0: () => haut(q("#sec-demos .demo")) - 110,
     duree: 3000,
@@ -137,8 +193,12 @@ const ARRETS: Arret[] = [
   },
   {
     cle: "apropos",
-    titre: "À propos",
-    phrase: "Je cherche un stage de 4 à 6 mois à partir d'avril 2027, en MLOps ou en data engineering.",
+    titre: () => tr("À propos", "About"),
+    phrase: () =>
+      tr(
+        "Je cherche un stage de 4 à 6 mois à partir d'avril 2027, en MLOps ou en data engineering.",
+        "I'm looking for a 4–6 month internship starting April 2027, in MLOps or data engineering.",
+      ),
     ok: existe("#sec-apropos"),
     y0: () => haut(q("#sec-apropos")) - 60,
     // Le robot souligne les phrases au fur et a mesure qu'elles passent sa ligne de lecture.
@@ -147,26 +207,35 @@ const ARRETS: Arret[] = [
   },
   {
     cle: "competences",
-    titre: "Compétences",
-    phrase: "Quatre familles de technologies. Pour chacune, une preuve tirée d'un projet.",
+    titre: () => tr("Compétences", "Skills"),
+    phrase: () =>
+      tr(
+        "Quatre familles de technologies. Pour chacune, une preuve tirée d'un projet.",
+        "Four families of technologies. For each, a proof drawn from a project.",
+      ),
     ...rangee("#sec-competences .carte", 0.94, 0.42, 8500),
   },
   {
     cle: "methode",
-    titre: "Méthode",
-    phrase: "Cadrer, préparer la donnée, construire, prouver, déployer : la démarche derrière les projets.",
+    titre: () => tr("Méthode", "Method"),
+    phrase: () =>
+      tr(
+        "Cadrer, préparer la donnée, construire, prouver, déployer : la démarche derrière les projets.",
+        "Frame it, prepare the data, build, prove, deploy: the approach behind the projects.",
+      ),
     ...rangee("#sec-methode div.rounded-full", 0.94, 0.44, 8000),
   },
   {
     cle: "veille",
-    titre: "En ce moment",
-    phrase: "Ce que j'apprends : LLMOps, architecture et DevOps.",
+    titre: () => tr("En ce moment", "Right now"),
+    phrase: () => tr("Ce que j'apprends : LLMOps, architecture et DevOps.", "What I'm learning: LLMOps, architecture and DevOps."),
     ...rangee("#sec-veille .carte", 0.94, 0.5, 6500),
   },
   {
     cle: "contact",
-    titre: "Travaillons ensemble",
-    phrase: "C'est la fin de la visite. Le bouton « Me contacter » est juste là.",
+    titre: () => tr("Travaillons ensemble", "Let's work together"),
+    phrase: () =>
+      tr("C'est la fin de la visite. Le bouton « Me contacter » est juste là.", "That's the end of the tour. The “Contact me” button is right there."),
     y0: () => maxY(),
     duree: 5500,
   },
@@ -215,6 +284,7 @@ type Moteur = {
 }
 
 export function PresentationAuto() {
+  const t = useT()
   const [etat, setEtat] = useState<Etat>("repos")
   const [narration, setNarration] = useState<{ n: number; total: number; titre: string; phrase: string } | null>(null)
   const [avancement, setAvancement] = useState(0)
@@ -546,7 +616,7 @@ export function PresentationAuto() {
     changerEtat("repos")
     setAvancement(1)
     emotion("content", 4200)
-    setNarration({ n: s.liste.length, total: s.liste.length, titre: "Fin de la visite", phrase: "Merci de votre attention. Vous pouvez la relancer à tout moment." })
+    setNarration({ n: s.liste.length, total: s.liste.length, titre: tr("Fin de la visite", "End of the tour"), phrase: tr("Merci de votre attention. Vous pouvez la relancer à tout moment.", "Thank you for your attention. You can restart it at any time.") })
     setFin(true)
     window.clearTimeout(cacheFin.current)
     cacheFin.current = window.setTimeout(() => {
@@ -699,20 +769,48 @@ export function PresentationAuto() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Si le visiteur change de langue en pleine visite, la phrase affichee et la voix suivent tout de suite.
+  useEffect(
+    () =>
+      surLangue(() => {
+        const s = m.current
+        if (!s.liste.length) return
+        if (s.termine) {
+          setNarration((n) =>
+            n && {
+              ...n,
+              titre: tr("Fin de la visite", "End of the tour"),
+              phrase: tr("Merci de votre attention. Vous pouvez la relancer à tout moment.", "Thank you for your attention. You can restart it at any time."),
+            },
+          )
+          return
+        }
+        if (etatRef.current === "repos") return
+        montrer(s.i)
+        if (etatRef.current === "lecture" && s.phase !== "aller") {
+          const a = s.liste[s.i]
+          if (a) demarrerBeats(a, pDepuisScroll(a))
+        }
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
+
   // Au repos, le bouton s'efface pendant que le visiteur fait defiler la page (il ne passe plus
   // sur le texte) et revient des que le defilement s'arrete.
   useEffect(() => {
     let t = 0
     // Encore sur l'accroche ? Sous 1280px, le bouton attend qu'on l'ait quittee (voir la feuille de style).
     const majHaut = () => {
-      if (racine.current) racine.current.dataset.haut = window.scrollY < window.innerHeight * 0.6 ? "1" : "0"
+      const v = window.scrollY < window.innerHeight * 0.6 ? "1" : "0"
+      if (racine.current && racine.current.dataset.haut !== v) racine.current.dataset.haut = v
     }
     majHaut()
     const surScroll = () => {
       majHaut()
       const el = racine.current
       if (!el || etatRef.current === "lecture") return
-      el.dataset.defile = "1"
+      if (el.dataset.defile !== "1") el.dataset.defile = "1"
       window.clearTimeout(t)
       t = window.setTimeout(() => delete el.dataset.defile, 1100)
     }
@@ -817,7 +915,11 @@ export function PresentationAuto() {
 
   const enCours = etat === "lecture"
   const entame = avancement > 0 && !fin
-  const libelle = enCours ? "Arrêter la présentation" : entame ? "Reprendre la présentation" : "Présentation automatique"
+  const libelle = enCours
+    ? t("Arrêter la présentation", "Stop the presentation")
+    : entame
+      ? t("Reprendre la présentation", "Resume the presentation")
+      : t("Présentation automatique", "Automatic presentation")
   const R = 24
   const C = 2 * Math.PI * R
 
@@ -827,7 +929,7 @@ export function PresentationAuto() {
         {narration ? (
           <>
             <p className="pa__etape">
-              {fin ? "Terminé" : `Étape ${narration.n} / ${narration.total}`} · {narration.titre}
+              {fin ? t("Terminé", "Done") : `${t("Étape", "Step")} ${narration.n} / ${narration.total}`} · {narration.titre}
             </p>
             <p className="pa__phrase">{narration.phrase}</p>
           </>
@@ -836,17 +938,19 @@ export function PresentationAuto() {
 
       <div className="pa__rang">
         <div className="pa__invite" data-on={invite ? "1" : "0"} role="status" aria-hidden={invite ? undefined : true}>
-          <button className="pa__invite-x" onClick={fermerInvite} aria-label="Fermer l'invitation" tabIndex={invite ? 0 : -1}>
+          <button className="pa__invite-x" onClick={fermerInvite} aria-label={t("Fermer l'invitation", "Close the invitation")} tabIndex={invite ? 0 : -1}>
             <X size={14} />
           </button>
-          <p className="pa__invite-k">Visite guidée</p>
-          <p className="pa__invite-t">Envie que je vous présente les projets ? Je vous guide pas à pas, à partir d&apos;ici.</p>
+          <p className="pa__invite-k">{t("Visite guidée", "Guided tour")}</p>
+          <p className="pa__invite-t">
+            {t("Envie que je vous présente les projets ? Je vous guide pas à pas, à partir d'ici.", "Want me to walk you through the projects? I'll guide you step by step, from here.")}
+          </p>
           <div className="pa__invite-a">
             <button className="pa__invite-go" onClick={basculer} tabIndex={invite ? 0 : -1}>
-              <Play size={13} fill="currentColor" /> Lancer la visite
+              <Play size={13} fill="currentColor" /> {t("Lancer la visite", "Start the tour")}
             </button>
             <button className="pa__invite-non" onClick={fermerInvite} tabIndex={invite ? 0 : -1}>
-              Plus tard
+              {t("Plus tard", "Later")}
             </button>
           </div>
         </div>
@@ -855,7 +959,7 @@ export function PresentationAuto() {
             className="pa__pill"
             data-mode="retour"
             data-actif={manoeuvre === "retour" ? "1" : "0"}
-            aria-label="Retour arrière : maintenir enfoncé"
+            aria-label={t("Retour arrière : maintenir enfoncé", "Rewind: hold down")}
             onPointerDown={(e) => {
               e.currentTarget.setPointerCapture?.(e.pointerId)
               debutRetour()
@@ -872,14 +976,14 @@ export function PresentationAuto() {
             onContextMenu={(e) => e.preventDefault()}
           >
             <Rewind size={14} fill="currentColor" />
-            <span>Retour</span>
-            <small>maintenir</small>
+            <span>{t("Retour", "Rewind")}</span>
+            <small>{t("maintenir", "hold")}</small>
           </button>
           <button
             className="pa__pill"
             data-mode="avance"
             data-actif={manoeuvre === "avance" ? "1" : "0"}
-            aria-label="Avance rapide ×2 : maintenir enfoncé"
+            aria-label={t("Avance rapide ×2 : maintenir enfoncé", "Fast forward ×2: hold down")}
             onPointerDown={(e) => {
               e.currentTarget.setPointerCapture?.(e.pointerId)
               debutAvance()
@@ -897,9 +1001,9 @@ export function PresentationAuto() {
           >
             <FastForward size={14} fill="currentColor" />
             <span>×2</span>
-            <small>maintenir</small>
+            <small>{t("maintenir", "hold")}</small>
           </button>
-          <button className="pa__recom" onClick={recommencer} aria-label="Recommencer la présentation depuis le début" title="Recommencer">
+          <button className="pa__recom" onClick={recommencer} aria-label={t("Recommencer la présentation depuis le début", "Restart the presentation from the beginning")} title={t("Recommencer", "Restart")}>
             <RotateCcw size={16} />
           </button>
         </div>
@@ -923,8 +1027,8 @@ export function PresentationAuto() {
           data-on={son ? "1" : "0"}
           onClick={basculerSon}
           aria-pressed={son}
-          aria-label={son ? "Couper le son (voix et musique)" : "Activer le son (voix et musique)"}
-          title={son ? "Voix et musique : activées" : "Voix et musique : coupées"}
+          aria-label={son ? t("Couper le son (voix et musique)", "Mute sound (voice and music)") : t("Activer le son (voix et musique)", "Turn sound on (voice and music)")}
+          title={son ? t("Voix et musique : activées", "Voice and music: on") : t("Voix et musique : coupées", "Voice and music: off")}
         >
           {son ? <Volume2 size={13} /> : <VolumeX size={13} />}
         </button>

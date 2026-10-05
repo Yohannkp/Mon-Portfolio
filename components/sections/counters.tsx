@@ -2,15 +2,17 @@
 
 import { useEffect, useRef } from "react"
 import { NB_PHARES } from "@/lib/dossiers"
+import { useT } from "@/lib/langue"
 
 const CHIFFRES = [
-  { valeur: 23, suffixe: "", libelle: "Dépôts actifs" },
-  { valeur: 2, suffixe: "", libelle: "Stages en entreprise" },
-  { valeur: NB_PHARES, suffixe: "", libelle: "Projets en vitrine" },
-  { valeur: 100, suffixe: " %", libelle: "Exécution locale" },
+  { valeur: 23, suffixe: "", fr: "Dépôts actifs", en: "Active repositories" },
+  { valeur: 2, suffixe: "", fr: "Stages en entreprise", en: "Company internships" },
+  { valeur: NB_PHARES, suffixe: "", fr: "Projets en vitrine", en: "Featured projects" },
+  { valeur: 100, suffixe: " %", fr: "Exécution locale", en: "Local execution" },
 ]
 
 export function Counters() {
+  const t = useT()
   const racine = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -65,16 +67,16 @@ export function Counters() {
   return (
     <section id="sec-chiffres" className="border-t border-border/40">
       <div className="mx-auto max-w-6xl px-6 py-24">
-        <p className="rag__kicker">En chiffres</p>
-        <h2 className="rag__h2">Ce qui existe vraiment</h2>
+        <p className="rag__kicker">{t("En chiffres", "By the numbers")}</p>
+        <h2 className="rag__h2">{t("Ce qui existe vraiment", "What really exists")}</h2>
         <div className="compteurs" ref={racine}>
           {CHIFFRES.map((c) => (
-            <div className="compteur" key={c.libelle}>
+            <div className="compteur" key={c.fr}>
               <b data-valeur={c.valeur} data-suffixe={c.suffixe}>
                 {c.valeur}
                 {c.suffixe}
               </b>
-              <span>{c.libelle}</span>
+              <span>{t(c.fr, c.en)}</span>
             </div>
           ))}
         </div>

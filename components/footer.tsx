@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Github, Linkedin, Mail } from "lucide-react"
 import { EMAIL } from "@/lib/contact"
+import { T } from "@/components/t"
 
 const socialLinks = [
   { name: "GitHub", href: "https://github.com/Yohannkp", icon: Github },
@@ -16,7 +17,7 @@ export function Footer() {
           <div className="flex flex-col items-center gap-2 md:items-start">
             <span className="text-sm font-medium">Yendi Yohann</span>
             <span className="text-sm text-muted-foreground">
-              Élève ingénieur Big Data &amp; IA — ECE Paris
+              <T fr={<>Élève ingénieur Big Data &amp; IA — ECE Paris</>} en={<>Big Data &amp; AI engineering student — ECE Paris</>} />
             </span>
           </div>
 
@@ -37,13 +38,17 @@ export function Footer() {
         </div>
 
         <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-border/40 pt-8 text-sm text-muted-foreground md:flex-row">
-          <p>&copy; {new Date().getFullYear()} Yendi Yohann. Tous droits réservés.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Yendi Yohann. <T fr="Tous droits réservés." en="All rights reserved." />
+          </p>
           <div className="flex items-center gap-1">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
             </span>
-            <span className="ml-2">Disponible pour opportunités</span>
+            <span className="ml-2">
+              <T fr="Disponible pour opportunités" en="Open to opportunities" />
+            </span>
           </div>
         </div>
       </div>

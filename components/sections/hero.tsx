@@ -6,9 +6,13 @@ import { ArrowRight, Download } from "lucide-react"
 import type { EasingParam } from "animejs"
 import { Button } from "@/components/ui/button"
 import { CV_URL } from "@/lib/contact"
+import { useT } from "@/lib/langue"
 
 const TITRE_1 = "MLOps & Machine Learning Engineering"
-const TITRE_2 = "J'affine des modèles, je les mets en production, et je sais prouver qu'ils marchent."
+const TITRE_2 = {
+  fr: "J'affine des modèles, je les mets en production, et je sais prouver qu'ils marchent.",
+  en: "I fine-tune models, I put them into production, and I can prove they work.",
+}
 
 /** Decoupe une phrase en mots enveloppes, pour les animer un par un. */
 function Mots({ texte, className }: { texte: string; className?: string }) {
@@ -26,6 +30,7 @@ function Mots({ texte, className }: { texte: string; className?: string }) {
 
 export function Hero() {
   const racine = React.useRef<HTMLElement>(null)
+  const t = useT()
 
   React.useEffect(() => {
     const el = racine.current
@@ -83,35 +88,36 @@ export function Hero() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
               </span>
-              Stage de 4 à 6 mois — à partir d&apos;avril 2027
+              {t("Stage de 4 à 6 mois — à partir d'avril 2027", "4–6 month internship — starting April 2027")}
             </span>
           </div>
 
           <h1 className="max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-balance sm:text-4xl md:text-5xl lg:text-6xl">
             <Mots texte={TITRE_1} />
-            <Mots texte={TITRE_2} className="mt-2 block text-2xl font-semibold text-muted-foreground sm:text-4xl md:text-5xl lg:text-6xl" />
+            <Mots texte={t(TITRE_2.fr, TITRE_2.en)} className="mt-2 block text-2xl font-semibold text-muted-foreground sm:text-4xl md:text-5xl lg:text-6xl" />
           </h1>
 
           <p data-apres className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl">
-            Élève ingénieur Big Data &amp; IA à l&apos;ECE Paris. Ce qui m&apos;intéresse est la chaîne complète :
-            affiner un modèle, le servir derrière une API, le conteneuriser et le déployer de façon reproductible. Deux
-            stages en développement, dont un en Go sur un système déjà en production.
+            {t(
+              "Élève ingénieur Big Data & IA à l'ECE Paris. Ce qui m'intéresse est la chaîne complète : affiner un modèle, le servir derrière une API, le conteneuriser et le déployer de façon reproductible. Deux stages en développement, dont un en Go sur un système déjà en production.",
+              "Big Data & AI engineering student at ECE Paris. What interests me is the full chain: fine-tuning a model, serving it behind an API, containerising it and deploying it reproducibly. Two development internships, one of them in Go on a system already in production.",
+            )}
           </p>
 
           <div data-apres className="flex flex-wrap gap-4">
             <Button asChild size="lg" className="gap-2">
               <Link href="/projects">
-                Voir mes projets
+                {t("Voir mes projets", "See my projects")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="gap-2 bg-transparent">
-              <Link href="/contact">Me contacter</Link>
+              <Link href="/contact">{t("Me contacter", "Contact me")}</Link>
             </Button>
             <Button asChild variant="ghost" size="lg" className="gap-2">
               <a href={CV_URL} download>
                 <Download className="h-4 w-4" />
-                Télécharger mon CV
+                {t("Télécharger mon CV", "Download my CV (in French)")}
               </a>
             </Button>
           </div>
