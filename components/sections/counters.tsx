@@ -8,7 +8,8 @@ const CHIFFRES = [
   { valeur: 23, suffixe: "", fr: "Dépôts actifs", en: "Active repositories" },
   { valeur: 2, suffixe: "", fr: "Stages en entreprise", en: "Company internships" },
   { valeur: NB_PHARES, suffixe: "", fr: "Projets en vitrine", en: "Featured projects" },
-  { valeur: 100, suffixe: " %", fr: "Exécution locale", en: "Local execution" },
+  // Vrai pour RAG-Local seulement : ApplyFlow, Salifort ou MiniSearch sont heberges en ligne.
+  { valeur: 100, suffixe: " %", fr: "RAG-Local, sans cloud", en: "RAG-Local, no cloud" },
 ]
 
 export function Counters() {

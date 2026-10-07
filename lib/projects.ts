@@ -29,7 +29,7 @@ export const projects: Project[] = [
     name: "Le Bon Coin — clone MERN",
     pitch: "Plateforme de petites annonces : authentification, CRUD complet et autorisation par propriétaire.",
     description: "Une application de petites annonces construite de bout en bout : un backend Express structuré en contrôleurs, modèles, routes et middleware, une authentification par jeton, et une interface React publiée sur GitHub Pages. Les règles d'accès sont vérifiées par des tests automatisés à chaque modification.",
-    image: "/projects/leboncoin.png",
+    image: "/projects/leboncoin.jpg",
     tags: ["Fullstack", "MERN", "Authentification", "CRUD"],
     stack: {
       frontend: ["React", "JavaScript"],
@@ -60,7 +60,7 @@ export const projects: Project[] = [
       "Masquer un bouton ne protège rien : une règle d'accès n'existe que si l'API la vérifie, et qu'un test le prouve",
       "Un backend découpé en contrôleurs, modèles et middleware reste lisible quand le projet grossit",
     ],
-    screenshots: ["/projects/leboncoin.png"],
+    screenshots: ["/projects/leboncoin.jpg"],
   },
   {
     slug: "applyflow",
@@ -106,7 +106,7 @@ export const projects: Project[] = [
     name: "Recommandation de films",
     pitch: "Moteur de recommandation de films propulsé par Neo4j et FastAPI.",
     description: "Plus qu'une simple base de données, ce projet exploite la puissance des graphes pour révéler les connexions cachées entre films. Utilise des algorithmes de similarité pour offrir des recommandations contextuelles ultra-rapides.",
-    image: "/projects/movie_database.png",
+    image: "/projects/movie_database.jpg",
     tags: ["Graph DB", "Recommendation Engine", "FastAPI", "Neo4j"],
     stack: {
       frontend: ["React", "Vite", "TypeScript", "Zustand"],
@@ -142,14 +142,14 @@ export const projects: Project[] = [
       "Gestion des états de chargement et d'erreurs pour une UX optimale",
       "Configuration CORS et sécurisation des API",
     ],
-    screenshots: ["/projects/movie_database.png"],
+    screenshots: ["/projects/movie_database.jpg"],
   },
   {
     slug: "cloudus-api",
     name: "CloudUs — API de gestion de fichiers",
     pitch: "API REST sécurisée pour la gestion de fichiers et d'espace de stockage cloud.",
     description: "API REST complète développée avec Symfony pour gérer les fichiers et l'espace de stockage. Authentification JWT sécurisée, gestion des rôles (Admin/User), système d'achat d'espace et génération automatique de factures PDF.",
-    image: "/projects/api_gestion_fichier.png",
+    image: "/projects/api_gestion_fichier.jpg",
     tags: ["Symfony", "PHP", "JWT", "API REST", "MySQL"],
     stack: {
       frontend: [],
@@ -186,7 +186,7 @@ export const projects: Project[] = [
       "Génération de documents PDF et envoi d'emails",
       "Conception de dashboards administratifs",
     ],
-    screenshots: ["/projects/api_gestion_fichier.png"],
+    screenshots: ["/projects/api_gestion_fichier.jpg"],
   },
   {
     slug: "minisearch",

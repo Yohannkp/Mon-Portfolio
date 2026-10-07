@@ -208,7 +208,7 @@ export const DOSSIERS: Dossier[] = [
     chiffre: { valeur: "0,94", unite: "d'AUC sur le jeu de test, sans le taux de satisfaction" },
     prouve: ["Interpréter un modèle", "Éviter la fuite de données", "Livrer de bout en bout"],
     stack: ["Random Forest", "Scikit-learn", "FastAPI", "Streamlit", "Power BI"],
-    depot: "https://github.com/Yohannkp/Projet-Salifort-Motors.",
+    depot: "https://github.com/Yohannkp/Projet-Salifort-Motors",
     demo: "https://projet-salifort-motors-app.streamlit.app/",
     phare: { rang: 8, titre: "Un modèle sans fuite, livré jusqu'au bout", question: "Sait-il mener une analyse RH jusqu'à un outil utilisable ?" },
     image: "/projects/Prédiction du départ des Employés avec le Machine Learning.png",
@@ -256,7 +256,7 @@ export const DOSSIERS: Dossier[] = [
     stack: ["Node.js", "Express", "JWT", "bcrypt", "MongoDB", "React"],
     depot: "https://github.com/Yohannkp/React-MERN-Project",
     fiche: "/projects/leboncoin-mern",
-    image: "/projects/leboncoin.png",
+    image: "/projects/leboncoin.jpg",
     phare: { rang: 5, titre: "Chaque annonce protégée de son auteur", question: "Sait-il sécuriser un backend ?" },
   },
   {
@@ -283,7 +283,7 @@ export const DOSSIERS: Dossier[] = [
     stack: ["Neo4j", "FastAPI", "React", "Docker Compose"],
     depot: "https://github.com/fayesarah555/movies-webapp",
     fiche: "/projects/movies-database",
-    image: "/projects/movie_database.png",
+    image: "/projects/movie_database.jpg",
   },
   {
     slug: "cloudus-api",
@@ -296,7 +296,7 @@ export const DOSSIERS: Dossier[] = [
     stack: ["Symfony", "PHP", "JWT", "MySQL"],
     depot: "https://github.com/Batyeste/CloudUs",
     fiche: "/projects/cloudus-api",
-    image: "/projects/api_gestion_fichier.png",
+    image: "/projects/api_gestion_fichier.jpg",
   },
   {
     slug: "minisearch",

@@ -2,6 +2,15 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { T } from "@/components/t"
+import type { Metadata } from "next"
+
+// Sans cela, la 404 reprendrait le titre de l'accueil et une adresse canonique en « /_not-found ».
+export const metadata: Metadata = {
+  title: "Page introuvable",
+  robots: { index: false, follow: true },
+  alternates: { canonical: null },
+  openGraph: null,
+}
 
 export default function NotFound() {
   return (

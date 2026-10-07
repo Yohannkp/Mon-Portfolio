@@ -1063,7 +1063,12 @@ const TOUS_ATTRS = ["data-robot-vise", "data-robot-invite", "data-lu", "data-pre
     const image = (now: number) => {
       const dt = Math.min(now - dernierTemps, 64)
       dernierTemps = now
-      if (!actif()) return
+      if (!actif()) {
+        // Passe sous 1281 px en pleine colere (fenetre retrecie, tablette tournee) : la sequence ne peut plus aller
+        // jusqu'a son terme, c'est donc ici qu'il faut rendre le defilement, sinon la page resterait bloquee.
+        if (R.etat === "joue") finRage()
+        return
+      }
       N.vitesse = N.vitesse * 0.9 + N.brut * 0.01
       N.brut = 0
       N.dy = N.dy * 0.85 + N.dyBrut * 0.15

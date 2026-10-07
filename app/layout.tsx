@@ -29,18 +29,16 @@ export const metadata: Metadata = {
   keywords: ['MLOps', 'machine learning engineering', 'data engineering', 'Python', 'SQL', 'Go', 'Docker', 'PyTorch', 'FastAPI', 'fine-tuning LLM', 'ECE Paris'],
   authors: [{ name: 'Yendi Yohann' }],
   creator: 'Yendi Yohann',
+  // Ni titre ni description ici : Next reprend ceux de chaque page, et l'adresse './' se resout page par page.
+  // Sinon, un lien vers /about ou un projet partage sur LinkedIn afficherait l'apercu de l'accueil.
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: SITE_URL,
-    title: 'Yendi Yohann | MLOps & Machine Learning Engineering',
-    description: "Élève ingénieur Big Data & IA à l'ECE Paris. J'affine des modèles et je les mets en production : pipelines de données, APIs, conteneurisation, déploiement continu.",
+    url: './',
     siteName: 'Yendi Yohann — Portfolio',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Yendi Yohann | MLOps & Machine Learning Engineering',
-    description: "Élève ingénieur Big Data & IA à l'ECE Paris. J'affine des modèles et je les mets en production : pipelines de données, APIs, conteneurisation, déploiement continu.",
   },
   robots: {
     index: true,
