@@ -1,0 +1,132 @@
+/*
+ * Les etudes de cas des projets ML (components/pages/etude-contenu.tsx, components/etude/visuels.tsx).
+ * Importee par la page elle-meme : elle ne pese que sur les pages qui s'en servent.
+ * Graphiques : l'accent pour ce dont parle le texte, le gris pour le contexte ; barres fines, chaque valeur ecrite.
+ */
+
+.et { max-width: 60rem; margin: 0 auto; padding: 6rem 1.5rem; }
+.et__retour { display: inline-flex; align-items: center; gap: .5rem; font-size: .875rem; color: var(--muted-foreground); transition: color .2s; }
+.et__retour:hover { color: var(--foreground); }
+
+.et__tete { margin-top: 2.5rem; }
+.et__h1 { font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight: 600; line-height: 1.08; letter-spacing: -.035em; }
+.et__question { margin-top: .9rem; font-size: 1.05rem; font-style: italic; color: var(--accent); }
+.et__pitch { max-width: 62ch; margin-top: 1rem; font-size: 1.15rem; line-height: 1.6; color: var(--muted-foreground); }
+.et__prouve { margin-top: 1.4rem; }
+.et__liens { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
+.et__stack { margin-top: 1rem; }
+
+/* Les chiffres de tete : le nombre d'abord, puis ce qu'il mesure. */
+.et__chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); margin-top: 3rem;
+  border: 1px solid var(--border); border-radius: 14px; background: var(--card); overflow: hidden; }
+.et__chiffre { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: .55rem; padding: 1.4rem 1.5rem;
+  border-right: 1px solid var(--border); }
+.et__chiffre:last-child { border-right: 0; }
+.et__chiffre dd { font-size: clamp(1.7rem, 3.4vw, 2.3rem); font-weight: 600; line-height: 1.05; letter-spacing: -.03em; }
+.et__chiffre dt { font-size: .85rem; line-height: 1.5; color: var(--muted-foreground); }
+@media (max-width: 720px) {
+  .et__chiffre { border-right: 0; border-bottom: 1px solid var(--border); }
+  .et__chiffre:last-child { border-bottom: 0; }
+}
+
+/* Sommaire : une ligne de liens numerotes, comme les axes de /projects. */
+.et__sommaire { margin-top: 2.5rem; }
+.et__sommaire ol { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.et__sommaire a { display: inline-flex; align-items: center; gap: .45rem; padding: .45rem .85rem; border: 1px solid var(--border);
+  border-radius: 999px; font-size: .85rem; color: var(--muted-foreground); transition: color .2s, border-color .2s; }
+.et__sommaire a:hover, .et__sommaire a:focus-visible { color: var(--foreground); border-color: color-mix(in oklch, var(--accent) 60%, transparent); }
+.et__sommaire span { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 12px; color: var(--accent); }
+
+.et__section { margin-top: 4.5rem; scroll-margin-top: 6rem; }
+.et__h2 { display: flex; align-items: baseline; gap: .85rem; font-size: clamp(1.45rem, 3vw, 1.9rem); font-weight: 600; line-height: 1.2; letter-spacing: -.025em; }
+.et__n { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: .95rem; font-weight: 500; color: var(--accent); }
+.et__texte { max-width: 66ch; }
+.et__texte p { margin-top: 1rem; line-height: 1.75; color: var(--muted-foreground); }
+.et__points, .et__autrement { display: grid; gap: .7rem; margin-top: 1.2rem; padding: 0; list-style: none; }
+.et__points li, .et__autrement li { position: relative; padding-left: 1.3rem; line-height: 1.65; color: var(--muted-foreground); }
+.et__points li::before, .et__autrement li::before { content: ""; position: absolute; left: 0; top: .68em; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--accent); }
+.et__autrement { max-width: 66ch; }
+
+.et__source { display: flex; align-items: center; gap: .4rem; margin-top: 1.1rem; font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 12px; color: var(--muted-foreground); }
+.et__source a { color: var(--foreground); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 3px; }
+.et__source a:hover { text-decoration-color: var(--accent); }
+
+.et__pied { margin-top: 5rem; padding: 2rem; border: 1px solid var(--border); border-radius: 14px; background: var(--card); text-align: center; }
+.et__pied p { font-size: 1.1rem; font-weight: 500; }
+.et__pied .et__liens { justify-content: center; }
+.et__suivante { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.25rem; padding: 1.25rem;
+  border: 1px solid var(--border); border-radius: 14px; transition: border-color .2s; }
+.et__suivante:hover { border-color: color-mix(in oklch, var(--accent) 50%, transparent); }
+.et__suivante-k { display: block; font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
+.et__suivante-nom { display: block; margin-top: .25rem; font-weight: 600; }
+
+/* ------------------------------------------------------------------ Figures */
+
+.et-fig { margin-top: 2rem; padding: 1.4rem 1.5rem 1.5rem; border: 1px solid var(--border); border-radius: 14px; background: var(--card); }
+.et-fig__titre { margin-bottom: 1.2rem; font-size: .95rem; font-weight: 600; line-height: 1.4; }
+
+/* Barres horizontales : etiquette | piste | valeur. Barre fine, bout arrondi, base carree. */
+.et-barres { display: grid; gap: .55rem; margin: 0; padding: 0; list-style: none; }
+.et-barres__ligne { display: grid; grid-template-columns: minmax(9rem, 15rem) minmax(0, 1fr) 4.6rem; align-items: center; gap: .9rem;
+  padding: .3rem .4rem; margin: 0 -.4rem; border-radius: 8px; transition: background .15s; }
+.et-barres__ligne:hover { background: color-mix(in oklch, var(--foreground) 4%, transparent); }
+.et-barres__label { font-size: .875rem; line-height: 1.35; color: var(--muted-foreground); }
+.et-barres__ligne[data-accent="1"] .et-barres__label { color: var(--foreground); }
+.et-barres__piste { position: relative; height: 14px; }
+.et-barres__piste::before { content: ""; position: absolute; inset: 6px 0; border-radius: 2px; background: var(--border); opacity: .55; }
+.et-barres__barre { position: relative; display: block; height: 100%; border-radius: 0 4px 4px 0;
+  background: color-mix(in oklch, var(--muted-foreground) 55%, transparent); }
+.et-barres__ligne[data-accent="1"] .et-barres__barre { background: var(--accent); }
+.et-barres__valeur { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
+.et-barres__valeur small { font-size: 11px; color: var(--muted-foreground); }
+@media (max-width: 600px) {
+  .et-barres__ligne { grid-template-columns: minmax(0, 1fr) 4.2rem; row-gap: .35rem; }
+  .et-barres__label { grid-column: 1 / -1; }
+}
+
+/* Matrice de confusion : l'accent pour les bonnes predictions, le gris pour les erreurs (le nombre est ecrit dans la case). */
+.et-matrice { display: grid; grid-template-columns: minmax(5.5rem, auto) 1fr 1fr; gap: 4px; max-width: 34rem; }
+.et-matrice__ligne { display: contents; }
+.et-matrice__tete { align-self: end; padding: 0 .2rem .35rem; font-size: 12px; color: var(--muted-foreground); }
+.et-matrice__tete--ligne { align-self: center; padding: 0 .6rem 0 0; }
+.et-matrice__case { display: grid; gap: .2rem; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent);
+  background: color-mix(in oklch, var(--accent) 14%, transparent); }
+.et-matrice__case[data-juste="0"] { border-left-color: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
+  background: color-mix(in oklch, var(--muted-foreground) 10%, transparent); }
+.et-matrice__case b { font-size: 1.5rem; font-weight: 600; letter-spacing: -.02em; }
+.et-matrice__case span { font-size: 12px; color: var(--muted-foreground); }
+.et-matrice__bilan { margin-top: 1rem; font-size: 13px; color: var(--muted-foreground); }
+.et-matrice__bilan b { color: var(--foreground); font-weight: 600; }
+
+/* Pipeline : des etapes numerotees, reliees par un trait. */
+.et-pipe { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: .75rem; margin: 0; padding: 0; list-style: none; }
+.et-pipe__etape { position: relative; display: flex; flex-direction: column; gap: .4rem; padding: 1rem; border: 1px solid var(--border);
+  border-radius: 10px; background: var(--background); }
+.et-pipe__etape:not(:last-child)::after { content: ""; position: absolute; top: 1.55rem; right: calc(-.75rem - 1px); width: .75rem; height: 1px;
+  background: color-mix(in oklch, var(--accent) 70%, transparent); }
+.et-pipe__n { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 12px; color: var(--accent); }
+.et-pipe__etape b { font-size: .95rem; font-weight: 600; }
+.et-pipe__detail { font-size: .85rem; line-height: 1.55; color: var(--muted-foreground); }
+.et-pipe__tech { width: fit-content; max-width: 100%; margin-top: auto; overflow-wrap: anywhere; padding: .15rem .45rem; border-radius: 5px; background: var(--secondary);
+  font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11.5px; color: var(--foreground); }
+@media (max-width: 760px) {
+  .et-pipe { grid-template-columns: 1fr; }
+  .et-pipe__etape:not(:last-child)::after { top: auto; bottom: calc(-.75rem - 1px); right: auto; left: 1.6rem; width: 1px; height: .75rem; }
+}
+
+/* Tableaux */
+.et-table__boite { overflow-x: auto; }
+.et-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.et-table th, .et-table td { padding: .6rem .75rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+.et-table thead th { font-size: 12px; font-weight: 500; color: var(--muted-foreground); }
+.et-table tbody th { font-weight: 500; }
+.et-table td { color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+.et-table tbody tr:last-child th, .et-table tbody tr:last-child td { border-bottom: 0; }
+
+@media (max-width: 600px) {
+  .et-fig { padding: 1.1rem 1rem 1.2rem; }
+  .et-table { font-size: .82rem; }
+  .et-table th, .et-table td { padding: .5rem .45rem; }
+}

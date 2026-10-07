@@ -193,7 +193,7 @@ export const projects: Project[] = [
     name: "MiniSearch — moteur de recherche interne",
     pitch: "Moteur de recherche haute performance avec full-text search, filtres dynamiques et ranking avancé construit avec React, TypeScript et Supabase.",
     description: "Plateforme de recherche documentaire avancée avec support multilingue (FR/EN), full-text search natif PostgreSQL, scoring intelligent avec décomposition des scores, filtrage dynamique par catégories, sources, langues, tags et dates. Interface responsive moderne avec composants Shadcn/ui.",
-    image: "/projects/MiniSearch.png",
+    image: "/projects/minisearch.jpg",
     tags: ["React", "TypeScript", "Supabase", "PostgreSQL", "Tailwind CSS"],
     stack: {
       frontend: ["React 18.3", "TypeScript", "Vite", "React Router", "TanStack Query", "Tailwind CSS", "Shadcn/ui", "React Hook Form", "Lucide React"],
@@ -236,7 +236,7 @@ export const projects: Project[] = [
       "Optimisation des performances avec code splitting et tree shaking Vite",
       "Testing avec Vitest et React Testing Library",
     ],
-    screenshots: ["/projects/MiniSearch.png"],
+    screenshots: ["/projects/minisearch.jpg"],
   },
 ]
 

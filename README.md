@@ -12,7 +12,7 @@ Le site cherche un stage de 4 à 6 mois à partir d'avril 2027.
 | --- | --- |
 | `/` | Page d'accueil : l'essentiel du parcours, dans l'ordre décrit ci-dessous |
 | `/projects` | Les 17 projets, classés par ce qu'ils démontrent (voir ci-dessous). `/data-projects` y redirige |
-| `/projects/[slug]` | Étude de cas détaillée des applications (problème, solution, défis, apprentissages) |
+| `/projects/[slug]` | Étude de cas détaillée : pour les applications (problème, solution, défis, apprentissages), et pour les quatre projets ML phares, RAG-Local, Mina-Translator, SELF_DEV_AGENT et Salifort Motors (données, méthode, graphiques des résultats mesurés, sources dans les dépôts, ce que je ferais autrement) |
 | `/about` | Parcours (dont les stages), ce que je recherche, valeurs |
 | `/contact` | Formulaire de contact et coordonnées |
 | `/sitemap.xml`, `/robots.txt`, image d'aperçu | Générés au build : plan du site, indexation, et image affichée quand on partage le lien |
@@ -102,7 +102,7 @@ Le code est dans `components/objet-3d.tsx` (les scènes) et dans la fin de `app/
 
 Une liste de technologies ne dit pas pourquoi un projet compte. Chaque projet est donc décrit par un **dossier** (`lib/dossiers.ts`) : le problème posé, ce qui a été fait, ce que cela démontre, et **une preuve chiffrée quand elle existe**.
 
-- **Aucun chiffre inventé.** Chaque valeur vient d'un projet documenté (360 paires, AUC 0,88, 85 % de précision, +15 % de rotation des stocks, 0 requête sortante…). Un projet sans chiffre n'en reçoit pas : il a un enjeu et un résultat.
+- **Aucun chiffre inventé.** Chaque valeur vient d'un projet documenté (7,8 % de lignes signalées par l'audit du corpus mina, AUC 0,88, 85 % de précision, +15 % de rotation des stocks, 0 requête sortante…). Un projet sans chiffre n'en reçoit pas : il a un enjeu et un résultat.
 - **Sur l'accueil**, huit projets phares sont des études de cas. Chacun répond à une question de recruteur (« Peut-il livrer un système d'IA sans exposer les données ? »), avec un schéma qui illustre l'idée (`components/glyphes.tsx`). Le schéma est une illustration, jamais une mesure.
 - **Sur `/projects`**, un bandeau réunit les huit preuves chiffrées, puis les 17 projets sont classés en quatre axes : mettre des modèles en production, affiner et entraîner, mesurer et prouver, construire des applications. Un sommaire collant suit l'axe lu. Il remplace l'ancien mur de filtres techniques.
 
@@ -231,10 +231,11 @@ lib/
   contact.ts            l'adresse e-mail et le lien du message (formulaire, page Contact, pied de page)
   dossiers.ts           les projets : enjeu, résultat, preuve chiffrée, axe (source unique de l'accueil et de /projects)
   projects.ts           le détail des études de cas des applications (/projects/[slug])
+  etudes.ts             les études de cas des projets ML, textes [fr, en] et chiffres sourcés (/projects/[slug])
 public/                 images et icônes
 ```
 
-Pour ajouter un projet, on ajoute un dossier dans `lib/dossiers.ts` : il apparaît dans son axe sur `/projects`, et sur l'accueil s'il porte un `phare`. Une étude de cas détaillée s'ajoute en plus dans `lib/projects.ts`, et se relie par le champ `fiche`.
+Pour ajouter un projet, on ajoute un dossier dans `lib/dossiers.ts` : il apparaît dans son axe sur `/projects`, et sur l'accueil s'il porte un `phare`. Une étude de cas détaillée s'ajoute en plus, et se relie par le champ `fiche` : dans `lib/projects.ts` pour une application (problème, solution, fonctionnalités), dans `lib/etudes.ts` pour un projet ML (données, méthode, graphiques des résultats mesurés, ce que je ferais autrement ; chaque section cite le fichier du dépôt d'où viennent ses chiffres).
 
 ## Licence
 

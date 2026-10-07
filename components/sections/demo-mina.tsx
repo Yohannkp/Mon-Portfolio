@@ -24,8 +24,8 @@ const ETAPES: EtapeT[] = [
   {
     titre: ["Un corpus à construire", "A corpus to build"],
     texte: [
-      "Faute de corpus, j'en ai généré un, puis un script a audité chaque ligne : 360 paires exploitables sur 500, sur 7 domaines.",
-      "With no corpus, I generated one, then a script audited every line: 360 usable pairs out of 500, across 7 domains.",
+      "Faute de corpus, j'en ai construit, puis un script a audité chaque ligne : le corpus final garde 360 paires sur 7 domaines.",
+      "With no corpus, I built some, then a script audited every line: the final corpus keeps 360 pairs across 7 domains.",
     ],
     humeur: "concentre",
     attente: 1800,
@@ -33,8 +33,8 @@ const ETAPES: EtapeT[] = [
   {
     titre: ["Affiner un petit modèle", "Fine-tuning a small model"],
     texte: [
-      "Avec ces paires, j'affine Qwen2-0.5B en QLoRA 4 bits : le modèle reste petit, seule une couche d'adaptation est apprise.",
-      "With these pairs, I fine-tune Qwen2-0.5B with 4-bit QLoRA: the model stays small, only an adaptation layer is learned.",
+      "J'affine Qwen2-0.5B en QLoRA 4 bits : le modèle reste petit, seule une couche d'adaptation est apprise.",
+      "I fine-tune Qwen2-0.5B with 4-bit QLoRA: the model stays small, only an adaptation layer is learned.",
     ],
     humeur: "curieux",
     attente: 800,
@@ -70,8 +70,8 @@ const ETAPES: EtapeT[] = [
   {
     titre: ["Ce qui compte", "What matters"],
     texte: [
-      "La chaîne fait parole, texte, traduction. Mais c'est le corpus de 360 paires qui rend la traduction possible.",
-      "The chain does speech, text, translation. But it's the 360-pair corpus that makes the translation possible.",
+      "La chaîne fait parole, texte, traduction. Mais c'est la qualité du corpus qui décide de celle de la traduction.",
+      "The chain does speech, text, translation. But it's the quality of the corpus that decides the quality of the translation.",
     ],
     humeur: "content",
   },

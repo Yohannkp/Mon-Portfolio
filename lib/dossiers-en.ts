@@ -57,8 +57,8 @@ export const DOSSIERS_EN: Record<string, Surcharge> = {
     role: "French ↔ Mina translation",
     enjeu: "Mina has no public parallel corpus: on a low-resource language, the difficulty is the data, not the training.",
     resultat:
-      "A corpus generated for the occasion then audited by script: 360 usable pairs out of 500, spread over seven domains, completed by ~19,600 Common Voice transcriptions. Qwen2-0.5B fine-tuned with 4-bit QLoRA, Whisper upstream, a FastAPI service, and a crowdsourced collection app to extend the corpus.",
-    chiffre: { valeur: "360", unite: "pairs kept after audit, out of 500 generated" },
+      "Three corpora built for the occasion, then audited by script: 68% defective lines in the machine-translated corpus, 7.8% in the final corpus of 360 pairs over seven domains. On top of that, 11 h of Common Voice recordings in Mina. Qwen2-0.5B fine-tuned with 4-bit QLoRA, Whisper upstream, a FastAPI service, and a crowdsourced collection app to extend the corpus.",
+    chiffre: { valeur: "7.8%", unite: "of lines flagged by the audit in the final corpus, against 68% in the generated one" },
     prouve: ["Fine-tuning a model", "Building the data"],
     phare: { rang: 3, titre: "A language with no corpus", question: "Can they work when the data doesn't exist?" },
   },
@@ -110,8 +110,8 @@ export const DOSSIERS_EN: Record<string, Surcharge> = {
     role: "employee retention",
     enjeu: "Identify employees at risk of leaving, and what keeps them, before they resign.",
     resultat:
-      "14,999 employees, 20% duplicates removed, then three models compared. The satisfaction score is left out of the final model to avoid leakage: the random forest still recovers 90% of actual departures without it. Delivered end to end: a Power BI dashboard, a FastAPI API deployed on Railway and a Streamlit app to test a profile.",
-    chiffre: { valeur: "0.94", unite: "AUC on the test set, without the satisfaction score" },
+      "14,999 employees, 20% duplicates removed, then three models compared. The satisfaction score is left out of the final model to avoid leakage, and 87% of its alerts are still correct. Delivered end to end: a Power BI dashboard, a FastAPI API and a Streamlit app to test a profile.",
+    chiffre: { valeur: "90%", unite: "of actual departures found on the test set, without the satisfaction score" },
     prouve: ["Interpreting a model", "Avoiding data leakage", "Delivering end to end"],
     phare: { rang: 8, titre: "A leak-free model, delivered end to end", question: "Can they take an HR analysis all the way to a usable tool?" },
   },
