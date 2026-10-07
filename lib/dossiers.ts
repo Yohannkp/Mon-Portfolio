@@ -208,7 +208,7 @@ export const DOSSIERS: Dossier[] = [
     chiffre: { valeur: "0,94", unite: "d'AUC sur le jeu de test, sans le taux de satisfaction" },
     prouve: ["Interpréter un modèle", "Éviter la fuite de données", "Livrer de bout en bout"],
     stack: ["Random Forest", "Scikit-learn", "FastAPI", "Streamlit", "Power BI"],
-    depot: "https://github.com/Yohannkp/Projet-Salifort-Motors",
+    depot: "https://github.com/Yohannkp/Projet-Salifort-Motors.",
     demo: "https://projet-salifort-motors-app.streamlit.app/",
     phare: { rang: 8, titre: "Un modèle sans fuite, livré jusqu'au bout", question: "Sait-il mener une analyse RH jusqu'à un outil utilisable ?" },
     image: "/projects/Prédiction du départ des Employés avec le Machine Learning.png",
